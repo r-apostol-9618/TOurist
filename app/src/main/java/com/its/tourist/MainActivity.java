@@ -18,9 +18,8 @@ public class MainActivity extends AppCompatActivity {
             //Aspetto 5 secondi e passo alla nuova activity
             mHandler.postDelayed(new Runnable() {
                 public void run() {
-                    BudgetFragment bf = new BudgetFragment();
                     FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                    fragmentTransaction.replace(R.id.frame_main,bf);
+                    fragmentTransaction.replace(R.id.frame_main, new BudgetFragment());
                     fragmentTransaction.addToBackStack(null);
                     fragmentTransaction.commit();
                 }

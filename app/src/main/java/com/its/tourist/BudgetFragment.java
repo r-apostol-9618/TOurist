@@ -14,8 +14,6 @@ import android.widget.Button;
 
 public class BudgetFragment extends Fragment {
 
-    private Button avanti;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -30,7 +28,7 @@ public class BudgetFragment extends Fragment {
 
         super.onViewCreated(view, savedInstanceState);
 
-        avanti = getView().findViewById(R.id.btnAvanti);
+        Button avanti = getView().findViewById(R.id.btnAvanti);
 
         avanti.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -43,4 +41,6 @@ public class BudgetFragment extends Fragment {
         });
 
     }
+
+
 }

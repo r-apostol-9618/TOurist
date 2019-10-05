@@ -15,17 +15,10 @@ import android.widget.ImageView;
 
 public class PeopleFragment extends Fragment {
 
-    private ImageView imgSingolo;
-    private ImageView imgCoppia;
-    private ImageView imgGruppo;
-
-    public PeopleFragment() {
-        // Required empty public constructor
-    }
+    public PeopleFragment() { }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_people, container, false);
     }
 
@@ -33,33 +26,23 @@ public class PeopleFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        //Gestione Singolo
-
-        //imgSingolo.setClickable(true);
-
-        imgSingolo = getView().findViewById(R.id.imgViewSingolo);
+        ImageView imgSingolo = getView().findViewById(R.id.imgViewSingolo);
         imgSingolo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 newFragment();
             }
         });
-        //Gestione Coppia
 
-        //imgCoppia.setClickable(true);
-
-        imgCoppia = getView().findViewById(R.id.imgViewCoppia);
+        ImageView imgCoppia = getView().findViewById(R.id.imgViewCoppia);
         imgCoppia.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 newFragment();
             }
         });
-        //Gestione Gruppo
 
-        //imgGruppo.setClickable(true);
-
-        imgGruppo = getView().findViewById(R.id.imgViewGruppo);
+        ImageView imgGruppo = getView().findViewById(R.id.imgViewGruppo);
         imgGruppo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

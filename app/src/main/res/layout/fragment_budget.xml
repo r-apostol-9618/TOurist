@@ -20,7 +20,7 @@
             android:layout_weight="5"
             android:gravity="center"
             android:text="Seleziona il tuo budget"
-            android:textSize="24sp"
+            android:textSize="18sp"
             android:textColor="#000" />
 
         <ImageView
@@ -41,7 +41,7 @@
             <com.jem.rubberpicker.RubberRangePicker
                 android:id="@+id/seekbar"
                 android:layout_width="match_parent"
-                android:layout_weight="5"
+                android:layout_weight="8"
                 android:layout_height="0dp"
                 app:minValue="0"
                 app:maxValue="200"

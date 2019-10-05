@@ -18,7 +18,7 @@
             android:layout_weight="10"
             android:gravity="center"
             android:text="Seleziona il numero di persone"
-            android:textSize="24sp"
+            android:textSize="18sp"
             android:textColor="#000" />
 
         <ImageView

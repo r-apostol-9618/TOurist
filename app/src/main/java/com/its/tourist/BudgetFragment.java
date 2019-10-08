@@ -11,8 +11,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
+
+import com.jem.rubberpicker.RubberRangePicker;
 
 public class BudgetFragment extends Fragment {
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -28,6 +33,22 @@ public class BudgetFragment extends Fragment {
 
         super.onViewCreated(view, savedInstanceState);
 
+        //gestione picker
+
+        RubberRangePicker rubberRangePicker = new RubberRangePicker(getContext());
+        int startThumbValue = rubberRangePicker.getCurrentStartValue();
+        int endThumbValue = rubberRangePicker.getCurrentEndValue();
+
+
+        rubberRangePicker.setCurrentStartValue(startThumbValue + 10);
+        rubberRangePicker.setCurrentEndValue(endThumbValue + 10);
+        TextView txtStart = getView().findViewById(R.id.txtSeekbarStart);
+        TextView txtEnd = getView().findViewById(R.id.txtSeekbarEnd);
+        txtStart.setText(startThumbValue+"a");
+        txtEnd.setText(endThumbValue+"b");
+
+
+        //fine gestione picker
         Button avanti = getView().findViewById(R.id.btnAvanti);
 
         avanti.setOnClickListener(new View.OnClickListener() {

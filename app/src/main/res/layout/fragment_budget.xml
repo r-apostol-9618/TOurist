@@ -18,10 +18,11 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="5"
+            android:fontFamily="@font/roboto"
             android:gravity="center"
-            android:text="Seleziona il tuo budget"
-            android:textSize="18sp"
-            android:textColor="#000" />
+            android:text="@string/seleziona_budget"
+            android:textColor="#000"
+            android:textSize="@dimen/title" />
 
         <ImageView
             android:id="@+id/imgViewPortafoglio"
@@ -45,7 +46,7 @@
                 android:layout_height="0dp"
                 app:minValue="0"
                 app:maxValue="200"
-                app:elasticBehavior="linear"
+                app:elasticBehavior="cubic"
                 app:dampingRatio="0.4"
                 app:stiffness="400"
                 app:stretchRange="36dp"
@@ -53,10 +54,10 @@
                 app:normalTrackWidth="4dp"
                 app:highlightTrackWidth="8dp"
                 app:normalTrackColor="#AAAAAA"
-                app:highlightTrackColor="#BA1F33"
-                app:highlightDefaultThumbOnTouchColor="#CD5D67"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp" />
+                app:highlightTrackColor="@color/colorPrimary"
+                app:highlightDefaultThumbOnTouchColor="@color/colorAccent"
+                android:layout_marginLeft="40sp"
+                android:layout_marginRight="40sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -72,7 +73,7 @@
                     android:gravity="center"
                     android:textSize="24sp"
                     android:textColor="#000"
-                    android:text="aaaa"/>
+                    />
 
                 <TextView
                     android:id="@+id/txtSeekbarEnd"
@@ -81,7 +82,7 @@
                     android:gravity="center"
                     android:textSize="24sp"
                     android:textColor="#000"
-                    android:text="aaaa"/>
+                    />
 
             </LinearLayout>
 
@@ -95,13 +96,14 @@
 
             <Button
                 android:id="@+id/btnAvanti"
+                style="@style/Widget.MaterialComponents.Button.Icon"
                 android:layout_width="120dp"
                 android:layout_height="60dp"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="25dp"
                 android:layout_marginTop="5dp"
-                android:text="AVANTI"
-                android:textSize="24sp" />
+                android:layout_marginBottom="25dp"
+                android:text="@string/btn_avanti"
+                android:textSize="@dimen/btn_text" />
 
             <ImageView
                 android:id="@+id/imgViewPage1"

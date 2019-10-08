@@ -17,7 +17,7 @@
             android:layout_height="0dp"
             android:layout_weight="10"
             android:gravity="center"
-            android:text="Seleziona il numero di persone"
+            android:text="@string/seleziona_persone"
             android:textSize="18sp"
             android:textColor="#000" />
 

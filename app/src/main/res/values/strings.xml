@@ -4,6 +4,18 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <!-- bottoni -->
+    <string name="btn_avanti">Avanti</string>
+
+    <!-- fragment_budget -->
+    <string name="seleziona_budget">Seleziona il tuo budget</string>
+
+    <!-- fragment_people -->
+    <string name="seleziona_persone">Seleziona il numero di persone</string>
+
+    <!-- fragment_time -->
+    <string name="seleziona_tempo">Seleziona quanto tempo hai a disposizione</string>
+
     <!-- Toolbar -->
 
     <string name="large_text">10.0</string>

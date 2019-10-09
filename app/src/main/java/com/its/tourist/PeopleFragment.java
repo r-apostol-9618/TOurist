@@ -26,6 +26,9 @@ public class PeopleFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        GlobalVariable backPeople = GlobalVariable.getInstance();
+        backPeople.setBackPeople(true);
+
         ImageView imgSingolo = getView().findViewById(R.id.imgViewSingolo);
         imgSingolo.setOnClickListener(new View.OnClickListener() {
             @Override

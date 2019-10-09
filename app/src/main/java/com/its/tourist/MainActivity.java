@@ -46,7 +46,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         final BudgetFragment fragment = (BudgetFragment) getSupportFragmentManager().findFragmentByTag("BUDJET_FRAGMENT");
-        if(fragment.allowBack()) {
+        GlobalVariable backPeople = GlobalVariable.getInstance();
+        if(fragment.allowBack() || backPeople.getBackPeople()) {
             super.onBackPressed();
         }else{
             new AlertDialog.Builder(this).setTitle("Chiudi").setMessage("Sei sicuro di voler uscire?").setPositiveButton("ESCI", new DialogInterface.OnClickListener() {

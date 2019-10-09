@@ -33,6 +33,9 @@ public class BudgetFragment extends Fragment {
 
         super.onViewCreated(view, savedInstanceState);
 
+        GlobalVariable backPeople = GlobalVariable.getInstance();
+        backPeople.setBackPeople(false);
+
         //gestione picker
 
         RubberRangePicker rubberRangePicker = new RubberRangePicker(getContext());

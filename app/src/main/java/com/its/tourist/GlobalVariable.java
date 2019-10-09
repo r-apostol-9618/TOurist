@@ -8,9 +8,11 @@ class GlobalVariable {
     }
 
     private boolean backEnable;
+    private boolean backPeople;
 
     private GlobalVariable() {
         backEnable=false;
+        backPeople=false;
     }
 
     public boolean getBackEnable(){
@@ -19,6 +21,14 @@ class GlobalVariable {
 
     public void setBackEnable(boolean back){
         backEnable=back;
+    }
+
+    public boolean getBackPeople(){
+        return backPeople;
+    }
+
+    public void setBackPeople(boolean back){
+        backPeople=back;
     }
 
 

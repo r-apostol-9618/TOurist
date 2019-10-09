@@ -19,4 +19,7 @@
     <color name="toolbar_gradient_2_noon">#ff00b0ff</color>
     <color name="toolbar_gradient_2_noon_evening">#704343</color>
 
+    <color name="nero">#000</color>
+    <color name="track_color">#AAAAAA</color>
+
 </resources>

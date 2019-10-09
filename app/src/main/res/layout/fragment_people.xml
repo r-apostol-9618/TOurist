@@ -18,8 +18,8 @@
             android:layout_weight="10"
             android:gravity="center"
             android:text="@string/seleziona_persone"
-            android:textSize="18sp"
-            android:textColor="#000" />
+            android:textSize="@dimen/title"
+            android:textColor="@color/nero" />
 
         <ImageView
             android:id="@+id/imgViewSingolo"

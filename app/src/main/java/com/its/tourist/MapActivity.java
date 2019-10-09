@@ -1,9 +1,12 @@
 package com.its.tourist;
 
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.ViewTreeObserver;
 import android.view.Window;
@@ -16,18 +19,20 @@ public class MapActivity extends AppCompatActivity {
     // Inizio gestione Toolbar
 
     //Istanzio ToolbarArcBackground e AppbarLayout
-    ToolbarArcBackground mToolbarArcBackground;
-    AppBarLayout mAppBarLayout;
+    private ToolbarArcBackground mToolbarArcBackground;
+    private AppBarLayout mAppBarLayout;
     // Gestione Meteo (Gradi)
-    TextView currentTemperatureField;
+    private TextView currentTemperatureField;
     //Fine gestione Toolbar
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //Questa solo nella MainActivity
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         //getSupportActionBar().hide();
+
+        GlobalVariable back = GlobalVariable.getInstance();
+        back.setBackEnable(true);
 
         setContentView(R.layout.activity_map);
 
@@ -35,10 +40,10 @@ public class MapActivity extends AppCompatActivity {
         // Inizio gestione Toolbar
 
         // Gestione Meteo Gradi
-        //currentTemperatureField = (TextView) findViewById(R.id.current_temperature_field);
+        //currentTemperatureField = findViewById(R.id.current_temperature_field);
 
         // Gestione Toolbar
-        mToolbarArcBackground = (ToolbarArcBackground) findViewById(R.id.toolbarArcBackground);
+        mToolbarArcBackground = findViewById(R.id.toolbarArcBackground);
 
         //Tree Observe Listener per prendere la larghezza e la lunghezza della toolbar quando finisce di creare la view
         final AppBarLayout layout = findViewById(R.id.appbar);
@@ -91,5 +96,23 @@ public class MapActivity extends AppCompatActivity {
                 mToolbarArcBackground.startAnimate();
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this).setTitle("Chiudi").setMessage("Sei sicuro di voler uscire?").setPositiveButton("ESCI", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Intent intent = new Intent(MapActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("Exit", true);
+                startActivity(intent);
+                finish();
+            }
+        }).setNegativeButton("ANNULLA", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+            }
+        }).show();
     }
 }

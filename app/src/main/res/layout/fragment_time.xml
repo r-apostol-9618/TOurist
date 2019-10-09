@@ -18,8 +18,8 @@
             android:layout_weight="3"
             android:gravity="center"
             android:text="@string/seleziona_tempo"
-            android:textSize="18sp"
-            android:textColor="#000" />
+            android:textSize="@dimen/title"
+            android:textColor="@color/nero" />
 
         <ImageView
             android:id="@+id/imgViewTempo"
@@ -43,15 +43,16 @@
                 android:layout_gravity="center"
                 android:layout_marginStart="20dp"
                 android:layout_weight="1"
-                android:inputType="date" />
+                android:inputType="date"
+                android:hint="@string/dateHint"
+                android:textAlignment="center"/>
 
             <ImageView
                 android:id="@+id/imgViewCalendar"
-                android:layout_width="106dp"
-                android:layout_height="82dp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:layout_weight="1"
-                android:src="@drawable/calendar" />
+                android:layout_weight="1" />
 
         </LinearLayout>
 
@@ -156,7 +157,7 @@
                 android:layout_marginBottom="15dp"
                 android:fontFamily="@font/roboto"
                 android:text="@string/btn_avanti"
-                android:textSize="@dimen/btn_text" />
+                android:textSize="@dimen/base_text" />
 
             <ImageView
                 android:id="@+id/imgViewGruppo3"

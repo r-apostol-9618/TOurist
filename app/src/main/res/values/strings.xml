@@ -15,6 +15,7 @@
 
     <!-- fragment_time -->
     <string name="seleziona_tempo">Seleziona quanto tempo hai a disposizione</string>
+    <string name="dateHint">gg/mm/aaaa</string>
 
     <!-- Toolbar -->
 

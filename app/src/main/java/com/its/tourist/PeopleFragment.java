@@ -59,3 +59,11 @@ public class PeopleFragment extends Fragment {
         fragmentTransaction.commit();
     }
 }
+
+
+/*
+* Cose da fare:
+*
+* 1) Inserire le immagini
+*
+* */

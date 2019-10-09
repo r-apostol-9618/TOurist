@@ -63,5 +63,16 @@ public class BudgetFragment extends Fragment {
 
     }
 
+    public boolean allowBack(){
+        return GlobalVariable.getInstance().getBackEnable();
+    }
 
 }
+
+/*
+ * Cose da fare:
+ *
+ * 1) Modificare i valori delle TextView in base alla seekbar (Prova: vedere conteggio di caratteri in tempo reale)
+ * 2) Prova: Salvataggio in singleton per i 3 fragment
+ *
+*/

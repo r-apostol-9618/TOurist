@@ -42,6 +42,8 @@ public class TimeFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
+        /*
         //Gestione button calendar
         ImageView calendar = getView().findViewById(R.id.imgViewCalendar);
 
@@ -54,7 +56,17 @@ public class TimeFragment extends Fragment {
                 fragmentTransaction.commit();
             }
         });
+
+         */
     }
 
-
 }
+
+/*
+* Cose da fare:
+*
+* 1) Calendario tramite bottone (apertura di un fragment)
+* 2) Verificare che la data inserita manualmente sia corretta
+* 3) Avviare una selezione dell'ora alla pressione delle TextView Dalle/Alle
+*
+* */

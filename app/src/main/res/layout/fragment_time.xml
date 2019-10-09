@@ -37,19 +37,21 @@
 
             <EditText
                 android:id="@+id/editData"
+                style="@android:style/Widget.Material.Light.EditText"
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginStart="20dp"
+                android:layout_weight="1"
                 android:inputType="date" />
 
             <ImageView
                 android:id="@+id/imgViewCalendar"
-                android:layout_width="0dp"
+                android:layout_width="106dp"
+                android:layout_height="82dp"
+                android:layout_gravity="center"
                 android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:layout_gravity="center" />
+                android:src="@drawable/calendar" />
 
         </LinearLayout>
 

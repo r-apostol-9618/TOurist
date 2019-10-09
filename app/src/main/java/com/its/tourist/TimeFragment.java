@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 
 public class TimeFragment extends Fragment {
 
@@ -31,7 +32,7 @@ public class TimeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        //Gestione button avanti
         Button avanti = getView().findViewById(R.id.btnAvanti3);
 
         avanti.setOnClickListener(new View.OnClickListener() {
@@ -39,6 +40,18 @@ public class TimeFragment extends Fragment {
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), MapActivity.class);
                 startActivity(intent);
+            }
+        });
+        //Gestione button calendar
+        ImageView calendar = getView().findViewById(R.id.imgViewCalendar);
+
+        calendar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.frame_main, new CalendarFragment());
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
             }
         });
     }

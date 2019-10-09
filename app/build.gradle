@@ -1,6 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
     defaultConfig {
@@ -30,6 +34,7 @@ dependencies {
     implementation 'com.github.Chrisvin:RubberPicker:v1.1'/* Picker Library */
     implementation 'androidx.coordinatorlayout:coordinatorlayout:1'
     implementation 'com.google.android.material:material:1.0.0' /* Material Design Library */
+    implementation 'com.applandeo:material-calendar-view:1.7.0' /* Material Design Calendar */
 
 
 }

@@ -7,20 +7,20 @@ class GlobalVariable {
         return ourInstance;
     }
 
-    private boolean backEnable;
+    private boolean backMain;
     private boolean backPeople;
 
     private GlobalVariable() {
-        backEnable=false;
+        backMain=false;
         backPeople=false;
     }
 
-    public boolean getBackEnable(){
-        return backEnable;
+    public boolean getBackMain(){
+        return backMain;
     }
 
-    public void setBackEnable(boolean back){
-        backEnable=back;
+    public void setBackMain(boolean back){
+        backMain=back;
     }
 
     public boolean getBackPeople(){

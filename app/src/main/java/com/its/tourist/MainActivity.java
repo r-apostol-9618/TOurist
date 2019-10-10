@@ -12,13 +12,14 @@ import android.widget.FrameLayout;
 
 public class MainActivity extends AppCompatActivity {
 
+    private GlobalVariable back=GlobalVariable.getInstance();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        GlobalVariable back=GlobalVariable.getInstance();
-        back.setBackEnable(false);
+        back.setBackMain(false);
 
         //Aspetto 5 secondi e passo alla nuova activity
         new Handler().postDelayed(new Runnable() {
@@ -29,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
                 main.setVisibility(View.VISIBLE);
 
                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.frame_main, new BudgetFragment(), "BUDJET_FRAGMENT");
+                fragmentTransaction.replace(R.id.frame_main, new BudgetFragment());
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
             }
@@ -45,9 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        final BudgetFragment fragment = (BudgetFragment) getSupportFragmentManager().findFragmentByTag("BUDJET_FRAGMENT");
-        GlobalVariable backPeople = GlobalVariable.getInstance();
-        if(fragment.allowBack() || backPeople.getBackPeople()) {
+        if(back.getBackMain() || back.getBackPeople()) {
             super.onBackPressed();
         }else{
             new AlertDialog.Builder(this).setTitle("Chiudi").setMessage("Sei sicuro di voler uscire?").setPositiveButton("ESCI", new DialogInterface.OnClickListener() {

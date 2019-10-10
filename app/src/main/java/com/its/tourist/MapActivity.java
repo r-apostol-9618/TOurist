@@ -23,37 +23,40 @@ public class MapActivity extends AppCompatActivity {
     private AppBarLayout mAppBarLayout;
     // Gestione Meteo (Gradi)
     private TextView currentTemperatureField;
+
     //Fine gestione Toolbar
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        //getSupportActionBar().hide();
 
         GlobalVariable back = GlobalVariable.getInstance();
-        back.setBackEnable(true);
+        back.setBackMain(true);
 
         setContentView(R.layout.activity_map);
-
 
         // Inizio gestione Toolbar
 
         // Gestione Meteo Gradi
-        //currentTemperatureField = findViewById(R.id.current_temperature_field);
+        currentTemperatureField = findViewById(R.id.current_temperature_field);
 
         // Gestione Toolbar
         mToolbarArcBackground = findViewById(R.id.toolbarArcBackground);
 
+        //Gestione AppBarLayout
+        mAppBarLayout = findViewById(R.id.appbar);
+
         //Tree Observe Listener per prendere la larghezza e la lunghezza della toolbar quando finisce di creare la view
-        final AppBarLayout layout = findViewById(R.id.appbar);
-        ViewTreeObserver vto = layout.getViewTreeObserver();
+        ViewTreeObserver vto = mAppBarLayout.getViewTreeObserver();
         vto.addOnGlobalLayoutListener (new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                layout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                int width  = layout.getMeasuredWidth();
-                int height = layout.getMeasuredHeight();
+                mAppBarLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                int width  = mAppBarLayout.getMeasuredWidth();
+                int height = mAppBarLayout.getMeasuredHeight();
+
                 //Mando i dati alla ToolbarArcBackground class per gestire la posizione del sole
                 //Intent i = new Intent(MainActivity.this, ToolbarArcBackground.class);
                 //i.putExtra("deviceWidth", width);
@@ -64,16 +67,11 @@ public class MapActivity extends AppCompatActivity {
         });
 
 
-
-
-
         //Collego la toolbar al relativo toolbar del xml
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        final ActionBar ab = getSupportActionBar();
+        //final ActionBar ab = getSupportActionBar();
         setTitle("TOurist");
-
-        mAppBarLayout = findViewById(R.id.appbar);
 
         mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             int scrollRange = -1;
@@ -84,18 +82,18 @@ public class MapActivity extends AppCompatActivity {
                 }
 
                 float scale = (float) Math.abs(verticalOffset) / scrollRange;
-
-
                 mToolbarArcBackground.setScale(1 - scale);
 
             }
         });
+
         getWindow().getDecorView().post(new Runnable() {
             @Override
             public void run() {
                 mToolbarArcBackground.startAnimate();
             }
         });
+
     }
 
     @Override

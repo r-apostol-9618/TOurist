@@ -190,12 +190,10 @@ public class ToolbarArcBackground extends View {
 
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                //时间段的过渡
                 float currentValue = (float) animation.getAnimatedValue();
                 timeRate = currentValue * temp;
 
-                //由上一个时间段的颜色过渡到下一个时间段的颜色
-                ArgbEvaluator argbEvaluator = new ArgbEvaluator();//渐变色计算类
+                ArgbEvaluator argbEvaluator = new ArgbEvaluator();
                 gradientColor1 = (int) (argbEvaluator.evaluate(currentValue, lastGradientColor1, currentGradientColor1));
                 gradientColor2 = (int) (argbEvaluator.evaluate(currentValue, lastGradientColor2, currentGradientColor2));
                 invalidate();
@@ -216,8 +214,6 @@ public class ToolbarArcBackground extends View {
             drawSun(canvas);
         }
         drawOval(canvas);
-
-        //Log.d("ARC","onDraw");
     }
 
     private void drawOval(Canvas canvas) {
@@ -228,7 +224,8 @@ public class ToolbarArcBackground extends View {
         ovalPaint.setAntiAlias(true);
 
         path.moveTo(0, getMeasuredHeight());
-    //arco
+
+        //arco
         path.quadTo(getMeasuredWidth() / 2, getMeasuredHeight() - waveHeight * scale, getMeasuredWidth(), getMeasuredHeight());
 
         path.lineTo(0, getMeasuredHeight());
@@ -257,16 +254,16 @@ public class ToolbarArcBackground extends View {
 
     private void drawGradient(Canvas canvas) {
         Paint paint = new Paint();
-        ArgbEvaluator argbEvaluator = new ArgbEvaluator();//渐变色计算类
+        ArgbEvaluator argbEvaluator = new ArgbEvaluator();
         int changedColor1 = (int) (argbEvaluator.evaluate(1 - scale, gradientColor1, ContextCompat.getColor(context, R.color.colorPrimaryDark)));
         int changedColor2 = (int) (argbEvaluator.evaluate(1 - scale, gradientColor2, ContextCompat.getColor(context, R.color.toolbar_gradient_2_noon)));
         LinearGradient linearGradient = new LinearGradient(0f, 0f, getMeasuredWidth(), getMeasuredHeight(), changedColor1, changedColor2, Shader.TileMode.CLAMP);
         paint.setShader(linearGradient);
         canvas.drawRect(0, 0, getMeasuredWidth(), getMeasuredHeight(), paint);
-//
-//        LinearGradient linearGradient1 = new LinearGradient(0f, 0f, getMeasuredWidth(), getMeasuredHeight(), 0xff00d9ff, 0xff00b0ff, Shader.TileMode.CLAMP);
-//        paint.setShader(linearGradient1);
-//        canvas.drawRect(0, 0, getMeasuredWidth(), getMeasuredHeight(), paint);
+
+        //LinearGradient linearGradient1 = new LinearGradient(0f, 0f, getMeasuredWidth(), getMeasuredHeight(), 0xff00d9ff, 0xff00b0ff, Shader.TileMode.CLAMP);
+        //paint.setShader(linearGradient1);
+        //canvas.drawRect(0, 0, getMeasuredWidth(), getMeasuredHeight(), paint);
     }
 
     private void drawSun(Canvas canvas) {

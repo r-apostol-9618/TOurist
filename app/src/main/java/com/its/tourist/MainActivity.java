@@ -21,7 +21,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         global = GlobalVariable.getInstance();
-        global.setHandlerBudget(true);
         toBudget();
 
         if(getIntent().getBooleanExtra("Exit", false)){

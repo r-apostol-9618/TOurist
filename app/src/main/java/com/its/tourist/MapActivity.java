@@ -31,6 +31,7 @@ public class MapActivity extends AppCompatActivity {
 
         GlobalVariable global = GlobalVariable.getInstance();
         global.setBackPeople(true);
+        global.setHandlerBudget(true);
 
         currentTemperatureField = findViewById(R.id.current_temperature_field);
         mToolbarArcBackground = findViewById(R.id.toolbarArcBackground);

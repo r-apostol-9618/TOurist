@@ -7,28 +7,18 @@ class GlobalVariable {
         return ourInstance;
     }
 
-    private boolean backMain;
     private boolean backPeople;
 
     private GlobalVariable() {
-        backMain=false;
-        backPeople=false;
+        backPeople = true;
     }
 
-    public boolean getBackMain(){
-        return backMain;
-    }
-
-    public void setBackMain(boolean back){
-        backMain=back;
-    }
-
-    public boolean getBackPeople(){
+    boolean getBackPeople(){
         return backPeople;
     }
 
-    public void setBackPeople(boolean back){
-        backPeople=back;
+    void setBackPeople(boolean back){
+        backPeople = back;
     }
 
 

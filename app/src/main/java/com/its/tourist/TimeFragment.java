@@ -1,8 +1,6 @@
 package com.its.tourist;
 
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -16,7 +14,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import java.util.Objects;
+
 public class TimeFragment extends Fragment {
+
+    private Button avanti;
 
     public TimeFragment() {
         // Required empty public constructor
@@ -32,16 +34,8 @@ public class TimeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        //Gestione button avanti
-        Button avanti = getView().findViewById(R.id.btnAvanti3);
 
-        avanti.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), MapActivity.class);
-                startActivity(intent);
-            }
-        });
+        toMap();
 
         /*
         //Gestione button calendar
@@ -58,6 +52,14 @@ public class TimeFragment extends Fragment {
         });
 
          */
+    }
+
+    private void toMap(){
+        avanti = Objects.requireNonNull(getView()).findViewById(R.id.btnAvanti3);
+        avanti.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), MapActivity.class);
+            startActivity(intent);
+        });
     }
 
 }

@@ -16,38 +16,45 @@ import com.google.android.material.appbar.AppBarLayout;
 
 public class MapActivity extends AppCompatActivity {
 
-    // Inizio gestione Toolbar
-
-    //Istanzio ToolbarArcBackground e AppbarLayout
     private ToolbarArcBackground mToolbarArcBackground;
     private AppBarLayout mAppBarLayout;
+
     // Gestione Meteo (Gradi)
     private TextView currentTemperatureField;
-
-    //Fine gestione Toolbar
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-        GlobalVariable back = GlobalVariable.getInstance();
-        back.setBackMain(true);
-
         setContentView(R.layout.activity_map);
 
-        // Inizio gestione Toolbar
+        GlobalVariable global = GlobalVariable.getInstance();
+        global.setBackPeople(true);
 
-        // Gestione Meteo Gradi
         currentTemperatureField = findViewById(R.id.current_temperature_field);
-
-        // Gestione Toolbar
         mToolbarArcBackground = findViewById(R.id.toolbarArcBackground);
-
-        //Gestione AppBarLayout
         mAppBarLayout = findViewById(R.id.appbar);
 
+        treeObserve();
+        toolbar();
+        getWindow().getDecorView().post(() -> mToolbarArcBackground.startAnimate());
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this).setTitle("Chiudi").setMessage("Sei sicuro di voler uscire?")
+                .setPositiveButton("ESCI", (dialogInterface, i) -> {
+                    Intent intent = new Intent(MapActivity.this, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.putExtra("Exit", true);
+                    startActivity(intent);
+                    finish();
+                }).setNegativeButton("ANNULLA", (dialogInterface, i) -> { }).show();
+    }
+
+    private void treeObserve(){
         //Tree Observe Listener per prendere la larghezza e la lunghezza della toolbar quando finisce di creare la view
         ViewTreeObserver vto = mAppBarLayout.getViewTreeObserver();
         vto.addOnGlobalLayoutListener (new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -65,8 +72,9 @@ public class MapActivity extends AppCompatActivity {
                 mToolbarArcBackground.setHeight(height);
             }
         });
+    }
 
-
+    private void toolbar(){
         //Collego la toolbar al relativo toolbar del xml
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -86,31 +94,6 @@ public class MapActivity extends AppCompatActivity {
 
             }
         });
-
-        getWindow().getDecorView().post(new Runnable() {
-            @Override
-            public void run() {
-                mToolbarArcBackground.startAnimate();
-            }
-        });
-
     }
 
-    @Override
-    public void onBackPressed() {
-        new AlertDialog.Builder(this).setTitle("Chiudi").setMessage("Sei sicuro di voler uscire?").setPositiveButton("ESCI", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                Intent intent = new Intent(MapActivity.this, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra("Exit", true);
-                startActivity(intent);
-                finish();
-            }
-        }).setNegativeButton("ANNULLA", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-            }
-        }).show();
-    }
 }

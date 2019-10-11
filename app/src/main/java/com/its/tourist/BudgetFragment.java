@@ -15,9 +15,12 @@ import android.widget.TextView;
 
 import com.jem.rubberpicker.RubberRangePicker;
 
+import java.util.Objects;
+
 public class BudgetFragment extends Fragment {
 
-
+    private TextView txtStart,txtEnd;
+    private Button avanti;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -29,40 +32,42 @@ public class BudgetFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
-
         super.onViewCreated(view, savedInstanceState);
 
-        GlobalVariable backPeople = GlobalVariable.getInstance();
-        backPeople.setBackPeople(false);
+        GlobalVariable global = GlobalVariable.getInstance();
+        global.setBackPeople(true);
 
-        //gestione picker
+        gestionePicker();
+        toPeople();
 
-        RubberRangePicker rubberRangePicker = new RubberRangePicker(getContext());
+    }
+
+
+    private void gestionePicker(){
+        RubberRangePicker rubberRangePicker = new RubberRangePicker(Objects.requireNonNull(getContext()));
         int startThumbValue = rubberRangePicker.getCurrentStartValue();
         int endThumbValue = rubberRangePicker.getCurrentEndValue();
 
-
         rubberRangePicker.setCurrentStartValue(startThumbValue + 10);
         rubberRangePicker.setCurrentEndValue(endThumbValue + 10);
-        TextView txtStart = getView().findViewById(R.id.txtSeekbarStart);
-        TextView txtEnd = getView().findViewById(R.id.txtSeekbarEnd);
-        txtStart.setText(startThumbValue+"a");
-        txtEnd.setText(endThumbValue+"b");
+        txtStart = Objects.requireNonNull(getView()).findViewById(R.id.txtSeekbarStart);
+        txtEnd = getView().findViewById(R.id.txtSeekbarEnd);
+        String textStart = startThumbValue+"a";
+        String textEnd = endThumbValue+"b";
+        txtStart.setText(textStart);
+        txtEnd.setText(textEnd);
+    }
 
+    private void toPeople(){
+        avanti = Objects.requireNonNull(getView()).findViewById(R.id.btnAvanti);
 
-        //fine gestione picker
-        Button avanti = getView().findViewById(R.id.btnAvanti);
-
-        avanti.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.frame_main, new PeopleFragment());
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-            }
+        avanti.setOnClickListener(v -> {
+            assert getFragmentManager() != null;
+            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.frame_main, new PeopleFragment());
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
         });
-
     }
 
 }

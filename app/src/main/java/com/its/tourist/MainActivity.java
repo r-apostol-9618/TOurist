@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         global = GlobalVariable.getInstance();
+        global.setHandlerBudget(true);
         toBudget();
 
         if(getIntent().getBooleanExtra("Exit", false)){
@@ -64,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
-        if (global.getBackPeople()) {
+        if (global.getHandlerBudget()) {
             handler.removeCallbacks(run);
             handler.postDelayed(run, 3000);
         }

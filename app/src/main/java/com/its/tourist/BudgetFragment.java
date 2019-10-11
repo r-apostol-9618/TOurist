@@ -36,6 +36,7 @@ public class BudgetFragment extends Fragment {
 
         GlobalVariable global = GlobalVariable.getInstance();
         global.setBackPeople(true);
+        global.setHandlerBudget(false);
 
         gestionePicker();
         toPeople();

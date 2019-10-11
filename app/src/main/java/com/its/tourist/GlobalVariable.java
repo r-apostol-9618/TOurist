@@ -8,9 +8,19 @@ class GlobalVariable {
     }
 
     private boolean backPeople;
+    private boolean handlerBudget;
 
     private GlobalVariable() {
         backPeople = true;
+        handlerBudget = true;
+    }
+
+    boolean getHandlerBudget(){
+        return handlerBudget;
+    }
+
+    void setHandlerBudget(boolean handler){
+        handlerBudget = handler;
     }
 
     boolean getBackPeople(){

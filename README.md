@@ -1,7 +1,7 @@
 Progetto TOurist
 
 Salve a tutti, questo spazio github è dedicato al progetto TOurist durante il periodo ITS.
-Questo branch è il master, cioè il progetto completo. 
+Questo branch è il master, cioè il progetto completo.
 Qui vengono salvate le modifiche apportate al progetto finale visibile agli altri membri e, se nel caso si debbano salvare informazioni da ricordare per le prossime build o per informare gli altri utenti, questo file README è disponibile e modificabile.
 
 Per inizaiare a lavorare sul progetto basta seguire questi passi:

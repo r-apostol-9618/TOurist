@@ -20,7 +20,7 @@ Dopo che sono state effettuate le modifiche sul progetto e si volesse caricarlo 
 - Infine, premere la combinazione CTRL-SHIFT-K per eseguire il Push all'interno del master e renderlo condiviso con gli altri utenti (potrebbe essere necessario inserire le proprie credenziali di git)
 
 
-Consigli da seguire / non seguire a vostra disposizione:
+Consigli utili:
 - Tenere sempre aggiornato Android Studio
 - Disinstallare la build precedente dell'app prima di installare quella successiva
 - Ricordate di controllare se sono state apportate modifiche all'interno del master dagli altri utenti mentre si sta per esguire un commit oppure si sta per lavorare su una build vecchia

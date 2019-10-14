@@ -44,18 +44,54 @@ public class BudgetFragment extends Fragment {
 
 
     private void gestionePicker(){
-        RubberRangePicker rubberRangePicker = new RubberRangePicker(Objects.requireNonNull(getContext()));
-        int startThumbValue = rubberRangePicker.getCurrentStartValue();
-        int endThumbValue = rubberRangePicker.getCurrentEndValue();
+        //seekbar
+        RubberRangePicker rubberRangePicker;
+        // textView seekbar start / end
+        TextView seekbarStart;
+        TextView seekbarEnd;
 
-        rubberRangePicker.setCurrentStartValue(startThumbValue + 10);
-        rubberRangePicker.setCurrentEndValue(endThumbValue + 10);
-        txtStart = Objects.requireNonNull(getView()).findViewById(R.id.txtSeekbarStart);
-        txtEnd = getView().findViewById(R.id.txtSeekbarEnd);
-        String textStart = startThumbValue+"a";
-        String textEnd = endThumbValue+"b";
-        txtStart.setText(textStart);
-        txtEnd.setText(textEnd);
+        //textView seekbar
+        rubberRangePicker = getView().findViewById(R.id.seekbar);
+
+        seekbarStart = getView().findViewById(R.id.txtSeekbarStart);
+        seekbarEnd = getView().findViewById(R.id.txtSeekbarEnd);
+
+        seekbarStart.setText(String.valueOf(0));
+        seekbarEnd.setText(String.valueOf(0));
+
+        rubberRangePicker.setOnRubberRangePickerChangeListener(new RubberRangePicker.OnRubberRangePickerChangeListener() {
+            @Override
+            public void onProgressChanged(RubberRangePicker rubberRangePicker, int startThumbValue, int endThumbValue, boolean b) {
+                //Gestione seekbar doppia
+
+                if(b && startThumbValue != Integer.parseInt(seekbarStart.getText().toString())){
+                    seekbarStart.setText(String.valueOf(startThumbValue));
+                }
+                if(b && endThumbValue != Integer.parseInt(seekbarEnd.getText().toString())){
+                    seekbarEnd.setText(String.valueOf(endThumbValue));
+                }/*
+                startThumbValue = rubberRangePicker.getCurrentStartValue();
+                endThumbValue = rubberRangePicker.getCurrentEndValue();
+
+                rubberRangePicker.setCurrentStartValue(startThumbValue);
+                rubberRangePicker.setCurrentEndValue(endThumbValue);
+
+                seekbarStart.setText(endThumbValue);
+                seekbarEnd.setText(endThumbValue);*/
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(RubberRangePicker rubberRangePicker, boolean b) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(RubberRangePicker rubberRangePicker, boolean b) {
+
+            }
+        });
+
     }
 
     private void toPeople(){

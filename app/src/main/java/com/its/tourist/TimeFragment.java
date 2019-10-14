@@ -14,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -71,7 +70,7 @@ public class TimeFragment extends Fragment {
     }
 
     private void updateLabelCalendar(){
-        EditText txtCalendar = Objects.requireNonNull(getView()).findViewById(R.id.txtData);
+        TextView txtCalendar = Objects.requireNonNull(getView()).findViewById(R.id.txtData);
         String myFormat = "dd/MM/yyyy";
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.ITALIAN);
         txtCalendar.setText(sdf.format(myCalendar.getTime()));

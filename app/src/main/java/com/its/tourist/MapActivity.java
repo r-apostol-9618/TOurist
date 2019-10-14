@@ -1,16 +1,14 @@
 package com.its.tourist;
 
-import androidx.appcompat.app.ActionBar;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.ViewTreeObserver;
 import android.view.Window;
-import android.widget.TextView;
 
 import com.google.android.material.appbar.AppBarLayout;
 

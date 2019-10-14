@@ -45,16 +45,10 @@ public class BudgetFragment extends Fragment {
 
     private void gestionePicker(){
         //seekbar
-        RubberRangePicker rubberRangePicker;
+        RubberRangePicker rubberRangePicker = Objects.requireNonNull(getView()).findViewById(R.id.seekbar);;
         // textView seekbar start / end
-        TextView seekbarStart;
-        TextView seekbarEnd;
-
-        //textView seekbar
-        rubberRangePicker = getView().findViewById(R.id.seekbar);
-
-        seekbarStart = getView().findViewById(R.id.txtSeekbarStart);
-        seekbarEnd = getView().findViewById(R.id.txtSeekbarEnd);
+        TextView seekbarStart = getView().findViewById(R.id.txtSeekbarStart);
+        TextView seekbarEnd = getView().findViewById(R.id.txtSeekbarEnd);
 
         seekbarStart.setText(String.valueOf(0));
         seekbarEnd.setText(String.valueOf(0));
@@ -64,32 +58,19 @@ public class BudgetFragment extends Fragment {
             public void onProgressChanged(RubberRangePicker rubberRangePicker, int startThumbValue, int endThumbValue, boolean b) {
                 //Gestione seekbar doppia
 
-                if(b && startThumbValue != Integer.parseInt(seekbarStart.getText().toString())){
+                if(b && (startThumbValue != Integer.parseInt(seekbarStart.getText().toString()) || endThumbValue != Integer.parseInt(seekbarEnd.getText().toString()))){
                     seekbarStart.setText(String.valueOf(startThumbValue));
-                }
-                if(b && endThumbValue != Integer.parseInt(seekbarEnd.getText().toString())){
                     seekbarEnd.setText(String.valueOf(endThumbValue));
-                }/*
-                startThumbValue = rubberRangePicker.getCurrentStartValue();
-                endThumbValue = rubberRangePicker.getCurrentEndValue();
-
-                rubberRangePicker.setCurrentStartValue(startThumbValue);
-                rubberRangePicker.setCurrentEndValue(endThumbValue);
-
-                seekbarStart.setText(endThumbValue);
-                seekbarEnd.setText(endThumbValue);*/
+                }
 
             }
 
             @Override
-            public void onStartTrackingTouch(RubberRangePicker rubberRangePicker, boolean b) {
-
-            }
+            public void onStartTrackingTouch(RubberRangePicker rubberRangePicker, boolean b) { }
 
             @Override
-            public void onStopTrackingTouch(RubberRangePicker rubberRangePicker, boolean b) {
+            public void onStopTrackingTouch(RubberRangePicker rubberRangePicker, boolean b) { }
 
-            }
         });
 
     }

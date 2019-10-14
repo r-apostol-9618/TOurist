@@ -1,24 +1,30 @@
 package com.its.tourist;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 import java.util.Objects;
 
 public class TimeFragment extends Fragment {
 
-    private Button avanti;
+    private Calendar myCalendar;
 
     public TimeFragment() {
         // Required empty public constructor
@@ -35,27 +41,55 @@ public class TimeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        setDateCalendar();
+
+        TextView txtStartTime = Objects.requireNonNull(getView()).findViewById(R.id.timeBegin);
+        TextView txtEndTime = getView().findViewById(R.id.timeEnd);
+        setTime(txtStartTime);
+        setTime(txtEndTime);
+
         toMap();
 
-        /*
-        //Gestione button calendar
-        ImageView calendar = getView().findViewById(R.id.imgViewCalendar);
+    }
 
-        calendar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.frame_main, new CalendarFragment());
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-            }
+    private void setDateCalendar(){
+        myCalendar = Calendar.getInstance();
+        DatePickerDialog.OnDateSetListener date = (datePicker, year, month, day) -> {
+            myCalendar.set(Calendar.YEAR, year);
+            myCalendar.set(Calendar.MONTH, month);
+            myCalendar.set(Calendar.DAY_OF_MONTH, day);
+            updateLabelCalendar();
+        };
+
+        ImageView calendar = Objects.requireNonNull(getView()).findViewById(R.id.imgViewCalendar);
+        calendar.setOnClickListener(view ->
+                new DatePickerDialog(Objects.requireNonNull(getActivity()), date,
+                myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                myCalendar.get(Calendar.DAY_OF_MONTH)).show());
+
+    }
+
+    private void updateLabelCalendar(){
+        EditText txtCalendar = Objects.requireNonNull(getView()).findViewById(R.id.editData);
+        String myFormat = "dd/MM/yyyy";
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.ITALIAN);
+        txtCalendar.setText(sdf.format(myCalendar.getTime()));
+    }
+
+    private void setTime(TextView txtTime){
+        txtTime.setOnClickListener(view -> {
+            int hour = myCalendar.get(Calendar.HOUR_OF_DAY);
+            int minute = myCalendar.get(Calendar.MINUTE);
+            TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), (timePicker, selectedHour, selectedMinute) -> {
+                String textTime = selectedHour+":"+selectedMinute;
+                txtTime.setText(textTime);
+            },hour,minute,true);
+            timePickerDialog.show();
         });
-
-         */
     }
 
     private void toMap(){
-        avanti = Objects.requireNonNull(getView()).findViewById(R.id.btnAvanti3);
+        Button avanti = Objects.requireNonNull(getView()).findViewById(R.id.btnAvanti3);
         avanti.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), MapActivity.class);
             startActivity(intent);
@@ -67,8 +101,6 @@ public class TimeFragment extends Fragment {
 /*
 * Cose da fare:
 *
-* 1) Calendario tramite bottone (apertura di un fragment)
-* 2) Verificare che la data inserita manualmente sia corretta
-* 3) Avviare una selezione dell'ora alla pressione delle TextView Dalle/Alle
+* 1) Verificare che le info inserite siano correte
 *
 * */

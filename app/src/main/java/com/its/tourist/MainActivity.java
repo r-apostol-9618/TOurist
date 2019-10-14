@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(global.getBackPeople()) {
+        if(global.isBackPeople()) {
             new AlertDialog.Builder(this).setTitle("Chiudi").setMessage("Sei sicuro di voler uscire?")
                     .setPositiveButton("ESCI", (dialogInterface, i) ->
                             finish()
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
-        if (global.getHandlerBudget()) {
+        if (global.isHandlerBudget()) {
             handler.removeCallbacks(run);
             handler.postDelayed(run, 3000);
         }

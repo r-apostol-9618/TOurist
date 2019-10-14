@@ -2,4 +2,6 @@
 <resources>
     <dimen name="base_text">18sp</dimen>
     <dimen name="title">20sp</dimen>
+    <dimen name="budget_value">24sp</dimen>
+    <dimen name="budget_separator">32sp</dimen>
 </resources>

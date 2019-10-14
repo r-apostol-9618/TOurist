@@ -11,7 +11,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical" >
+        android:orientation="vertical"
+        tools:ignore="UselessParent">
 
         <TextView
             android:id="@+id/txtTitoloBudget"
@@ -29,7 +30,8 @@
             android:layout_width="match_parent"
             android:layout_weight="15"
             android:layout_height="0dp"
-            app:srcCompat="@drawable/wallet" />
+            app:srcCompat="@drawable/wallet"
+            android:contentDescription="@string/budgetIntroDescription" />
 
         <!-- Similar attributes can be applied for RubberRangePicker as well-->
         <com.jem.rubberpicker.RubberRangePicker
@@ -61,26 +63,30 @@
 
             <TextView
                 android:id="@+id/txtSeekbarStart"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:textSize="24sp"
-                android:textColor="@color/nero" />
+                android:textSize="@dimen/budget_value"
+                android:textColor="@color/nero"
+                tools:ignore="NestedWeights" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:textSize="32sp"
-                android:text="   -   "
+                android:textSize="@dimen/budget_separator"
+                android:text="@string/budgetSeparator"
                 android:textColor="@color/nero" />
 
             <TextView
                 android:id="@+id/txtSeekbarEnd"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:textSize="24sp"
+                android:textSize="@dimen/budget_value"
                 android:textColor="@color/nero" />
 
         </LinearLayout>

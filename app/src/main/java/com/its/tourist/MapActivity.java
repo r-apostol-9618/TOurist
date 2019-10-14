@@ -19,9 +19,6 @@ public class MapActivity extends AppCompatActivity {
     private ToolbarArcBackground mToolbarArcBackground;
     private AppBarLayout mAppBarLayout;
 
-    // Gestione Meteo (Gradi)
-    private TextView currentTemperatureField;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,7 +30,6 @@ public class MapActivity extends AppCompatActivity {
         global.setBackPeople(true);
         global.setHandlerBudget(true);
 
-        currentTemperatureField = findViewById(R.id.current_temperature_field);
         mToolbarArcBackground = findViewById(R.id.toolbarArcBackground);
         mAppBarLayout = findViewById(R.id.appbar);
 
@@ -66,8 +62,6 @@ public class MapActivity extends AppCompatActivity {
                 int height = mAppBarLayout.getMeasuredHeight();
 
                 //Mando i dati alla ToolbarArcBackground class per gestire la posizione del sole
-                //Intent i = new Intent(MainActivity.this, ToolbarArcBackground.class);
-                //i.putExtra("deviceWidth", width);
 
                 mToolbarArcBackground.setWidth(width);
                 mToolbarArcBackground.setHeight(height);
@@ -79,7 +73,6 @@ public class MapActivity extends AppCompatActivity {
         //Collego la toolbar al relativo toolbar del xml
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        //final ActionBar ab = getSupportActionBar();
         setTitle("TOurist");
 
         mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {

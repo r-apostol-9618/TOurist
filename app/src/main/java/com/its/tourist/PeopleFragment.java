@@ -38,22 +38,21 @@ public class PeopleFragment extends Fragment {
     private void chooseImageGroup(){
         ImageView imgSingolo = Objects.requireNonNull(getView()).findViewById(R.id.imgViewSingolo);
         imgSingolo.setOnClickListener(v -> {
-            toTime();
+            toTime("singolo");
         });
 
         ImageView imgCoppia = getView().findViewById(R.id.imgViewCoppia);
         imgCoppia.setOnClickListener(v -> {
-            toTime();
+            toTime("coppia");
         });
 
         ImageView imgGruppo = getView().findViewById(R.id.imgViewGruppo);
         imgGruppo.setOnClickListener(v -> {
-            toTime();
+            toTime("gruppo");
         });
     }
 
-
-    private void toTime() {
+    private void toTime(String txtPeople) {
         assert getFragmentManager() != null;
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.frame_main, new TimeFragment());

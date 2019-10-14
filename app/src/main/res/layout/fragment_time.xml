@@ -9,7 +9,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical" >
+        android:orientation="vertical"
+        tools:ignore="UselessParent">
 
         <TextView
             android:id="@+id/txtTitoloTime"
@@ -26,7 +27,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="5"
-            app:srcCompat="@drawable/hourglass" />
+            app:srcCompat="@drawable/hourglass"
+            android:contentDescription="@string/timeIntroDescription" />
 
 
         <LinearLayout
@@ -45,14 +47,18 @@
                 android:layout_weight="1"
                 android:inputType="date"
                 android:hint="@string/dateHint"
-                android:textAlignment="center"/>
+                android:textAlignment="center"
+                tools:ignore="NestedWeights"
+                android:importantForAutofill="no" />
 
             <ImageView
                 android:id="@+id/imgViewCalendar"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:focusable="false"
+                android:contentDescription="@string/timeCalendarDescription" />
 
         </LinearLayout>
 
@@ -66,11 +72,11 @@
                 android:id="@+id/txtGiorno"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="Tutto il giorno"
-                android:textAlignment="center"
-                android:layout_gravity="center"
-                android:textSize="18sp" />
+                android:layout_height="match_parent"
+                android:text="@string/allDay"
+                android:gravity="center"
+                android:textSize="@dimen/base_text"
+                tools:ignore="NestedWeights" />
 
             <RelativeLayout
                 android:layout_width="0dp"
@@ -97,20 +103,20 @@
                 android:id="@+id/txtDalle"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="Dalle"
-                android:textAlignment="center"
-                android:layout_gravity="center"
-                android:textSize="18sp" />
+                android:layout_height="match_parent"
+                android:text="@string/dalle"
+                android:gravity="center"
+                android:textSize="@dimen/base_text"
+                tools:ignore="NestedWeights" />
 
             <TextView
-                android:id="@+id/textView5"
+                android:id="@+id/timeBegin"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:textAlignment="center"
-                android:layout_gravity="center"
-                android:text="TextView" />
+                android:gravity="center"
+                android:textSize="@dimen/base_text"
+                android:text="@string/time" />
 
         </LinearLayout>
 
@@ -124,20 +130,20 @@
                 android:id="@+id/txtAlle"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="Alle"
-                android:textAlignment="center"
-                android:layout_gravity="center"
-                android:textSize="18sp" />
+                android:layout_height="match_parent"
+                android:text="@string/alle"
+                android:gravity="center"
+                android:textSize="@dimen/base_text"
+                tools:ignore="NestedWeights" />
 
             <TextView
-                android:id="@+id/textView13"
+                android:id="@+id/timeEnd"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:layout_gravity="center"
-                android:textAlignment="center"
-                android:text="TextView" />
+                android:gravity="center"
+                android:textSize="@dimen/base_text"
+                android:text="@string/time" />
 
         </LinearLayout>
 
@@ -164,7 +170,8 @@
                 android:layout_width="65dp"
                 android:layout_height="15dp"
                 android:layout_gravity="center"
-                app:srcCompat="@drawable/circles3" />
+                app:srcCompat="@drawable/circles3"
+                android:contentDescription="@string/timeGroupDescription" />
 
         </LinearLayout>
 

@@ -20,7 +20,6 @@ import java.util.Objects;
 public class BudgetFragment extends Fragment {
 
     private TextView txtStart,txtEnd;
-    private Button avanti;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -60,7 +59,7 @@ public class BudgetFragment extends Fragment {
     }
 
     private void toPeople(){
-        avanti = Objects.requireNonNull(getView()).findViewById(R.id.btnAvanti);
+        Button avanti = Objects.requireNonNull(getView()).findViewById(R.id.btnAvanti);
 
         avanti.setOnClickListener(v -> {
             assert getFragmentManager() != null;

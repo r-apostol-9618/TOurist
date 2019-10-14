@@ -153,14 +153,14 @@
             <Button
                 android:id="@+id/btnAvanti3"
                 style="@style/Widget.MaterialComponents.Button.Icon"
-                android:layout_width="140dp"
-                android:layout_height="65dp"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
                 android:layout_gravity="center"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="15dp"
                 android:fontFamily="@font/roboto"
                 android:text="@string/btn_avanti"
-                android:textSize="@dimen/base_text" />
+                android:textSize="@dimen/btn_text" />
 
             <ImageView
                 android:id="@+id/imgViewGruppo3"

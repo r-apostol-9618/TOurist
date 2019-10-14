@@ -11,8 +11,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:ignore="UselessParent">
+        android:orientation="vertical" >
 
         <TextView
             android:id="@+id/txtTitoloBudget"
@@ -30,8 +29,7 @@
             android:layout_width="match_parent"
             android:layout_weight="15"
             android:layout_height="0dp"
-            app:srcCompat="@drawable/wallet"
-            android:contentDescription="@string/budgetIntroDescription" />
+            app:srcCompat="@drawable/wallet" />
 
         <!-- Similar attributes can be applied for RubberRangePicker as well-->
         <com.jem.rubberpicker.RubberRangePicker
@@ -63,30 +61,26 @@
 
             <TextView
                 android:id="@+id/txtSeekbarStart"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:textSize="@dimen/budget_value"
-                android:textColor="@color/nero"
-                tools:ignore="NestedWeights" />
+                android:textSize="24sp"
+                android:textColor="@color/nero" />
 
             <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:textSize="@dimen/budget_separator"
-                android:text="@string/budgetSeparator"
+                android:textSize="32sp"
+                android:text="   -   "
                 android:textColor="@color/nero" />
 
             <TextView
                 android:id="@+id/txtSeekbarEnd"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:textSize="@dimen/budget_value"
+                android:textSize="24sp"
                 android:textColor="@color/nero" />
 
         </LinearLayout>
@@ -100,13 +94,13 @@
             <Button
                 android:id="@+id/btnAvanti"
                 style="@style/Widget.MaterialComponents.Button.Icon"
-                android:layout_width="120dp"
-                android:layout_height="60dp"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="25dp"
                 android:text="@string/btn_avanti"
-                android:textSize="@dimen/base_text" />
+                android:textSize="@dimen/btn_text" />
 
             <ImageView
                 android:id="@+id/imgViewPage1"

@@ -37,19 +37,16 @@
             android:layout_weight="4"
             android:orientation="horizontal">
 
-            <EditText
-                android:id="@+id/editData"
-                style="@android:style/Widget.Material.Light.EditText"
+            <TextView
+                android:id="@+id/txtData"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="20dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
                 android:layout_weight="1"
-                android:inputType="date"
                 android:hint="@string/dateHint"
                 android:textAlignment="center"
-                tools:ignore="NestedWeights"
-                android:importantForAutofill="no" />
+                android:textSize="@dimen/base_text"
+                tools:ignore="NestedWeights" />
 
             <ImageView
                 android:id="@+id/imgViewCalendar"

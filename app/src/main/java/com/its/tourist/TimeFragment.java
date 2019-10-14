@@ -1,5 +1,6 @@
 package com.its.tourist;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
@@ -70,7 +71,7 @@ public class TimeFragment extends Fragment {
     }
 
     private void updateLabelCalendar(){
-        EditText txtCalendar = Objects.requireNonNull(getView()).findViewById(R.id.editData);
+        EditText txtCalendar = Objects.requireNonNull(getView()).findViewById(R.id.txtData);
         String myFormat = "dd/MM/yyyy";
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.ITALIAN);
         txtCalendar.setText(sdf.format(myCalendar.getTime()));
@@ -81,7 +82,7 @@ public class TimeFragment extends Fragment {
             int hour = myCalendar.get(Calendar.HOUR_OF_DAY);
             int minute = myCalendar.get(Calendar.MINUTE);
             TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), (timePicker, selectedHour, selectedMinute) -> {
-                String textTime = selectedHour+":"+selectedMinute;
+                @SuppressLint("DefaultLocale") String textTime = String.format("%02d:%02d", selectedHour, selectedMinute);
                 txtTime.setText(textTime);
             },hour,minute,true);
             timePickerDialog.show();

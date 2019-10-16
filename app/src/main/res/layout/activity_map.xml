@@ -6,6 +6,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:map="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MapsActivity" />
+
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
@@ -17,12 +26,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fitsSystemWindows="true"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed" >
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            >
 
             <com.its.tourist.ToolbarArcBackground
                 android:id="@+id/toolbarArcBackground"
                 android:layout_width="match_parent"
-                android:layout_height="150dp" /> <!-- L'altezza del arco -->
+                android:layout_height="150dp"
+                /> <!-- L'altezza del arco -->
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -32,6 +43,7 @@
                 android:contentInsetLeft="0dp"
                 android:contentInsetRight="0dp"
                 android:contentInsetStart="0dp"
+                android:alpha="0.0"
                 app:contentInsetEnd="0dp"
                 app:contentInsetLeft="0dp"
                 app:contentInsetRight="0dp"

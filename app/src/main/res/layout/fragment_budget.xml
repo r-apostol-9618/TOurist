@@ -4,14 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/budgetFrame"
     tools:context=".BudgetFragment">
-
-
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical" >
+        android:orientation="vertical"
+        tools:ignore="UselessParent">
 
         <TextView
             android:id="@+id/txtTitoloBudget"
@@ -29,7 +29,8 @@
             android:layout_width="match_parent"
             android:layout_weight="15"
             android:layout_height="0dp"
-            app:srcCompat="@drawable/wallet" />
+            app:srcCompat="@drawable/wallet"
+            android:contentDescription="@string/budgetIntroDescription" />
 
         <!-- Similar attributes can be applied for RubberRangePicker as well-->
         <com.jem.rubberpicker.RubberRangePicker
@@ -107,7 +108,8 @@
                 android:layout_width="70dp"
                 android:layout_height="15dp"
                 android:layout_gravity="center_horizontal"
-                app:srcCompat="@drawable/circles" />
+                app:srcCompat="@drawable/circles"
+                android:contentDescription="@string/timeGroupDescription" />
 
         </LinearLayout>
 

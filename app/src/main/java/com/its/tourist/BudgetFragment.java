@@ -11,15 +11,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.jem.rubberpicker.RubberRangePicker;
 
 import java.util.Objects;
 
 public class BudgetFragment extends Fragment {
 
-    private TextView txtStart,txtEnd;
+    private TextView seekbarEnd,seekbarStart;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -45,10 +47,10 @@ public class BudgetFragment extends Fragment {
 
     private void gestionePicker(){
         //seekbar
-        RubberRangePicker rubberRangePicker = Objects.requireNonNull(getView()).findViewById(R.id.seekbar);;
+        RubberRangePicker rubberRangePicker = Objects.requireNonNull(getView()).findViewById(R.id.seekbar);
         // textView seekbar start / end
-        TextView seekbarStart = getView().findViewById(R.id.txtSeekbarStart);
-        TextView seekbarEnd = getView().findViewById(R.id.txtSeekbarEnd);
+        seekbarStart = getView().findViewById(R.id.txtSeekbarStart);
+        seekbarEnd = getView().findViewById(R.id.txtSeekbarEnd);
 
         seekbarStart.setText(String.valueOf(0));
         seekbarEnd.setText(String.valueOf(0));
@@ -79,20 +81,36 @@ public class BudgetFragment extends Fragment {
         Button avanti = Objects.requireNonNull(getView()).findViewById(R.id.btnAvanti);
 
         avanti.setOnClickListener(v -> {
-            assert getFragmentManager() != null;
-            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.frame_main, new PeopleFragment());
-            fragmentTransaction.addToBackStack(null);
-            fragmentTransaction.commit();
+            if(errorRangeValue()) {
+                toPeopleFragment();
+            }else{
+                messageErrorSnack();
+            }
         });
     }
 
-}
+    private void toPeopleFragment(){
+        assert getFragmentManager() != null;
+        Bundle bundle = new Bundle();
+        PeopleFragment peopleFragment = new PeopleFragment();
+        bundle.putInt("startBudget",Integer.parseInt(seekbarStart.getText().toString()));
+        bundle.putInt("endBudget",Integer.parseInt(seekbarEnd.getText().toString()));
+        peopleFragment.setArguments(bundle);
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.frame_main, peopleFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
 
-/*
- * Cose da fare:
- *
- * 1) Modificare i valori delle TextView in base alla seekbar (Prova: vedere conteggio di caratteri in tempo reale)
- * 2) Prova: Salvataggio in singleton per i 3 fragment
- *
-*/
+
+    private boolean errorRangeValue(){
+        return Integer.parseInt(seekbarEnd.getText().toString())>0 && !(seekbarStart.getText().toString().equals(seekbarEnd.getText().toString()));
+    }
+
+    private void messageErrorSnack(){
+        FrameLayout budgetFrame = Objects.requireNonNull(getView()).findViewById(R.id.budgetFrame);
+        Snackbar.make(budgetFrame,"Inserisci un range di valori valido!",Snackbar.LENGTH_LONG).show();
+    }
+
+
+}

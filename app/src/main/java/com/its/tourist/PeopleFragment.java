@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,41 +31,34 @@ public class PeopleFragment extends Fragment {
 
         GlobalVariable global = GlobalVariable.getInstance();
         global.setBackPeople(false);
-
         chooseImageGroup();
 
     }
 
     private void chooseImageGroup(){
         ImageView imgSingolo = Objects.requireNonNull(getView()).findViewById(R.id.imgViewSingolo);
-        imgSingolo.setOnClickListener(v -> {
-            toTime("singolo");
-        });
+        imgSingolo.setOnClickListener(v -> toTime("singolo"));
 
         ImageView imgCoppia = getView().findViewById(R.id.imgViewCoppia);
-        imgCoppia.setOnClickListener(v -> {
-            toTime("coppia");
-        });
+        imgCoppia.setOnClickListener(v -> toTime("coppia"));
 
         ImageView imgGruppo = getView().findViewById(R.id.imgViewGruppo);
-        imgGruppo.setOnClickListener(v -> {
-            toTime("gruppo");
-        });
+        imgGruppo.setOnClickListener(v -> toTime("gruppo"));
     }
 
     private void toTime(String txtPeople) {
         assert getFragmentManager() != null;
+        Bundle bundle = new Bundle();
+        TimeFragment timeFragment = new TimeFragment();
+        if (this.getArguments() != null){
+            bundle.putInt("startBudgetPeople",this.getArguments().getInt("startBudget"));
+            bundle.putInt("endBudgetPeople",this.getArguments().getInt("endBudget"));
+        }
+        bundle.putString("numberOfPeople",txtPeople);
+        timeFragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frame_main, new TimeFragment());
+        fragmentTransaction.replace(R.id.frame_main, timeFragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
 }
-
-
-/*
-* Cose da fare:
-*
-* 1) Inserire le immagini
-*
-* */

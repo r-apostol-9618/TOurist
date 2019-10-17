@@ -14,8 +14,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RadioGroup;
+import android.widget.Switch;
 import android.widget.TextView;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -25,6 +31,7 @@ import java.util.Objects;
 public class TimeFragment extends Fragment {
 
     private Calendar myCalendar;
+    private TextView txtCalendar,txtStartTime,txtEndTime;
 
     public TimeFragment() {
         // Required empty public constructor
@@ -41,12 +48,14 @@ public class TimeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        setDateCalendar();
+        txtCalendar = Objects.requireNonNull(getView()).findViewById(R.id.txtData);
+        txtStartTime = getView().findViewById(R.id.timeBegin);
+        txtEndTime = getView().findViewById(R.id.timeEnd);
 
-        TextView txtStartTime = Objects.requireNonNull(getView()).findViewById(R.id.timeBegin);
-        TextView txtEndTime = getView().findViewById(R.id.timeEnd);
+        disableDalleAlle();
         setTime(txtStartTime);
         setTime(txtEndTime);
+        setDateCalendar();
 
         toMap();
 
@@ -70,7 +79,6 @@ public class TimeFragment extends Fragment {
     }
 
     private void updateLabelCalendar(){
-        TextView txtCalendar = Objects.requireNonNull(getView()).findViewById(R.id.txtData);
         String myFormat = "dd/MM/yyyy";
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.ITALIAN);
         txtCalendar.setText(sdf.format(myCalendar.getTime()));
@@ -91,16 +99,60 @@ public class TimeFragment extends Fragment {
     private void toMap(){
         Button avanti = Objects.requireNonNull(getView()).findViewById(R.id.btnAvanti3);
         avanti.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), MapActivity.class);
-            startActivity(intent);
+            if(isEmptyDate()){
+                messageErrorSnack("Inserisci una data valida!");
+            }else if(timeRangeError()){
+                messageErrorSnack("Inserisci un range temporale valido!");
+            }else{
+                toMapActivity();
+            }
         });
     }
 
-}
+    private void toMapActivity(){
+        Bundle bundle = this.getArguments();
+        GlobalVariable globalVariable = GlobalVariable.getInstance();
+        if(bundle != null){
+            globalVariable.setBudgetStart(bundle.getInt("startBudgetPeople"));
+            globalVariable.setBudgetEnd(bundle.getInt("endBudgetPeople"));
+            globalVariable.setTypePerson(bundle.getString("numberOfPeople"));
+        }
+        globalVariable.setCalendarDay(txtCalendar.getText().toString());
+        globalVariable.setTimeStart(txtStartTime.getText().toString());
+        globalVariable.setTimeEnd(txtEndTime.getText().toString());
+        Intent intent = new Intent(getActivity(), MapActivity.class);
+        startActivity(intent);
+    }
 
-/*
-* Cose da fare:
-*
-* 1) Verificare che le info inserite siano correte
-*
-* */
+    private boolean isEmptyDate(){
+        return txtCalendar.getText().toString().equals("gg/mm/aaaa");
+    }
+
+    private boolean timeRangeError(){
+        return txtStartTime.getText().toString().equals(txtEndTime.getText().toString());
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void disableDalleAlle(){
+        Switch allDay = Objects.requireNonNull(getView()).findViewById(R.id.switchGiorno);
+        allDay.setOnCheckedChangeListener((compoundButton, isChecked) -> {
+            if(isChecked){
+                txtStartTime.setEnabled(false);
+                txtEndTime.setEnabled(false);
+                txtStartTime.setText("00:00");
+                txtEndTime.setText("23:59");
+            }else{
+                txtStartTime.setEnabled(true);
+                txtEndTime.setEnabled(true);
+                txtStartTime.setText("12:00");
+                txtEndTime.setText("12:00");
+            }
+        });
+    }
+
+    private void messageErrorSnack(String txt){
+        FrameLayout timeFrame = Objects.requireNonNull(getView()).findViewById(R.id.timeFrame);
+        Snackbar.make(timeFrame,txt,Snackbar.LENGTH_LONG).show();
+    }
+
+}

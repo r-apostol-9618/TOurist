@@ -4,18 +4,28 @@ package com.its.tourist;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.appbar.AppBarLayout;
 
-public class MapActivity extends AppCompatActivity {
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private ToolbarArcBackground mToolbarArcBackground;
     private AppBarLayout mAppBarLayout;
+    private GoogleMap mMap;
+    private SupportMapFragment mapFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +44,14 @@ public class MapActivity extends AppCompatActivity {
         treeObserve();
         toolbar();
         getWindow().getDecorView().post(() -> mToolbarArcBackground.startAnimate());
+
+        FragmentManager fm = getSupportFragmentManager();
+        mapFragment = SupportMapFragment.newInstance();
+        fm.beginTransaction().replace(R.id.map2,mapFragment).commit();
+        if(mapFragment!=null)
+        {
+            mapFragment.getMapAsync(this);
+        }
 
     }
 
@@ -86,6 +104,19 @@ public class MapActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
+
+        Log.d("tag2", "ciao");
+        mMap = googleMap;
+
+        // Add a marker in Sydney and move the camera
+        LatLng turin = new LatLng(-45.07120845, 7.686839780486022);
+        mMap.addMarker(new MarkerOptions().position(turin).title("Marker in Turin"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(turin));
     }
 
 }

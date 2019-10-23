@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
             FrameLayout main = findViewById(R.id.frame_main);
             main.setVisibility(View.VISIBLE);
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.frame_main, new BudgetFragment());
+            fragmentTransaction.replace(R.id.frame_main, new PeopleFragment());
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
         };

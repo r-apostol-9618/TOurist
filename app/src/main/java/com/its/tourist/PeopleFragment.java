@@ -37,27 +37,24 @@ public class PeopleFragment extends Fragment {
 
     private void chooseImageGroup(){
         ImageView imgSingolo = Objects.requireNonNull(getView()).findViewById(R.id.imgViewSingolo);
-        imgSingolo.setOnClickListener(v -> toTime("singolo"));
+        imgSingolo.setOnClickListener(v -> toBudget("singolo"));
 
         ImageView imgCoppia = getView().findViewById(R.id.imgViewCoppia);
-        imgCoppia.setOnClickListener(v -> toTime("coppia"));
+        imgCoppia.setOnClickListener(v -> toBudget("coppia"));
 
         ImageView imgGruppo = getView().findViewById(R.id.imgViewGruppo);
-        imgGruppo.setOnClickListener(v -> toTime("gruppo"));
+        imgGruppo.setOnClickListener(v -> toBudget("gruppo"));
     }
 
-    private void toTime(String txtPeople) {
+    private void toBudget(String txtPeople) {
         assert getFragmentManager() != null;
         Bundle bundle = new Bundle();
-        TimeFragment timeFragment = new TimeFragment();
-        if (this.getArguments() != null){
-            bundle.putInt("startBudgetPeople",this.getArguments().getInt("startBudget"));
-            bundle.putInt("endBudgetPeople",this.getArguments().getInt("endBudget"));
-        }
+        BudgetFragment budgetFragment = new BudgetFragment();
+
         bundle.putString("numberOfPeople",txtPeople);
-        timeFragment.setArguments(bundle);
+        budgetFragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frame_main, timeFragment);
+        fragmentTransaction.replace(R.id.frame_main, budgetFragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }

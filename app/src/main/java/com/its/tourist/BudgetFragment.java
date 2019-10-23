@@ -82,22 +82,22 @@ public class BudgetFragment extends Fragment {
 
         avanti.setOnClickListener(v -> {
             if(errorRangeValue()) {
-                toPeopleFragment();
+                toTimeFragment();
             }else{
                 messageErrorSnack();
             }
         });
     }
 
-    private void toPeopleFragment(){
+    private void toTimeFragment(){
         assert getFragmentManager() != null;
         Bundle bundle = new Bundle();
-        PeopleFragment peopleFragment = new PeopleFragment();
+        TimeFragment timeFragment = new TimeFragment();
         bundle.putInt("startBudget",Integer.parseInt(seekbarStart.getText().toString()));
         bundle.putInt("endBudget",Integer.parseInt(seekbarEnd.getText().toString()));
-        peopleFragment.setArguments(bundle);
+        timeFragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frame_main, peopleFragment);
+        fragmentTransaction.replace(R.id.frame_main, timeFragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }

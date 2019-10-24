@@ -7,18 +7,30 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ViewTreeObserver;
 import android.view.Window;
+import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.appbar.AppBarLayout;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -109,14 +121,82 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
-
         Log.d("tag2", "ciao");
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng turin = new LatLng(-45.07120845, 7.686839780486022);
+        // Mette un marker su Torino
+        LatLng turin = new LatLng(45.116177, 7.742615);
         mMap.addMarker(new MarkerOptions().position(turin).title("Marker in Turin"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(turin));
+
+        //Circoscrizione Torino
+        mMap.setMinZoomPreference(10);
+
+        //splitto per ";"
+        String coordinate[] = metodoLetturaCoordinate().split(";");
+        //istanzio l'array list
+        List<LatLng> latlngs = new ArrayList<>();
+
+        //ciclo for fino alla fine del array per aggiungere latitudine e longitude
+        for(int i = 0; i < coordinate.length-1; i++)
+        {
+            String LatLng[] = coordinate[i].split(",");
+            latlngs.add(new LatLng(Double.parseDouble(LatLng[1]), Double.parseDouble(LatLng[0])));
+        }
+        //disegno tutti i poligoni grazie alla lista
+        PolylineOptions rectOptions = new PolylineOptions().addAll(latlngs);
+        rectOptions.color(Color.RED);
+        rectOptions.width(10);
+        mMap.addPolyline(rectOptions);
+    }
+
+    public String metodoLetturaCoordinate(){
+
+        try {
+            InputStream is = getAssets().open("turinCoordinates.txt");
+
+            int size = is.available();
+
+            // Legge tutto l'asset e lo mette in un buffer
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+
+            // Converte il bufffer in una stringa
+            String text = new String(buffer);
+            //dentro text c'è tutto il nostro file txt
+
+            return text;
+
+
+        } catch (IOException e) {
+            // Should never happen!
+            throw new RuntimeException(e);
+        }
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

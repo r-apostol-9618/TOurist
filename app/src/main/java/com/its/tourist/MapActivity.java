@@ -64,6 +64,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         mMap = googleMap;
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.070935, 7.685048), (float) 11));
+        mMap.setMinZoomPreference(11);
+
 
         //Circoscrizione Torino
         circoscrizioneTorino();

@@ -37,7 +37,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private ToolbarArcBackground mToolbarArcBackground;
     private AppBarLayout mAppBarLayout;
     private GoogleMap mMap;
-    private SupportMapFragment mapFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,17 +52,21 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mToolbarArcBackground = findViewById(R.id.toolbarArcBackground);
         mAppBarLayout = findViewById(R.id.appbar);
 
+        visualizzaMappa();
         treeObserve();
         toolbar();
         getWindow().getDecorView().post(() -> mToolbarArcBackground.startAnimate());
 
-        FragmentManager fm = getSupportFragmentManager();
-        mapFragment = SupportMapFragment.newInstance();
-        fm.beginTransaction().replace(R.id.map2,mapFragment).commit();
-        if(mapFragment!=null)
-        {
-            mapFragment.getMapAsync(this);
-        }
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
+        mMap = googleMap;
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.070935, 7.685048), (float) 10));
+
+        //Circoscrizione Torino
+        circoscrizioneTorino();
 
     }
 
@@ -78,6 +81,33 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     finish();
                 }).setNegativeButton("ANNULLA", (dialogInterface, i) -> { }).show();
     }
+
+    private void circoscrizioneTorino(){
+        //splitto per ";"
+        String[] coordinate = metodoLetturaCoordinate().split(";");
+        //istanzio l'array list
+        List<LatLng> latlngs = new ArrayList<>();
+
+        //ciclo for fino alla fine del array per aggiungere latitudine e longitude
+        for(int i = 0; i < coordinate.length-1; i++)
+        {
+            String[] LatLng = coordinate[i].split(",");
+            latlngs.add(new LatLng(Double.parseDouble(LatLng[1]), Double.parseDouble(LatLng[0])));
+        }
+        //disegno tutti i poligoni grazie alla lista
+        PolylineOptions rectOptions = new PolylineOptions().addAll(latlngs);
+        rectOptions.color(Color.RED);
+        rectOptions.width(8);
+        mMap.addPolyline(rectOptions);
+    }
+
+    private void visualizzaMappa(){
+        FragmentManager fm = getSupportFragmentManager();
+        SupportMapFragment mapFragment = SupportMapFragment.newInstance();
+        fm.beginTransaction().replace(R.id.map2,mapFragment).commit();
+        mapFragment.getMapAsync(this);
+    }
+
 
     private void treeObserve(){
         //Tree Observe Listener per prendere la larghezza e la lunghezza della toolbar quando finisce di creare la view
@@ -118,43 +148,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
     }
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-
-        Log.d("tag2", "ciao");
-        mMap = googleMap;
-
-        // Mette un marker su Torino
-        LatLng turin = new LatLng(45.116177, 7.742615);
-        mMap.addMarker(new MarkerOptions().position(turin).title("Marker in Turin"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(turin));
-
-        //Circoscrizione Torino
-        mMap.setMinZoomPreference(10);
-
-        //splitto per ";"
-        String coordinate[] = metodoLetturaCoordinate().split(";");
-        //istanzio l'array list
-        List<LatLng> latlngs = new ArrayList<>();
-
-        //ciclo for fino alla fine del array per aggiungere latitudine e longitude
-        for(int i = 0; i < coordinate.length-1; i++)
-        {
-            String LatLng[] = coordinate[i].split(",");
-            latlngs.add(new LatLng(Double.parseDouble(LatLng[1]), Double.parseDouble(LatLng[0])));
-        }
-        //disegno tutti i poligoni grazie alla lista
-        PolylineOptions rectOptions = new PolylineOptions().addAll(latlngs);
-        rectOptions.color(Color.RED);
-        rectOptions.width(10);
-        mMap.addPolyline(rectOptions);
-    }
-
     public String metodoLetturaCoordinate(){
-
         try {
             InputStream is = getAssets().open("turinCoordinates.txt");
-
             int size = is.available();
 
             // Legge tutto l'asset e lo mette in un buffer
@@ -162,15 +158,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             is.read(buffer);
             is.close();
 
-            // Converte il bufffer in una stringa
-            String text = new String(buffer);
-            //dentro text c'è tutto il nostro file txt
-
-            return text;
-
+            // Converte il buffer in una stringa dove all'interno vi è il contenuto del file txt, restituendola a fine metodo
+            return new String(buffer);
 
         } catch (IOException e) {
-            // Should never happen!
             throw new RuntimeException(e);
         }
     }

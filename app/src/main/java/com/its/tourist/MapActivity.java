@@ -59,7 +59,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.070935, 7.685048), (float) 11));
         mMap.setMinZoomPreference(11);
 
-
         //Circoscrizione Torino
         circoscrizioneTorino();
 
@@ -84,9 +83,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         List<LatLng> latlngs = new ArrayList<>();
 
         //ciclo for fino alla fine del array per aggiungere latitudine e longitude
-        for(int i = 0; i < coordinate.length-1; i++)
-        {
-            String[] LatLng = coordinate[i].split(",");
+        for (String s : coordinate) {
+            String[] LatLng = s.split(",");
             latlngs.add(new LatLng(Double.parseDouble(LatLng[1]), Double.parseDouble(LatLng[0])));
         }
         //disegno tutti i poligoni grazie alla lista

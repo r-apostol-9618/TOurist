@@ -1,7 +1,7 @@
 Progetto TOurist
 
 Salve a tutti, questo spazio github è dedicato al progetto TOurist durante il periodo ITS.
-Questo branch è il master, cioè il progetto completo.
+Questo è il master, cioè il progetto completo.
 Qui vengono salvate le modifiche apportate al progetto finale visibile agli altri membri e, se nel caso si debbano salvare informazioni da ricordare per le prossime build o per informare gli altri utenti, questo file README è disponibile e modificabile.
 
 Per inizaiare a lavorare sul progetto basta seguire questi passi:
@@ -23,7 +23,7 @@ Dopo che sono state effettuate le modifiche sul progetto e si volesse caricarlo 
 Consigli utili:
 - Tenere sempre aggiornato Android Studio
 - Disinstallare la build precedente dell'app prima di installare quella successiva
-- Ricordate di controllare se sono state apportate modifiche all'interno del master dagli altri utenti mentre si sta per esguire un commit oppure si sta per lavorare su una build vecchia
+- Ricordate di controllare se sono state apportate modifiche all'interno del master dagli altri utenti mentre si sta per eseguire un commit oppure si sta per lavorare su una build vecchia
 - Inserire un commento ad ogni Build per informare gli utenti dei cambiamenti avvenuti
 - Create una copia di backup all'interno del vostro PC per non perdere eventuali dati
 - Inviate una copia dell'APK all'interno del gruppo Telegram, oppure avvertire gli altri Dev di un eventuale Push, per segnalare dei cambiamenti apportati

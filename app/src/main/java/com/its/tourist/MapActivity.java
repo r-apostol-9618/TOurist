@@ -17,6 +17,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.appbar.AppBarLayout;
 
@@ -40,7 +44,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         GlobalVariable global = GlobalVariable.getInstance();
         global.setBackPeople(true);
-        global.setHandlerBudget(true);
+        global.setHandlerPeople(true);
 
         mToolbarArcBackground = findViewById(R.id.toolbarArcBackground);
         mAppBarLayout = findViewById(R.id.appbar);
@@ -59,6 +63,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.070935, 7.685048), (float) 11));
         mMap.setMinZoomPreference(11);
 
+
+
+
+
+
         //Circoscrizione Torino
         circoscrizioneTorino();
 
@@ -74,6 +83,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     startActivity(intent);
                     finish();
                 }).setNegativeButton("ANNULLA", (dialogInterface, i) -> { }).show();
+    }
+
+    private Marker addMarker(LatLng coords, String title){
+        return mMap.addMarker(new MarkerOptions().position(coords).title(title));
     }
 
     private void circoscrizioneTorino(){
@@ -114,7 +127,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
                 //Mando i dati alla ToolbarArcBackground class per gestire la posizione del sole
 
-                mToolbarArcBackground.setWidth(width);
                 mToolbarArcBackground.setHeight(height);
             }
         });
@@ -148,6 +160,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
             // Legge tutto l'asset e lo mette in un buffer
             byte[] buffer = new byte[size];
+            //noinspection ResultOfMethodCallIgnored
             is.read(buffer);
             is.close();
 
@@ -160,27 +173,3 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

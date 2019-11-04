@@ -36,11 +36,10 @@ public class BudgetFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         GlobalVariable global = GlobalVariable.getInstance();
-        global.setBackPeople(true);
-        global.setHandlerBudget(false);
+        global.setBackPeople(false);
 
         gestionePicker();
-        toPeople();
+        toTime();
 
     }
 
@@ -55,11 +54,11 @@ public class BudgetFragment extends Fragment {
         seekbarStart.setText(String.valueOf(0));
         seekbarEnd.setText(String.valueOf(0));
 
+        //noinspection NullableProblems
         rubberRangePicker.setOnRubberRangePickerChangeListener(new RubberRangePicker.OnRubberRangePickerChangeListener() {
             @Override
             public void onProgressChanged(RubberRangePicker rubberRangePicker, int startThumbValue, int endThumbValue, boolean b) {
                 //Gestione seekbar doppia
-
                 if(b && (startThumbValue != Integer.parseInt(seekbarStart.getText().toString()) || endThumbValue != Integer.parseInt(seekbarEnd.getText().toString()))){
                     seekbarStart.setText(String.valueOf(startThumbValue));
                     seekbarEnd.setText(String.valueOf(endThumbValue));
@@ -77,9 +76,8 @@ public class BudgetFragment extends Fragment {
 
     }
 
-    private void toPeople(){
+    private void toTime(){
         Button avanti = Objects.requireNonNull(getView()).findViewById(R.id.btnAvanti);
-
         avanti.setOnClickListener(v -> {
             if(errorRangeValue()) {
                 toTimeFragment();

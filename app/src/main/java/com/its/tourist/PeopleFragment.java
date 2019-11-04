@@ -30,7 +30,8 @@ public class PeopleFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         GlobalVariable global = GlobalVariable.getInstance();
-        global.setBackPeople(false);
+        global.setBackPeople(true);
+        global.setHandlerPeople(false);
         chooseImageGroup();
 
     }
@@ -50,7 +51,6 @@ public class PeopleFragment extends Fragment {
         assert getFragmentManager() != null;
         Bundle bundle = new Bundle();
         BudgetFragment budgetFragment = new BudgetFragment();
-
         bundle.putString("numberOfPeople",txtPeople);
         budgetFragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();

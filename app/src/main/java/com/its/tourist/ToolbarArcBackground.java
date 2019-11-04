@@ -12,7 +12,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Shader;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import androidx.core.content.ContextCompat;
@@ -43,20 +42,13 @@ public class ToolbarArcBackground extends View {
     private Bitmap moon;
     private Bitmap star;
 
-    private int cloud1X = 50;
-    private int cloud2X = 450;
-    private int cloud3X = 850;
-
     int waveHeight = 60;
 
     private int cloud1Y = waveHeight + 150;
     private int cloud2Y = waveHeight + 120;
     private int cloud3Y = waveHeight + 20;
 
-    private int width;
     private int height;
-
-    private int sunHeight;
 
     private Day now = Day.MORNING;
 
@@ -150,9 +142,10 @@ public class ToolbarArcBackground extends View {
         }
 
         if (c.get(Calendar.HOUR_OF_DAY) > 5 && c.get(Calendar.HOUR_OF_DAY) < 18) {
-            timeRate = ((float)c.get(Calendar.HOUR_OF_DAY) - 5 )/ 13;//本来是12个小时，但是为了让太阳露一点出来，＋1
+            timeRate = ((float)c.get(Calendar.HOUR_OF_DAY) - 5 )/ 13;
         } else {
-            if (c.get(Calendar.HOUR_OF_DAY) < 24 && c.get(Calendar.HOUR_OF_DAY) >= 18) {
+            c.get(Calendar.HOUR_OF_DAY);
+            if (c.get(Calendar.HOUR_OF_DAY) >= 18) {
                 timeRate = (float)(c.get(Calendar.HOUR_OF_DAY) - 17) / 12;
             } else {
                 timeRate = (float)(c.get(Calendar.HOUR_OF_DAY) + 6) / 12;
@@ -178,7 +171,6 @@ public class ToolbarArcBackground extends View {
     }
 
     public void startAnimate(){
-        Log.i("ToolbarArcBackground", "timeRate = " + timeRate);
         ValueAnimator anim = ValueAnimator.ofFloat(0f, 1f);
         anim.setDuration(3000);
         //anim.setInterpolator();
@@ -217,7 +209,6 @@ public class ToolbarArcBackground extends View {
     }
 
     private void drawOval(Canvas canvas) {
-
         Paint ovalPaint = new Paint();
         final Path path = new Path();
         ovalPaint.setColor(Color.WHITE);
@@ -234,8 +225,11 @@ public class ToolbarArcBackground extends View {
     }
 
     private void drawCloud(Canvas canvas) {
+        int cloud1X = 50;
         canvas.drawBitmap(cloud1, cloud1X * scale, cloud1Y * scale, null);
+        int cloud2X = 450;
         canvas.drawBitmap(cloud2, cloud2X * scale, cloud2Y * scale, null);
+        int cloud3X = 850;
         canvas.drawBitmap(cloud3, cloud3X + (1 - scale) * getMeasuredWidth(), cloud3Y * scale, null);
     }
 
@@ -260,15 +254,9 @@ public class ToolbarArcBackground extends View {
         LinearGradient linearGradient = new LinearGradient(0f, 0f, getMeasuredWidth(), getMeasuredHeight(), changedColor1, changedColor2, Shader.TileMode.CLAMP);
         paint.setShader(linearGradient);
         canvas.drawRect(0, 0, getMeasuredWidth(), getMeasuredHeight(), paint);
-
-        //LinearGradient linearGradient1 = new LinearGradient(0f, 0f, getMeasuredWidth(), getMeasuredHeight(), 0xff00d9ff, 0xff00b0ff, Shader.TileMode.CLAMP);
-        //paint.setShader(linearGradient1);
-        //canvas.drawRect(0, 0, getMeasuredWidth(), getMeasuredHeight(), paint);
     }
 
     private void drawSun(Canvas canvas) {
-        Log.e("rate", "timeRate = " + timeRate);
-        Log.e("rate", "sun.getWidth() = " + sun.getWidth());
         int passed =  (int)(getMeasuredWidth() * timeRate);
         int xpos = passed - sun.getWidth() / 2;
         if (now == Day.MORNING) {
@@ -282,12 +270,8 @@ public class ToolbarArcBackground extends View {
         //modificare il top per la gestione delle Y sul sole
     }
 
-    public void setWidth(int w){
-        width = w;
-    }
     public void setHeight(int h){
         height = h;
-        Log.e("ARC","h: "+h);
     }
 
 

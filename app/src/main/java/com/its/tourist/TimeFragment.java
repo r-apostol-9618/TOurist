@@ -14,10 +14,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -38,8 +36,7 @@ public class TimeFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_time, container, false);
     }
@@ -116,10 +113,6 @@ public class TimeFragment extends Fragment {
             globalVariable.setBudgetStart(bundle.getInt("startBudgetPeople"));
             globalVariable.setBudgetEnd(bundle.getInt("endBudgetPeople"));
             globalVariable.setTypePerson(bundle.getString("numberOfPeople"));
-        }
-        if (this.getArguments() != null){
-            bundle.putInt("startBudgetPeople",this.getArguments().getInt("startBudget"));
-            bundle.putInt("endBudgetPeople",this.getArguments().getInt("endBudget"));
         }
         globalVariable.setCalendarDay(txtCalendar.getText().toString());
         globalVariable.setTimeStart(txtStartTime.getText().toString());

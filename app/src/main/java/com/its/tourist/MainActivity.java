@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         global = GlobalVariable.getInstance();
-        toBudget();
+        toPeople();
 
         if(getIntent().getBooleanExtra("Exit", false)){
             finish();
@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void toBudget(){
+    private void toPeople(){
         run = () -> {
             //Per poterci inserire all'interno della view il logo prima dell'avvio dei fragment
             FrameLayout main = findViewById(R.id.frame_main);
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
-        if (global.isHandlerBudget()) {
+        if (global.isHandlerPeople()) {
             handler.removeCallbacks(run);
             handler.postDelayed(run, 3000);
         }

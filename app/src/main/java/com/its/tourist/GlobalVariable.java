@@ -8,7 +8,7 @@ class GlobalVariable {
     }
 
     private boolean backPeople;
-    private boolean handlerBudget;
+    private boolean handlerPeople;
     private int budgetStart;
     private int budgetEnd;
     private String typePerson;
@@ -18,7 +18,7 @@ class GlobalVariable {
 
     private GlobalVariable() {
         backPeople = true;
-        handlerBudget = true;
+        handlerPeople = true;
         budgetStart = 0;
         budgetEnd = 0;
         typePerson = "singolo";
@@ -32,7 +32,7 @@ class GlobalVariable {
         return budgetStart;
     }
 
-    public void setBudgetStart(int budgetStart) {
+    void setBudgetStart(int budgetStart) {
         this.budgetStart = budgetStart;
     }
 
@@ -40,7 +40,7 @@ class GlobalVariable {
         return budgetEnd;
     }
 
-    public void setBudgetEnd(int budgetEnd) {
+    void setBudgetEnd(int budgetEnd) {
         this.budgetEnd = budgetEnd;
     }
 
@@ -48,7 +48,7 @@ class GlobalVariable {
         return typePerson;
     }
 
-    public void setTypePerson(String typePerson) {
+    void setTypePerson(String typePerson) {
         this.typePerson = typePerson;
     }
 
@@ -56,7 +56,7 @@ class GlobalVariable {
         return calendarDay;
     }
 
-    public void setCalendarDay(String calendarDay) {
+    void setCalendarDay(String calendarDay) {
         this.calendarDay = calendarDay;
     }
 
@@ -64,7 +64,7 @@ class GlobalVariable {
         return timeStart;
     }
 
-    public void setTimeStart(String timeStart) {
+    void setTimeStart(String timeStart) {
         this.timeStart = timeStart;
     }
 
@@ -72,7 +72,7 @@ class GlobalVariable {
         return timeEnd;
     }
 
-    public void setTimeEnd(String timeEnd) {
+    void setTimeEnd(String timeEnd) {
         this.timeEnd = timeEnd;
     }
 
@@ -84,11 +84,11 @@ class GlobalVariable {
         this.backPeople = backPeople;
     }
 
-    boolean isHandlerBudget() {
-        return handlerBudget;
+    boolean isHandlerPeople() {
+        return handlerPeople;
     }
 
-    void setHandlerBudget(boolean handlerBudget) {
-        this.handlerBudget = handlerBudget;
+    void setHandlerPeople(boolean handlerPeople) {
+        this.handlerPeople = handlerPeople;
     }
 }

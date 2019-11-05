@@ -27,7 +27,7 @@
         <ImageView
             android:id="@+id/imgViewPortafoglio"
             android:layout_width="match_parent"
-            android:layout_weight="15"
+            android:layout_weight="10"
             android:layout_height="0dp"
             app:srcCompat="@drawable/wallet"
             android:contentDescription="@string/budgetIntroDescription" />
@@ -36,7 +36,7 @@
         <com.jem.rubberpicker.RubberRangePicker
             android:id="@+id/seekbar"
             android:layout_width="match_parent"
-            android:layout_weight="9"
+            android:layout_weight="7"
             android:layout_height="0dp"
             app:minValue="0"
             app:maxValue="200"
@@ -56,7 +56,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5"
+            android:layout_weight="4"
             android:gravity="center"
             android:orientation="horizontal" >
 
@@ -93,6 +93,15 @@
             android:orientation="vertical" >
 
             <Button
+                android:id="@+id/btnFree"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center_horizontal"
+                android:textSize="@dimen/btn_text"
+                android:text="@string/btn_free"/>
+
+            <Button
                 android:id="@+id/btnAvanti"
                 style="@style/Widget.MaterialComponents.Button.Icon"
                 android:layout_width="100dp"
@@ -104,11 +113,11 @@
                 android:textSize="@dimen/btn_text" />
 
             <ImageView
-                android:id="@+id/imgViewPage1"
+                android:id="@+id/imgViewPage2"
                 android:layout_width="70dp"
                 android:layout_height="15dp"
                 android:layout_gravity="center_horizontal"
-                app:srcCompat="@drawable/circles"
+                app:srcCompat="@drawable/circles2"
                 android:contentDescription="@string/timeGroupDescription" />
 
         </LinearLayout>

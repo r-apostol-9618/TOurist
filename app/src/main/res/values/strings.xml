@@ -6,6 +6,7 @@
 
     <!-- bottoni -->
     <string name="btn_avanti">AVANTI</string>
+    <string name="btn_free">FREE</string>
 
     <!-- fragment_budget -->
     <string name="seleziona_budget">Seleziona il tuo budget</string>

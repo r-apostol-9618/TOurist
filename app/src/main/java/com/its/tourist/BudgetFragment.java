@@ -40,6 +40,7 @@ public class BudgetFragment extends Fragment {
 
         gestionePicker();
         toTime();
+        freeBudget();
 
     }
 
@@ -87,12 +88,33 @@ public class BudgetFragment extends Fragment {
         });
     }
 
+    private void freeBudget(){
+        Button free = Objects.requireNonNull(getView()).findViewById(R.id.btnFree);
+        free.setOnClickListener(v -> {
+            toTimeFragmentWithFree("free");
+        });
+    }
+
     private void toTimeFragment(){
         assert getFragmentManager() != null;
         Bundle bundle = new Bundle();
         TimeFragment timeFragment = new TimeFragment();
         bundle.putInt("startBudget",Integer.parseInt(seekbarStart.getText().toString()));
         bundle.putInt("endBudget",Integer.parseInt(seekbarEnd.getText().toString()));
+        timeFragment.setArguments(bundle);
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.frame_main, timeFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
+
+    /* ho aggiunto solo questo pezzo per memorizzare se l'utente preme sul bottone Free o meno e cambiare il fragment dopo averlo premuto.
+    *   se esiste un modo più semplice cambia pure */
+    private void toTimeFragmentWithFree(String txtFree) {
+        assert getFragmentManager() != null;
+        Bundle bundle = new Bundle();
+        TimeFragment timeFragment = new TimeFragment();
+        bundle.putString("isFree", txtFree);
         timeFragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.frame_main, timeFragment);

@@ -62,12 +62,12 @@
             android:orientation="vertical" >
 
             <ImageView
-                android:id="@+id/imgViewPage2"
+                android:id="@+id/imgViewPage1"
                 android:layout_width="65dp"
                 android:layout_height="15dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="50dp"
-                app:srcCompat="@drawable/circles2"
+                app:srcCompat="@drawable/circles"
                 android:contentDescription="@string/timeGroupDescription" />
 
         </LinearLayout>

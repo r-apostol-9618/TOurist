@@ -7,10 +7,14 @@
     <!-- bottoni -->
     <string name="btn_avanti">AVANTI</string>
     <string name="btn_free">FREE</string>
+    <string name="btn_cinema">CINEMA</string>
+    <string name="btn_ristoranti">RISTORANTI</string>
+    <string name="btn_musei">MUSEI</string>
 
     <!-- fragment_budget -->
     <string name="seleziona_budget">Seleziona il tuo budget</string>
     <string name="budgetIntroDescription">Immagine iniziale - Portafoglio</string>
+    <string name="budgetSeparator">-</string>
 
     <!-- fragment_people -->
     <string name="seleziona_persone">Seleziona il numero di persone</string>

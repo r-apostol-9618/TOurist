@@ -73,8 +73,10 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:textSize="32sp"
-                android:text="   -   "
-                android:textColor="@color/nero" />
+                android:text="@string/budgetSeparator"
+                android:textColor="@color/nero"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"/>
 
             <TextView
                 android:id="@+id/txtSeekbarEnd"

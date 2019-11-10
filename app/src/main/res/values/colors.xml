@@ -22,5 +22,6 @@
     <color name="nero">#000</color>
     <color name="track_color">#AAAAAA</color>
     <color name="transparent">#0000FFFF</color>
+    <color name="white">#FFF</color>
 
 </resources>

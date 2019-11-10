@@ -144,7 +144,6 @@ public class ToolbarArcBackground extends View {
         if (c.get(Calendar.HOUR_OF_DAY) > 5 && c.get(Calendar.HOUR_OF_DAY) < 18) {
             timeRate = ((float)c.get(Calendar.HOUR_OF_DAY) - 5 )/ 13;
         } else {
-            c.get(Calendar.HOUR_OF_DAY);
             if (c.get(Calendar.HOUR_OF_DAY) >= 18) {
                 timeRate = (float)(c.get(Calendar.HOUR_OF_DAY) - 17) / 12;
             } else {

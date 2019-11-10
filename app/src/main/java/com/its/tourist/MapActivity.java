@@ -11,16 +11,16 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.ViewTreeObserver;
 import android.view.Window;
+import android.widget.Button;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.appbar.AppBarLayout;
 
@@ -34,6 +34,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private ToolbarArcBackground mToolbarArcBackground;
     private AppBarLayout mAppBarLayout;
     private GoogleMap mMap;
+    private ArrayList<Marker> mMusei;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,13 +61,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
 
         mMap = googleMap;
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.070935, 7.685048), (float) 11));
-        mMap.setMinZoomPreference(11);
-
-
-
-
-
+        setInitialZoomMap();
+        setInitialMarkers();
+        filtriMarker();
 
         //Circoscrizione Torino
         circoscrizioneTorino();
@@ -85,8 +82,55 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }).setNegativeButton("ANNULLA", (dialogInterface, i) -> { }).show();
     }
 
-    private Marker addMarker(LatLng coords, String title){
-        return mMap.addMarker(new MarkerOptions().position(coords).title(title));
+    private Marker addMarker(LatLng coords, String title, float color){
+        return mMap.addMarker(new MarkerOptions().position(coords).title(title).icon(BitmapDescriptorFactory.defaultMarker(color)));
+    }
+
+    private void setInitialMarkers(){
+        mMusei = new ArrayList<>();
+        setInitialZoomMap();
+        mMusei.add(addMarker(new LatLng(45.070935, 7.685048),"Centro Musei",BitmapDescriptorFactory.HUE_RED));
+    }
+
+    private void filtriMarker(){
+        Button btnMusei = findViewById(R.id.btnMusei);
+        Button btnCinema = findViewById(R.id.btnCinema);
+        Button btnRisto = findViewById(R.id.btnRistoranti);
+        ArrayList<Marker> mCinema = new ArrayList<>();
+        ArrayList<Marker> mRisto = new ArrayList<>();
+
+        btnMusei.setOnClickListener(view -> {
+            setInitialZoomMap();
+            mMusei.add(addMarker(new LatLng(45.070935, 7.685048),"Centro Musei",BitmapDescriptorFactory.HUE_RED));
+            removeMarkers(mCinema);
+            removeMarkers(mRisto);
+        });
+
+        btnCinema.setOnClickListener(view -> {
+            setInitialZoomMap();
+            mCinema.add(addMarker(new LatLng(45.070935, 7.685048),"Centro Cinema",BitmapDescriptorFactory.HUE_ORANGE));
+            mCinema.add(addMarker(new LatLng(45.107147, 7.678741),"Centro Cinema",BitmapDescriptorFactory.HUE_ORANGE));
+            removeMarkers(mRisto);
+            removeMarkers(mMusei);
+        });
+
+        btnRisto.setOnClickListener(view -> {
+            setInitialZoomMap();
+            mRisto.add(addMarker(new LatLng(45.044114, 7.664933),"Centro Ristoranti",BitmapDescriptorFactory.HUE_GREEN));
+            removeMarkers(mCinema);
+            removeMarkers(mMusei);
+        });
+    }
+
+    private void removeMarkers(ArrayList<Marker> markers){
+        for(Marker m : markers){
+            m.remove();
+        }
+    }
+
+    private void setInitialZoomMap(){
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.070935, 7.685048), (float) 11));
+        mMap.setMinZoomPreference(11);
     }
 
     private void circoscrizioneTorino(){

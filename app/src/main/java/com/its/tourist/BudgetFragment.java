@@ -53,7 +53,7 @@ public class BudgetFragment extends Fragment {
         seekbarEnd = getView().findViewById(R.id.txtSeekbarEnd);
 
         seekbarStart.setText(String.valueOf(0));
-        seekbarEnd.setText(String.valueOf(0));
+        seekbarEnd.setText(String.valueOf(1));
 
         //noinspection NullableProblems
         rubberRangePicker.setOnRubberRangePickerChangeListener(new RubberRangePicker.OnRubberRangePickerChangeListener() {
@@ -90,9 +90,7 @@ public class BudgetFragment extends Fragment {
 
     private void freeBudget(){
         Button free = Objects.requireNonNull(getView()).findViewById(R.id.btnFree);
-        free.setOnClickListener(v -> {
-            toTimeFragmentWithFree("free");
-        });
+        free.setOnClickListener(v -> toTimeFragmentWithFree("free"));
     }
 
     private void toTimeFragment(){

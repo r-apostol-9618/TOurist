@@ -1,5 +1,6 @@
 package com.its.tourist;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -40,7 +41,7 @@ public class BudgetFragment extends Fragment {
 
         gestionePicker();
         toTime();
-        freeBudget();
+        toTimeFree();
 
     }
 
@@ -61,6 +62,10 @@ public class BudgetFragment extends Fragment {
             public void onProgressChanged(RubberRangePicker rubberRangePicker, int startThumbValue, int endThumbValue, boolean b) {
                 //Gestione seekbar doppia
                 if(b && (startThumbValue != Integer.parseInt(seekbarStart.getText().toString()) || endThumbValue != Integer.parseInt(seekbarEnd.getText().toString()))){
+                    //Da riguardare
+                    if(startThumbValue == endThumbValue || endThumbValue == 199){
+                        endThumbValue += 1;
+                    }
                     seekbarStart.setText(String.valueOf(startThumbValue));
                     seekbarEnd.setText(String.valueOf(endThumbValue));
                 }
@@ -68,7 +73,9 @@ public class BudgetFragment extends Fragment {
             }
 
             @Override
-            public void onStartTrackingTouch(RubberRangePicker rubberRangePicker, boolean b) { }
+            public void onStartTrackingTouch(RubberRangePicker rubberRangePicker, boolean b) {
+
+            }
 
             @Override
             public void onStopTrackingTouch(RubberRangePicker rubberRangePicker, boolean b) { }
@@ -79,56 +86,30 @@ public class BudgetFragment extends Fragment {
 
     private void toTime(){
         Button avanti = Objects.requireNonNull(getView()).findViewById(R.id.btnAvanti);
-        avanti.setOnClickListener(v -> {
-            if(errorRangeValue()) {
-                toTimeFragment();
-            }else{
-                messageErrorSnack();
-            }
-        });
+        avanti.setOnClickListener(v -> toTimeFragment(false));
     }
 
-    private void freeBudget(){
+    private void toTimeFree(){
         Button free = Objects.requireNonNull(getView()).findViewById(R.id.btnFree);
-        free.setOnClickListener(v -> toTimeFragmentWithFree("free"));
+        free.setOnClickListener(view -> toTimeFragment(true));
     }
 
-    private void toTimeFragment(){
+    private void toTimeFragment(boolean free){
         assert getFragmentManager() != null;
         Bundle bundle = new Bundle();
         TimeFragment timeFragment = new TimeFragment();
-        bundle.putInt("startBudget",Integer.parseInt(seekbarStart.getText().toString()));
-        bundle.putInt("endBudget",Integer.parseInt(seekbarEnd.getText().toString()));
+        if(free){
+            bundle.putInt("startBudget",0);
+            bundle.putInt("endBudget",0);
+        }else{
+            bundle.putInt("startBudget",Integer.parseInt(seekbarStart.getText().toString()));
+            bundle.putInt("endBudget",Integer.parseInt(seekbarEnd.getText().toString()));
+        }
         timeFragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.frame_main, timeFragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
-
-    /* ho aggiunto solo questo pezzo per memorizzare se l'utente preme sul bottone Free o meno e cambiare il fragment dopo averlo premuto.
-    *   se esiste un modo più semplice cambia pure */
-    private void toTimeFragmentWithFree(String txtFree) {
-        assert getFragmentManager() != null;
-        Bundle bundle = new Bundle();
-        TimeFragment timeFragment = new TimeFragment();
-        bundle.putString("isFree", txtFree);
-        timeFragment.setArguments(bundle);
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frame_main, timeFragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-    }
-
-
-    private boolean errorRangeValue(){
-        return Integer.parseInt(seekbarEnd.getText().toString())>0 && !(seekbarStart.getText().toString().equals(seekbarEnd.getText().toString()));
-    }
-
-    private void messageErrorSnack(){
-        FrameLayout budgetFrame = Objects.requireNonNull(getView()).findViewById(R.id.budgetFrame);
-        Snackbar.make(budgetFrame,"Inserisci un range di valori valido!",Snackbar.LENGTH_LONG).show();
-    }
-
 
 }

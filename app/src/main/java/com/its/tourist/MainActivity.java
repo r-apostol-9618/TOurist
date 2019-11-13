@@ -7,7 +7,6 @@ import androidx.fragment.app.FragmentTransaction;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
-import android.widget.FrameLayout;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -44,8 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private void toPeople(){
         run = () -> {
             //Per poterci inserire all'interno della view il logo prima dell'avvio dei fragment
-            FrameLayout main = findViewById(R.id.frame_main);
-            main.setVisibility(View.VISIBLE);
+            findViewById(R.id.frame_main).setVisibility(View.VISIBLE);
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.frame_main, new PeopleFragment());
             fragmentTransaction.addToBackStack(null);

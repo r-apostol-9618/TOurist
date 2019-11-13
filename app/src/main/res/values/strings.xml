@@ -6,7 +6,7 @@
 
     <!-- bottoni -->
     <string name="btn_avanti">AVANTI</string>
-    <string name="btn_free">FREE</string>
+    <string name="btn_free">GRATUITO</string>
     <string name="btn_cinema">CINEMA</string>
     <string name="btn_ristoranti">RISTORANTI</string>
     <string name="btn_musei">MUSEI</string>

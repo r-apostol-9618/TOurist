@@ -204,7 +204,7 @@ public class ToolbarArcBackground extends View {
         } else {
             drawSun(canvas);
         }
-        drawOval(canvas);
+        //drawOval(canvas);
     }
 
     private void drawOval(Canvas canvas) {

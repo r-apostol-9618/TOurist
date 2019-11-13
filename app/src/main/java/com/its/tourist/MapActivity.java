@@ -158,7 +158,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
     }
 
-
     private void treeObserve(){
         //Tree Observe Listener per prendere la larghezza e la lunghezza della toolbar quando finisce di creare la view
         ViewTreeObserver vto = mAppBarLayout.getViewTreeObserver();
@@ -166,7 +165,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             @Override
             public void onGlobalLayout() {
                 mAppBarLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                int width  = mAppBarLayout.getMeasuredWidth();
                 int height = mAppBarLayout.getMeasuredHeight();
 
                 //Mando i dati alla ToolbarArcBackground class per gestire la posizione del sole
@@ -181,6 +179,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setTitle("TOurist");
+
 
         mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             int scrollRange = -1;

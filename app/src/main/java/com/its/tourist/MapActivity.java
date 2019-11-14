@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -15,6 +16,7 @@ import android.util.Log;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -26,18 +28,16 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.tasks.Task;
-import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.PlaceLikelihood;
-import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
-import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
+import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.libraries.places.api.Places;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -68,46 +68,40 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         treeObserve();
         toolbar();
         getWindow().getDecorView().post(() -> mToolbarArcBackground.startAnimate());
-        provaPlaces();
     }
 
     private void provaPlaces() {
-        // Initialize the SDK
-        Places.initialize(getApplicationContext(), "AIzaSyDdpiYU6WSZpgzlB9d2wai983kwqAjBNXM)");
-        // Create a new Places client instance
+
+        // Initialize Places.
+        Places.initialize(getApplicationContext(), "AIzaSyDdpiYU6WSZpgzlB9d2wai983kwqAjBNXM");//DA MODIFICARE
+
+        // Create a new Places client instance.
         PlacesClient placesClient = Places.createClient(this);
 
-        // Use fields to define the data types to return.
-        List<Place.Field> placeFields = Collections.singletonList(Place.Field.NAME);
+        //ID BERNINI 8218
 
-        // Use the builder to create a FindCurrentPlaceRequest.
-        FindCurrentPlaceRequest request =
-                FindCurrentPlaceRequest.newInstance(placeFields);
+        // Define a Place ID.
+        String placeId = "ChIJtVWx_gFtiEcR7ptfEFvH3lw";
 
-        // Call findCurrentPlace and handle the response (first check that the user has granted permission).
-        if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
-            placeResponse.addOnCompleteListener(task -> {
-                if (task.isSuccessful()){
-                    FindCurrentPlaceResponse response = task.getResult();
-                    for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
-                        Log.i("AAAA", String.format("Place '%s' has likelihood: %f",
-                                placeLikelihood.getPlace().getName(),
-                                placeLikelihood.getLikelihood()));
-                    }
-                } else {
-                    Exception exception = task.getException();
-                    if (exception instanceof ApiException) {
-                        ApiException apiException = (ApiException) exception;
-                        Log.e("AAAAAAA", "Place not found: " + apiException.getStatusCode());
-                    }
-                }
-            });
-        } else {
-            // A local method to request required permissions;
-            // See https://developer.android.com/training/permissions/requesting
-            //getLocationPermission();
-        }
+        // Specify the fields to return.
+        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME);
+
+        // Construct a request object, passing the place ID and fields array.
+        FetchPlaceRequest request = FetchPlaceRequest.builder(placeId, placeFields)
+                .build();
+
+        // Add a listener to handle the response.
+        placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
+            Place place = response.getPlace();
+            Log.i("Bernini", "Place found: " + place.getName());
+        }).addOnFailureListener((exception) -> {
+            if (exception instanceof ApiException) {
+                ApiException apiException = (ApiException) exception;
+                int statusCode = apiException.getStatusCode();
+                // Handle error with given status code.
+                Log.e("NoBernini", "Place not found: " + exception.getMessage());
+            }
+        });
     }
 
     @Override
@@ -120,6 +114,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         //Circoscrizione Torino
         circoscrizioneTorino();
+        provaPlaces();
+
 
     }
 

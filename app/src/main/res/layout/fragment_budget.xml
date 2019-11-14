@@ -101,7 +101,7 @@
                 android:layout_gravity="center_horizontal"
                 android:textSize="@dimen/btn_text"
                 android:text="@string/btn_free"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="15dp"
                 android:layout_marginBottom="10dp"/>
 
             <Button

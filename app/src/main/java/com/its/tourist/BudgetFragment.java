@@ -1,6 +1,5 @@
 package com.its.tourist;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,10 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.jem.rubberpicker.RubberRangePicker;
 
 import java.util.Objects;
@@ -41,8 +38,6 @@ public class BudgetFragment extends Fragment {
 
         gestionePicker();
         toTime();
-        toTimeFree();
-
     }
 
 
@@ -86,11 +81,8 @@ public class BudgetFragment extends Fragment {
 
     private void toTime(){
         Button avanti = Objects.requireNonNull(getView()).findViewById(R.id.btnAvanti);
-        avanti.setOnClickListener(v -> toTimeFragment(false));
-    }
-
-    private void toTimeFree(){
         Button free = Objects.requireNonNull(getView()).findViewById(R.id.btnFree);
+        avanti.setOnClickListener(v -> toTimeFragment(false));
         free.setOnClickListener(view -> toTimeFragment(true));
     }
 

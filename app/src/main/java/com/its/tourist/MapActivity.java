@@ -1,6 +1,5 @@
 package com.its.tourist;
 
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -68,7 +67,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         treeObserve();
         toolbar();
         getWindow().getDecorView().post(() -> mToolbarArcBackground.startAnimate());
-        provaPlaces();
     }
 
     private void provaPlaces() {
@@ -90,6 +88,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             placeResponse.addOnCompleteListener(task -> {
                 if (task.isSuccessful()){
                     FindCurrentPlaceResponse response = task.getResult();
+                    assert response != null;
                     for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
                         Log.i("AAAA", String.format("Place '%s' has likelihood: %f",
                                 placeLikelihood.getPlace().getName(),
@@ -117,6 +116,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         setInitialZoomMap();
         setInitialMarkers();
         filtriMarker();
+        provaPlaces();
 
         //Circoscrizione Torino
         circoscrizioneTorino();
@@ -221,7 +221,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 int height = mAppBarLayout.getMeasuredHeight();
 
                 //Mando i dati alla ToolbarArcBackground class per gestire la posizione del sole
-
                 mToolbarArcBackground.setHeight(height);
             }
         });

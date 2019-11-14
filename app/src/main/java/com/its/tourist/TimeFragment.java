@@ -66,12 +66,16 @@ public class TimeFragment extends Fragment {
             myCalendar.set(Calendar.DAY_OF_MONTH, day);
             updateLabelCalendar();
         };
-
         ImageView calendar = Objects.requireNonNull(getView()).findViewById(R.id.imgViewCalendar);
-        calendar.setOnClickListener(view ->
-                new DatePickerDialog(Objects.requireNonNull(getActivity()), date,
-                myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
-                myCalendar.get(Calendar.DAY_OF_MONTH)).show());
+        calendar.setOnClickListener(view -> {
+            DatePickerDialog datePickerDialog = new DatePickerDialog(Objects.requireNonNull(getActivity()), date,
+                    myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                    myCalendar.get(Calendar.DAY_OF_MONTH));
+            datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+            datePickerDialog.show();
+
+        });
+
 
     }
 

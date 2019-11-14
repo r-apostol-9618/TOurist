@@ -32,14 +32,13 @@
             app:srcCompat="@drawable/wallet"
             android:contentDescription="@string/budgetIntroDescription" />
 
-        <!-- Similar attributes can be applied for RubberRangePicker as well-->
         <com.jem.rubberpicker.RubberRangePicker
             android:id="@+id/seekbar"
             android:layout_width="match_parent"
             android:layout_weight="7"
             android:layout_height="0dp"
             app:minValue="0"
-            app:maxValue="200"
+            app:maxValue="199"
             app:elasticBehavior="cubic"
             app:dampingRatio="0.4"
             app:stiffness="400"
@@ -101,7 +100,9 @@
                 android:layout_height="50dp"
                 android:layout_gravity="center_horizontal"
                 android:textSize="@dimen/btn_text"
-                android:text="@string/btn_free"/>
+                android:text="@string/btn_free"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="10dp"/>
 
             <Button
                 android:id="@+id/btnAvanti"
@@ -110,7 +111,7 @@
                 android:layout_height="50dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="5dp"
-                android:layout_marginBottom="25dp"
+                android:layout_marginBottom="15dp"
                 android:text="@string/btn_avanti"
                 android:textSize="@dimen/btn_text" />
 

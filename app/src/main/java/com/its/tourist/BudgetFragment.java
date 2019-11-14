@@ -56,9 +56,10 @@ public class BudgetFragment extends Fragment {
             @Override
             public void onProgressChanged(RubberRangePicker rubberRangePicker, int startThumbValue, int endThumbValue, boolean b) {
                 //Gestione seekbar doppia
-                if(b && (startThumbValue != Integer.parseInt(seekbarStart.getText().toString()) || endThumbValue != Integer.parseInt(seekbarEnd.getText().toString()))){
-                    //Da riguardare
-                    if(startThumbValue == endThumbValue || endThumbValue == 199){
+                if(b && (startThumbValue != Integer.parseInt(seekbarStart.getText().toString()) || endThumbValue != Integer.parseInt(seekbarEnd.getText().toString()))) {
+                    if(endThumbValue == 200 && startThumbValue == 200){
+                        startThumbValue -= 1;
+                    }else if(startThumbValue == endThumbValue){
                         endThumbValue += 1;
                     }
                     seekbarStart.setText(String.valueOf(startThumbValue));

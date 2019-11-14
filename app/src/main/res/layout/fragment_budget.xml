@@ -38,7 +38,7 @@
             android:layout_weight="7"
             android:layout_height="0dp"
             app:minValue="0"
-            app:maxValue="199"
+            app:maxValue="200"
             app:elasticBehavior="cubic"
             app:dampingRatio="0.4"
             app:stiffness="400"

@@ -27,6 +27,16 @@
         <item name="colorControlNormal">@android:color/white</item>
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
-
     </style>
+
+    <!-- The launcher theme. It sets the main window background to the launch_screen drawable -->
+    <!-- F. Ho copiato lo style di nostatusbar altrimenti nelle schermate compariva.
+            Se trovo un modo migliore per non ripetere il codice modifico. -->
+    <style name="AppTheme.Launcher">
+    <item name="android:windowBackground">@drawable/launch_screen</item>
+        <item name="colorControlNormal">@android:color/white</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+    </style>
+
 </resources>

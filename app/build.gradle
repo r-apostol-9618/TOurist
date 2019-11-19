@@ -37,6 +37,8 @@ dependencies {
     implementation 'com.google.android.material:material:1.0.0' /* Material Design Library */
     implementation 'com.applandeo:material-calendar-view:1.7.0' /* Material Design Calendar */
     implementation 'com.google.android.libraries.places:places:2.1.0' /* Places */
-
-
+    // weather
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
+    implementation 'com.ajts.androidmads.fontutils:fontutils:1.0.2'
 }

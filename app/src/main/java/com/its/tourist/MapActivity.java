@@ -1,6 +1,7 @@
 package com.its.tourist;
 
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -16,6 +17,7 @@ import android.util.Log;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.ApiException;
@@ -41,6 +43,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -49,6 +57,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private AppBarLayout mAppBarLayout;
     private GoogleMap mMap;
     private ArrayList<Marker> mMusei;
+
+    public static String BaseUrl = "http://api.openweathermap.org/";
+    public static String AppId = "c96e8bd7dcf26eab873b1b5417951ba7";
+    public static String lat = "45.070935";
+    public static String lon = "7.685048";
+
+    //private TextView weatherData;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,12 +84,58 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         treeObserve();
         toolbar();
         getWindow().getDecorView().post(() -> mToolbarArcBackground.startAnimate());
+        getCurrentData();
+
+    }
+
+    void getCurrentData() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BaseUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        WeatherService service = retrofit.create(WeatherService.class);
+        Call<WeatherResponse> call = service.getCurrentWeatherData(lat, lon, AppId);
+        call.enqueue(new Callback<WeatherResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<WeatherResponse> call, @NonNull Response<WeatherResponse> response) {
+                if (response.code() == 200) {
+                    WeatherResponse weatherResponse = response.body();
+                    assert weatherResponse != null;
+
+                    String stringBuilder = "Country: " +
+                            weatherResponse.sys.country +
+                            "\n" +
+                            "Temperature: " +
+                            weatherResponse.main.temp +
+                            "\n" +
+                            "Temperature(Min): " +
+                            weatherResponse.main.temp_min +
+                            "\n" +
+                            "Temperature(Max): " +
+                            weatherResponse.main.temp_max +
+                            "\n" +
+                            "Humidity: " +
+                            weatherResponse.main.humidity +
+                            "\n" +
+                            "Pressure: " +
+                            weatherResponse.main.pressure;
+
+                    //weatherData.setText(stringBuilder);
+                    Toast.makeText(MapActivity.this, "CIAO"+stringBuilder, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<WeatherResponse> call, @NonNull Throwable t) {
+                //weatherData.setText(t.getMessage());
+            }
+        });
     }
 
     private void provaPlaces() {
 
         // Initialize Places.
-        Places.initialize(getApplicationContext(), "AIzaSyDdpiYU6WSZpgzlB9d2wai983kwqAjBNXM");//DA MODIFICARE
+        /*Places.initialize(getApplicationContext(), "AIzaSyDdpiYU6WSZpgzlB9d2wai983kwqAjBNXM");//DA MODIFICARE
 
         // Create a new Places client instance.
         PlacesClient placesClient = Places.createClient(this);
@@ -86,6 +148,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         // Specify the fields to return.
         List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME);
 
+
+        placesClient.findCurrentPlace();
         // Construct a request object, passing the place ID and fields array.
         FetchPlaceRequest request = FetchPlaceRequest.builder(placeId, placeFields)
                 .build();
@@ -93,6 +157,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         // Add a listener to handle the response.
         placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
             Place place = response.getPlace();
+            place.getPriceLevel();
             Log.i("Bernini", "Place found: " + place.getName());
         }).addOnFailureListener((exception) -> {
             if (exception instanceof ApiException) {
@@ -101,7 +166,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 // Handle error with given status code.
                 Log.e("NoBernini", "Place not found: " + exception.getMessage());
             }
-        });
+        });*/
     }
 
     @Override

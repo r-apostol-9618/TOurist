@@ -9,8 +9,6 @@
     </style>-->
 
 
-
-
     <!-- Styles per la toolbar ad arco -->
 
     <style name="AppTheme" parent="@style/Theme.AppCompat.Light">
@@ -33,10 +31,19 @@
     <!-- F. Ho copiato lo style di nostatusbar altrimenti nelle schermate compariva.
             Se trovo un modo migliore per non ripetere il codice modifico. -->
     <style name="AppTheme.Launcher">
-    <item name="android:windowBackground">@drawable/launch_screen</item>
+        <!--<item name="android:windowBackground">@drawable/launch_screen</item>-->
         <item name="colorControlNormal">@android:color/white</item>
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
     </style>
+
+    <style name="AppTheme.NoActionBar.nostatusbar.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar.nostatusbar.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.NoActionBar.nostatusbar.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>

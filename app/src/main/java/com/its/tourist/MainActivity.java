@@ -49,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
         run = () -> {
             //Per poterci inserire all'interno della view il logo prima dell'avvio dei fragment
             findViewById(R.id.frame_main).setVisibility(View.VISIBLE);
+            findViewById(R.id.logoApp).setVisibility(View.INVISIBLE);
+            findViewById(R.id.txtLogo).setVisibility(View.INVISIBLE);
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.frame_main, new PeopleFragment());
             fragmentTransaction.addToBackStack(null);
@@ -56,6 +58,12 @@ public class MainActivity extends AppCompatActivity {
         };
         handler = new Handler();
         handler.postDelayed(run,3000);
+    }
+
+    // funzione che trasforma i gradi da Farenheit a Celsius
+    public int farenheitToCelsius(int grades) {
+        int convertedGrades = 0;
+        return convertedGrades = ((grades - 32) * 5)/9;
     }
 
     @Override
@@ -79,3 +87,5 @@ public class MainActivity extends AppCompatActivity {
         handler.removeCallbacks(run);
     }
 }
+
+

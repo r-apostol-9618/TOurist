@@ -2,17 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.its.tourist">
-
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
          location permissions for the 'MyLocation' functionality.
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
-    <uses-permission android:name="android.permission.INTERNET"/>
-
-    <!--suppress AndroidElementNotAllowed -->
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- suppress AndroidElementNotAllowed -->
     <meta-data
         android:name="preloaded_fonts"
         android:resource="@array/preloaded_fonts" />
@@ -42,9 +38,9 @@
         <activity
             android:name=".MapActivity"
             android:theme="@style/AppTheme.NoActionBar.nostatusbar" />
-        <activity android:name=".MainActivity"
-            android:theme="@style/AppTheme.Launcher"
-            >
+        <activity
+            android:name=".MainActivity"
+            android:theme="@style/AppTheme.Launcher">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

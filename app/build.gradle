@@ -38,5 +38,4 @@ dependencies {
     implementation 'com.applandeo:material-calendar-view:1.7.0' /* Material Design Calendar */
     implementation 'com.google.android.libraries.places:places:2.1.0' /* Places */
 
-
 }

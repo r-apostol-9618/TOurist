@@ -19,6 +19,7 @@
 
         <Button
             android:id="@+id/btnMusei"
+            android:onClick="onClick"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -29,6 +30,7 @@
 
         <Button
             android:id="@+id/btnCinema"
+            android:onClick="onClick"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -39,6 +41,7 @@
 
         <Button
             android:id="@+id/btnRistoranti"
+            android:onClick="onClick"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"

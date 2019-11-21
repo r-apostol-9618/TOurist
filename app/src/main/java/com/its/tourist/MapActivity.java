@@ -122,6 +122,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
                     //weatherData.setText(stringBuilder);
                     Toast.makeText(MapActivity.this, "CIAO"+stringBuilder, Toast.LENGTH_SHORT).show();
+
                 }
             }
 

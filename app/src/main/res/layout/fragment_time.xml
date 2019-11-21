@@ -44,7 +44,6 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:layout_weight="1"
-                android:text="@string/dateHint"
                 android:textAlignment="center"
                 android:textSize="@dimen/base_text"
                 tools:ignore="NestedWeights" />

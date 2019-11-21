@@ -25,8 +25,7 @@
 
     <!-- fragment_time -->
     <string name="seleziona_tempo">Seleziona quanto tempo hai a disposizione</string>
-    <string name="dateHint">gg/mm/aaaa</string>
-    <string name="time">12:00</string>
+    <string name="time">00:00</string>
     <string name="allDay">Tutto il giorno</string>
     <string name="dalle">Dalle</string>
     <string name="alle">Alle</string>

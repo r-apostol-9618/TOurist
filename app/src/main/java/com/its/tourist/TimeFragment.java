@@ -30,6 +30,7 @@ public class TimeFragment extends Fragment {
 
     private Calendar myCalendar;
     private TextView txtCalendar,txtStartTime,txtEndTime;
+    private int hour,minute;
 
     public TimeFragment() {
         // Required empty public constructor
@@ -48,18 +49,22 @@ public class TimeFragment extends Fragment {
         txtCalendar = Objects.requireNonNull(getView()).findViewById(R.id.txtData);
         txtStartTime = getView().findViewById(R.id.timeBegin);
         txtEndTime = getView().findViewById(R.id.timeEnd);
+        myCalendar = Calendar.getInstance();
+        hour = myCalendar.get(Calendar.HOUR_OF_DAY);
+        minute = myCalendar.get(Calendar.MINUTE);
 
         disableDalleAlle();
-        setTime(txtStartTime);
-        setTime(txtEndTime);
+        setTime(txtStartTime,true);
+        setTime(txtEndTime,false);
         setDateCalendar();
 
         toMap();
 
     }
 
+    @SuppressLint("SetTextI18n")
     private void setDateCalendar(){
-        myCalendar = Calendar.getInstance();
+        txtCalendar.setText(myCalendar.get(Calendar.DAY_OF_MONTH)+"/"+myCalendar.get(Calendar.MONTH)+"/"+myCalendar.get(Calendar.YEAR));
         DatePickerDialog.OnDateSetListener date = (datePicker, year, month, day) -> {
             myCalendar.set(Calendar.YEAR, year);
             myCalendar.set(Calendar.MONTH, month);
@@ -85,12 +90,14 @@ public class TimeFragment extends Fragment {
         txtCalendar.setText(sdf.format(myCalendar.getTime()));
     }
 
-    private void setTime(TextView txtTime){
+    @SuppressLint("DefaultLocale")
+    private void setTime(TextView txtTime, boolean start){
+        if (start) {
+            txtTime.setText(String.format("%02d:%02d", hour, minute));
+        }
         txtTime.setOnClickListener(view -> {
-            int hour = myCalendar.get(Calendar.HOUR_OF_DAY);
-            int minute = myCalendar.get(Calendar.MINUTE);
             TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), (timePicker, selectedHour, selectedMinute) -> {
-                @SuppressLint("DefaultLocale") String textTime = String.format("%02d:%02d", selectedHour, selectedMinute);
+                String textTime = String.format("%02d:%02d", selectedHour, selectedMinute);
                 txtTime.setText(textTime);
             },hour,minute,true);
             timePickerDialog.show();
@@ -99,11 +106,10 @@ public class TimeFragment extends Fragment {
 
     private void toMap(){
         Button avanti = Objects.requireNonNull(getView()).findViewById(R.id.btnAvanti3);
+        FrameLayout timeFrame = getView().findViewById(R.id.timeFrame);
         avanti.setOnClickListener(v -> {
-            if(isEmptyDate()){
-                messageErrorSnack("Inserisci una data valida!");
-            }else if(timeRangeError()){
-                messageErrorSnack("Inserisci un range temporale valido!");
+            if(timeRangeError()){
+                Snackbar.make(timeFrame,"Inserisci un range temporale valido!",Snackbar.LENGTH_LONG).show();
             }else{
                 toMapActivity();
             }
@@ -125,15 +131,11 @@ public class TimeFragment extends Fragment {
         startActivity(intent);
     }
 
-    private boolean isEmptyDate(){
-        return txtCalendar.getText().toString().equals("gg/mm/aaaa");
-    }
-
     private boolean timeRangeError(){
         return txtStartTime.getText().toString().equals(txtEndTime.getText().toString());
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint({"SetTextI18n", "DefaultLocale"})
     private void disableDalleAlle(){
         Switch allDay = Objects.requireNonNull(getView()).findViewById(R.id.switchGiorno);
         allDay.setOnCheckedChangeListener((compoundButton, isChecked) -> {
@@ -145,15 +147,10 @@ public class TimeFragment extends Fragment {
             }else{
                 txtStartTime.setEnabled(true);
                 txtEndTime.setEnabled(true);
-                txtStartTime.setText("12:00");
-                txtEndTime.setText("12:00");
+                txtStartTime.setText(String.format("%02d:%02d", hour, minute));
+                txtEndTime.setText("00:00");
             }
         });
-    }
-
-    private void messageErrorSnack(String txt){
-        FrameLayout timeFrame = Objects.requireNonNull(getView()).findViewById(R.id.timeFrame);
-        Snackbar.make(timeFrame,txt,Snackbar.LENGTH_LONG).show();
     }
 
 }

@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     public int farenheitToCelsius(int grades) {
         int convertedGrades = 0;
         return convertedGrades = ((grades - 32) * 5)/9;
+
     }
 
     @Override

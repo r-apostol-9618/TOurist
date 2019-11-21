@@ -172,13 +172,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             weatherResponse.sys.country +
                             "\n" +
                             "Temperature: " +
-                            weatherResponse.main.temp +
+                            farenheitToCelsius(weatherResponse.main.temp) +
                             "\n" +
                             "Temperature(Min): " +
-                            weatherResponse.main.temp_min +
+                            farenheitToCelsius(weatherResponse.main.temp_min) +
                             "\n" +
                             "Temperature(Max): " +
-                            weatherResponse.main.temp_max +
+                            farenheitToCelsius(weatherResponse.main.temp_max) +
                             "\n" +
                             "Humidity: " +
                             weatherResponse.main.humidity +
@@ -199,9 +199,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
     }
 
-    private void provaPlaces() {
-
-
+    public double farenheitToCelsius(double grades) {
+        return (grades - 32) * 5/9;
     }
 
     @Override
@@ -214,8 +213,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         //Circoscrizione Torino
         circoscrizioneTorino();
-        provaPlaces();
-
 
     }
 

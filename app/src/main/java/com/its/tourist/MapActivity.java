@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -25,7 +26,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -119,17 +119,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     WeatherResponse weatherResponse = response.body();
                     assert weatherResponse != null;
 
-                    String stringBuilder = "Country: " +
+                    @SuppressLint("DefaultLocale") String stringBuilder = "Country: " +
                             weatherResponse.sys.country +
                             "\n" +
                             "Temperature: " +
-                            farenheitToCelsius(weatherResponse.main.temp) +
+                            String.format("%.2f",kelvinToCelsius(weatherResponse.main.temp)) +
                             "\n" +
                             "Temperature(Min): " +
-                            farenheitToCelsius(weatherResponse.main.temp_min) +
+                            String.format("%.2f",kelvinToCelsius(weatherResponse.main.temp_min)) +
                             "\n" +
                             "Temperature(Max): " +
-                            farenheitToCelsius(weatherResponse.main.temp_max) +
+                            String.format("%.2f",kelvinToCelsius(weatherResponse.main.temp_max)) +
                             "\n" +
                             "Humidity: " +
                             weatherResponse.main.humidity +
@@ -137,21 +137,19 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             "Pressure: " +
                             weatherResponse.main.pressure;
 
-                    //weatherData.setText(stringBuilder);
-                    Toast.makeText(MapActivity.this, "CIAO"+stringBuilder, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MapActivity.this, stringBuilder, Toast.LENGTH_SHORT).show();
 
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<WeatherResponse> call, @NonNull Throwable t) {
-                //weatherData.setText(t.getMessage());
-            }
+            public void onFailure(@NonNull Call<WeatherResponse> call, @NonNull Throwable t) { }
+
         });
     }
 
-    public double farenheitToCelsius(double grades) {
-        return (grades - 32) * 5/9;
+    double kelvinToCelsius(double grades) {
+        return grades - 273.15;
     }
 
     @Override
@@ -159,7 +157,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         mMap = googleMap;
         setInitialZoomMap();
-        setInitialMarkers();
+        //setInitialMarkers();
         //filtriMarker();
 
         //Circoscrizione Torino
@@ -179,6 +177,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }).setNegativeButton("ANNULLA", (dialogInterface, i) -> { }).show();
     }
 
+    /*
     private Marker addMarker(LatLng coords, String title, float color){
         return mMap.addMarker(new MarkerOptions().position(coords).title(title).icon(BitmapDescriptorFactory.defaultMarker(color)));
     }
@@ -189,7 +188,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMusei.add(addMarker(new LatLng(45.070935, 7.685048),"Centro Musei",BitmapDescriptorFactory.HUE_RED));
     }
 
-    /*
     private void filtriMarker(){
         Button btnMusei = findViewById(R.id.btnMusei);
         Button btnCinema = findViewById(R.id.btnCinema);
@@ -339,20 +337,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch(requestCode) {
-            case REQUEST_LOCATION_CODE:
-                if(grantResults.length >0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION) !=  PackageManager.PERMISSION_GRANTED) {
-                        if(client == null) {
-                            bulidGoogleApiClient();
-                        }
-                        mMap.setMyLocationEnabled(true);
+        if (requestCode == REQUEST_LOCATION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    if (client == null) {
+                        bulidGoogleApiClient();
                     }
+                    mMap.setMyLocationEnabled(true);
                 }
-                else {
-                    Toast.makeText(this,"Permission Denied" , Toast.LENGTH_LONG).show();
-                }
-
+            } else {
+                Toast.makeText(this, "Permission Denied", Toast.LENGTH_LONG).show();
+            }
         }
 
     }
@@ -365,10 +360,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onLocationChanged(Location location) {
         lastlocation = location;
-        if(currentLocationmMarker != null)
-        {
+        if(currentLocationmMarker != null) {
             currentLocationmMarker.remove();
-
         }
         LatLng latLng = new LatLng(location.getLatitude() , location.getLongitude());
         MarkerOptions markerOptions = new MarkerOptions();
@@ -381,35 +374,34 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         if(client != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(client,this);
+
         }
     }
 
-    public void onClick(View v)
-    {
-        Object dataTransfer[] = new Object[2];
+    public void onClick(View v) {
+        Object[] dataTransfer = new Object[2];
         GetNearbyPlacesData getNearbyPlacesData = new GetNearbyPlacesData();
 
-        switch(v.getId())
-        {
+        switch(v.getId()) {
             case R.id.btnMusei:
                 mMap.clear();
                 circoscrizioneTorino();
-                String url = getUrl("hospital");
+                String url = getUrl("museum");
                 dataTransfer[0] = mMap;
                 dataTransfer[1] = url;
 
                 getNearbyPlacesData.execute(dataTransfer);
-                Toast.makeText(MapActivity.this, "Showing Nearby Hospitals", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MapActivity.this, "Showing Nearby Museum", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.btnCinema:
                 mMap.clear();
                 circoscrizioneTorino();
-                url = getUrl("school");
+                url = getUrl("movie_theater");
                 dataTransfer[0] = mMap;
                 dataTransfer[1] = url;
 
                 getNearbyPlacesData.execute(dataTransfer);
-                Toast.makeText(MapActivity.this, "Showing Nearby Schools", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MapActivity.this, "Showing Nearby Cinema", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.btnRistoranti:
                 mMap.clear();
@@ -433,7 +425,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         googlePlaceUrl.append("&type=").append(nearbyPlace);
         googlePlaceUrl.append("&keyword=");
         googlePlaceUrl.append("&sensor=true");
-        googlePlaceUrl.append("&key="+"AIzaSyAZT8itfVIs6bA_VsA-Kz9H5sG46n9eJcU");
+        googlePlaceUrl.append("&key="+"AIzaSyBO1-3dOjC_UwnKhBrDfLgeeKm7gSYEIwo");
 
         Log.d("MapsActivity", "url = "+googlePlaceUrl.toString());
 
@@ -448,7 +440,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         locationRequest.setFastestInterval(1000);
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
-
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION ) == PackageManager.PERMISSION_GRANTED) {
             LocationServices.FusedLocationApi.requestLocationUpdates(client, locationRequest, this);
         }
@@ -458,6 +449,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public boolean checkLocationPermission() {
         if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)  != PackageManager.PERMISSION_GRANTED ) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.ACCESS_FINE_LOCATION)) {
+                ActivityCompat.requestPermissions(this,new String[] {Manifest.permission.ACCESS_FINE_LOCATION },REQUEST_LOCATION_CODE);
+            } else {
                 ActivityCompat.requestPermissions(this,new String[] {Manifest.permission.ACCESS_FINE_LOCATION },REQUEST_LOCATION_CODE);
             }
             return false;
@@ -473,20 +466,5 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) { }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

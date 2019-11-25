@@ -12,6 +12,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Priyanka
@@ -21,12 +22,11 @@ class GetNearbyPlacesData extends AsyncTask<Object, String, String> {
 
     private String googlePlacesData;
     private GoogleMap mMap;
-    String url;
 
     @Override
     protected String doInBackground(Object... objects){
         mMap = (GoogleMap)objects[0];
-        url = (String)objects[1];
+        String url = (String) objects[1];
 
         DownloadURL downloadURL = new DownloadURL();
         try {
@@ -40,7 +40,6 @@ class GetNearbyPlacesData extends AsyncTask<Object, String, String> {
 
     @Override
     protected void onPostExecute(String s){
-
         List<HashMap<String, String>> nearbyPlaceList;
         DataParser parser = new DataParser();
         nearbyPlaceList = parser.parse(s);
@@ -48,17 +47,15 @@ class GetNearbyPlacesData extends AsyncTask<Object, String, String> {
         showNearbyPlaces(nearbyPlaceList);
     }
 
-    private void showNearbyPlaces(List<HashMap<String, String>> nearbyPlaceList)
-    {
-        for(int i = 0; i < nearbyPlaceList.size(); i++)
-        {
+    private void showNearbyPlaces(List<HashMap<String, String>> nearbyPlaceList) {
+        for(int i = 0; i < nearbyPlaceList.size(); i++) {
             MarkerOptions markerOptions = new MarkerOptions();
             HashMap<String, String> googlePlace = nearbyPlaceList.get(i);
 
             String placeName = googlePlace.get("place_name");
             String vicinity = googlePlace.get("vicinity");
-            double lat = Double.parseDouble( googlePlace.get("lat"));
-            double lng = Double.parseDouble( googlePlace.get("lng"));
+            double lat = Double.parseDouble(Objects.requireNonNull(googlePlace.get("lat")));
+            double lng = Double.parseDouble(Objects.requireNonNull(googlePlace.get("lng")));
 
             LatLng latLng = new LatLng( lat, lng);
             markerOptions.position(latLng);

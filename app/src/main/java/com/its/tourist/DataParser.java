@@ -14,16 +14,15 @@ import java.util.List;
  * @author Priyanka
  */
 
-public class DataParser {
+class DataParser {
 
-    private HashMap<String, String> getPlace(JSONObject googlePlaceJson)
-    {
+    private HashMap<String, String> getPlace(JSONObject googlePlaceJson) {
         HashMap<String, String> googlePlaceMap = new HashMap<>();
         String placeName = "--NA--";
         String vicinity= "--NA--";
-        String latitude= "";
-        String longitude="";
-        String reference="";
+        String latitude;
+        String longitude;
+        String reference;
 
         Log.d("DataParser","jsonobject ="+googlePlaceJson.toString());
 
@@ -55,14 +54,13 @@ public class DataParser {
         return googlePlaceMap;
 
     }
-    private List<HashMap<String, String>> getPlaces(JSONArray jsonArray)
-    {
+
+    private List<HashMap<String, String>> getPlaces(JSONArray jsonArray) {
         int count = jsonArray.length();
         List<HashMap<String, String>> placelist = new ArrayList<>();
-        HashMap<String, String> placeMap = null;
+        HashMap<String, String> placeMap;
 
-        for(int i = 0; i<count;i++)
-        {
+        for(int i = 0; i<count;i++) {
             try {
                 placeMap = getPlace((JSONObject) jsonArray.get(i));
                 placelist.add(placeMap);
@@ -73,8 +71,7 @@ public class DataParser {
         return placelist;
     }
 
-    public List<HashMap<String, String>> parse(String jsonData)
-    {
+    List<HashMap<String, String>> parse(String jsonData) {
         JSONArray jsonArray = null;
         JSONObject jsonObject;
 
@@ -86,6 +83,7 @@ public class DataParser {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        assert jsonArray != null;
         return getPlaces(jsonArray);
     }
 }

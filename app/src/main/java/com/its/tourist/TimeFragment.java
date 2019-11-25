@@ -32,13 +32,10 @@ public class TimeFragment extends Fragment {
     private TextView txtCalendar,txtStartTime,txtEndTime;
     private int hour,minute;
 
-    public TimeFragment() {
-        // Required empty public constructor
-    }
+    public TimeFragment() { }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_time, container, false);
     }
 

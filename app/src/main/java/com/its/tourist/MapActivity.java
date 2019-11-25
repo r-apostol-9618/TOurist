@@ -374,7 +374,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         if(client != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(client,this);
-
         }
     }
 
@@ -406,7 +405,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             case R.id.btnRistoranti:
                 mMap.clear();
                 circoscrizioneTorino();
-                url = getUrl("resturant");
+                url = getUrl("restaurant");
                 dataTransfer[0] = mMap;
                 dataTransfer[1] = url;
 

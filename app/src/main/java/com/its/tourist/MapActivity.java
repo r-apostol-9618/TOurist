@@ -413,7 +413,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         googlePlaceUrl.append("&type=").append(nearbyPlace);
         googlePlaceUrl.append("&keyword=");
         googlePlaceUrl.append("&sensor=true");
-        googlePlaceUrl.append("&key="+getResources().getString(R.string.google_maps_key));
+        googlePlaceUrl.append("&key=").append(getResources().getString(R.string.google_maps_key));
 
         Log.d("MapsActivity", "url = "+googlePlaceUrl.toString());
 

@@ -28,6 +28,8 @@ class GetNearbyPlacesData extends AsyncTask<Object, String, String> {
         mMap = (GoogleMap)objects[0];
         String url = (String) objects[1];
 
+        Log.d("nearbyplacesdata","DoInBackground");
+
         DownloadURL downloadURL = new DownloadURL();
         try {
             googlePlacesData = downloadURL.readUrl(url);
@@ -43,16 +45,18 @@ class GetNearbyPlacesData extends AsyncTask<Object, String, String> {
         List<HashMap<String, String>> nearbyPlaceList;
         DataParser parser = new DataParser();
         nearbyPlaceList = parser.parse(s);
-        Log.d("nearbyplacesdata","called parse method");
+        Log.d("nearbyplacesdata",s);
         showNearbyPlaces(nearbyPlaceList);
     }
 
     private void showNearbyPlaces(List<HashMap<String, String>> nearbyPlaceList) {
         for(int i = 0; i < nearbyPlaceList.size(); i++) {
+
             MarkerOptions markerOptions = new MarkerOptions();
             HashMap<String, String> googlePlace = nearbyPlaceList.get(i);
 
             String placeName = googlePlace.get("place_name");
+            Log.d("nearbyplacesdata",placeName);
             String vicinity = googlePlace.get("vicinity");
             double lat = Double.parseDouble(Objects.requireNonNull(googlePlace.get("lat")));
             double lng = Double.parseDouble(Objects.requireNonNull(googlePlace.get("lng")));

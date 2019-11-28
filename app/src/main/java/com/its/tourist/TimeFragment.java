@@ -136,12 +136,12 @@ public class TimeFragment extends Fragment {
     private void disableDalleAlle(){
         Switch allDay = Objects.requireNonNull(getView()).findViewById(R.id.switchGiorno);
         allDay.setOnCheckedChangeListener((compoundButton, isChecked) -> {
-            if(isChecked){
+            if(isChecked) {
                 txtStartTime.setEnabled(false);
                 txtEndTime.setEnabled(false);
                 txtStartTime.setText("00:00");
                 txtEndTime.setText("23:59");
-            }else{
+            } else {
                 txtStartTime.setEnabled(true);
                 txtEndTime.setEnabled(true);
                 txtStartTime.setText(String.format("%02d:%02d", hour, minute));

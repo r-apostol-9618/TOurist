@@ -77,7 +77,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Location lastlocation;
     private Marker currentLocationmMarker;
     public static final int REQUEST_LOCATION_CODE = 99;
-    int PROXIMITY_RADIUS = 8000;
+    int PROXIMITY_RADIUS = 7500;
 
 
     //private TextView weatherData;
@@ -122,19 +122,19 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     @SuppressLint("DefaultLocale") String stringBuilder = "Country: " +
                             weatherResponse.sys.country +
                             "\n" +
-                            "Temperature: " +
+                            "Temperatura: " +
                             String.format("%.2f",kelvinToCelsius(weatherResponse.main.temp)) +
                             "\n" +
-                            "Temperature(Min): " +
+                            "Minima: " +
                             String.format("%.2f",kelvinToCelsius(weatherResponse.main.temp_min)) +
                             "\n" +
-                            "Temperature(Max): " +
+                            "Massima: " +
                             String.format("%.2f",kelvinToCelsius(weatherResponse.main.temp_max)) +
                             "\n" +
-                            "Humidity: " +
+                            "Umidità: " +
                             weatherResponse.main.humidity +
                             "\n" +
-                            "Pressure: " +
+                            "Pressione atmosferica: " +
                             weatherResponse.main.pressure;
 
                     Toast.makeText(MapActivity.this, stringBuilder, Toast.LENGTH_SHORT).show();
@@ -230,21 +230,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void circoscrizioneTorino(){
-        //splitto per ";"
         String[] coordinate = metodoLetturaCoordinate().split(";");
-        //istanzio l'array list
         List<LatLng> latlngs = new ArrayList<>();
-
-        //ciclo for fino alla fine del array per aggiungere latitudine e longitude
         for (String s : coordinate) {
             String[] LatLng = s.split(",");
             latlngs.add(new LatLng(Double.parseDouble(LatLng[1]), Double.parseDouble(LatLng[0])));
         }
-        //disegno tutti i poligoni grazie alla lista
         PolylineOptions rectOptions = new PolylineOptions().addAll(latlngs);
         rectOptions.color(Color.RED);
         rectOptions.width(8);
         mMap.addPolyline(rectOptions);
+        setInitialZoomMap();
     }
 
     private void visualizzaMappa(){
@@ -253,24 +249,19 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         fm.beginTransaction().replace(R.id.map2,mapFragment).commit();
         mapFragment.getMapAsync(this);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-        {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
-
         }
     }
 
-
+    //Si utilizza questa funzione per prendere la larghezza e la lunghezza della toolbar quando finisce di creare la view
     private void treeObserve(){
-        //Tree Observe Listener per prendere la larghezza e la lunghezza della toolbar quando finisce di creare la view
         ViewTreeObserver vto = mAppBarLayout.getViewTreeObserver();
         vto.addOnGlobalLayoutListener (new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
                 mAppBarLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 int height = mAppBarLayout.getMeasuredHeight();
-
-                //Mando i dati alla ToolbarArcBackground class per gestire la posizione del sole
                 mToolbarArcBackground.setHeight(height);
             }
         });
@@ -281,7 +272,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setTitle("TOurist");
-
         mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             int scrollRange = -1;
             @Override
@@ -289,7 +279,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 if (scrollRange == -1) {
                     scrollRange = appBarLayout.getTotalScrollRange();
                 }
-
                 float scale = (float) Math.abs(verticalOffset) / scrollRange;
                 mToolbarArcBackground.setScale(1 - scale);
 
@@ -297,18 +286,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
     }
 
+    // Questa funzione converte un flusso di dati, restituendolo in una stringa dove all'interno vi è il contenuto del file txt
     public String metodoLetturaCoordinate(){
         try {
             InputStream is = getAssets().open("turinCoordinates.txt");
             int size = is.available();
-
-            // Legge tutto l'asset e lo mette in un buffer
             byte[] buffer = new byte[size];
+
             //noinspection ResultOfMethodCallIgnored
             is.read(buffer);
             is.close();
 
-            // Converte il buffer in una stringa dove all'interno vi è il contenuto del file txt, restituendola a fine metodo
             return new String(buffer);
 
         } catch (IOException e) {
@@ -380,12 +368,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void onClick(View v) {
         Object[] dataTransfer = new Object[2];
         GetNearbyPlacesData getNearbyPlacesData = new GetNearbyPlacesData();
+        String url;
 
         switch(v.getId()) {
             case R.id.btnMusei:
                 mMap.clear();
                 circoscrizioneTorino();
-                String url = getUrl("museum");
+                url = getUrl("museum");
                 dataTransfer[0] = mMap;
                 dataTransfer[1] = url;
 
@@ -424,7 +413,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         googlePlaceUrl.append("&type=").append(nearbyPlace);
         googlePlaceUrl.append("&keyword=");
         googlePlaceUrl.append("&sensor=true");
-        googlePlaceUrl.append("&key="+"AIzaSyBO1-3dOjC_UwnKhBrDfLgeeKm7gSYEIwo");
+        googlePlaceUrl.append("&key="+getResources().getString(R.string.google_maps_key));
 
         Log.d("MapsActivity", "url = "+googlePlaceUrl.toString());
 
@@ -453,8 +442,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 ActivityCompat.requestPermissions(this,new String[] {Manifest.permission.ACCESS_FINE_LOCATION },REQUEST_LOCATION_CODE);
             }
             return false;
-        }
-        else {
+        } else {
             return true;
         }
 

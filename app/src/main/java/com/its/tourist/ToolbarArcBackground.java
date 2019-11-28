@@ -263,8 +263,7 @@ public class ToolbarArcBackground extends View {
         } else if (now == Day.NOON) {
             canvas.drawBitmap(sunNoon, xpos + (1 - scale) * getMeasuredWidth(), (float) (-height/1.2), null);
         } else if (now == Day.AFTERNOON) {
-            canvas.drawBitmap(sunEvening, xpos + (1 - scale) * getMeasuredWidth(), (float) (-height / 1.2)
-                    , null);
+            canvas.drawBitmap(sunEvening, xpos + (1 - scale) * getMeasuredWidth(), (float) (-height / 1.2), null);
         }
     }
 

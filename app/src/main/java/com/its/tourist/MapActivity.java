@@ -124,6 +124,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         // Call findCurrentPlace and handle the response (first check that the user has granted permission).
         if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            checkLocationPermission();
             Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
             placeResponse.addOnCompleteListener(task -> {
                 if (task.isSuccessful()){

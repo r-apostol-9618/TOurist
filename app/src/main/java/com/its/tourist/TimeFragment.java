@@ -3,13 +3,17 @@ package com.its.tourist;
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,13 +22,22 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Objects;
+
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 public class TimeFragment extends Fragment {
 
@@ -108,9 +121,41 @@ public class TimeFragment extends Fragment {
             if(timeRangeError()){
                 Snackbar.make(timeFrame,"Inserisci un range temporale valido!",Snackbar.LENGTH_LONG).show();
             }else{
-                toMapActivity();
+                permessi();
             }
         });
+    }
+
+    private void permessi(){
+        Dexter.withActivity(getActivity())
+                .withPermission(ACCESS_FINE_LOCATION)
+                .withListener(new PermissionListener() {
+                    @Override
+                    public void onPermissionGranted(PermissionGrantedResponse response) {
+                        toMapActivity();
+                    }
+
+                    @Override
+                    public void onPermissionDenied(PermissionDeniedResponse response) {
+                        if(response.isPermanentlyDenied()){
+                            new AlertDialog
+                                    .Builder(Objects.requireNonNull(getActivity()))
+                                    .setTitle("Accesso ai permessi")
+                                    .setMessage("L'accesso alla localizzazione è permanentemente negato. \nRecarsi nelle impostazioni per attivare il servizio")
+                                    .setNegativeButton("Cancel", null)
+                                    .setPositiveButton("OK", (dialog, which) -> getActivity().finish())
+                                    .show();
+                        } else {
+                            Toast.makeText(getActivity(), "Permesso negato", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+                        token.continuePermissionRequest();
+                    }
+                })
+                .check();
     }
 
     private void toMapActivity(){

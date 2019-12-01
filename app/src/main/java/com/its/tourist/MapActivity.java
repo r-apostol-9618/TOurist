@@ -12,24 +12,39 @@ import androidx.fragment.app.FragmentManager;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.media.audiofx.Equalizer;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.Window;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -39,14 +54,25 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.AutocompletePrediction;
+import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.PlaceLikelihood;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.appbar.AppBarLayout;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -68,7 +94,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private ToolbarArcBackground mToolbarArcBackground;
     private AppBarLayout mAppBarLayout;
     private GoogleMap mMap;
-    private ArrayList<Marker> mMusei;
+    private FusedLocationProviderClient mFusedLocationProviderClient;
+    private PlacesClient placesClient;
+    private List<AutocompletePrediction> predicationList;
+    private Location mLastLocation;
+    private LocationCallback  locationCallback;
+    private View mapView;
+
+    private final float DEFAULT_ZOOM = 10;
+
 
     public static String BaseUrl = "http://api.openweathermap.org/";
     public static String AppId = "c96e8bd7dcf26eab873b1b5417951ba7";
@@ -81,7 +115,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 
     private GoogleApiClient client;
-    private LocationRequest locationRequest;
     private Location lastlocation;
     private Marker currentLocationmMarker;
     public static final int REQUEST_LOCATION_CODE = 99;
@@ -104,27 +137,27 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mToolbarArcBackground = findViewById(R.id.toolbarArcBackground);
         mAppBarLayout = findViewById(R.id.appbar);
 
+        Places.initialize(this, getResources().getString(R.string.google_maps_key));
+
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        placesClient = Places.createClient(this);
+        AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
+
         visualizzaMappa();
         treeObserve();
         toolbar();
         getWindow().getDecorView().post(() -> mToolbarArcBackground.startAnimate());
-        getCurrentData();
+        getCurrentWeather();
 
-        // Initialize the SDK
-        Places.initialize(getApplicationContext(), getResources().getString(R.string.google_maps_key));
+    }
 
-        // Create a new Places client instance
+    private void places(){
         PlacesClient placesClient = Places.createClient(this);
-
-        // Use fields to define the data types to return.
         List<Place.Field> placeFields = Collections.singletonList(Place.Field.NAME);
-
-        // Use the builder to create a FindCurrentPlaceRequest.
         FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(placeFields);
 
         // Call findCurrentPlace and handle the response (first check that the user has granted permission).
         if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            checkLocationPermission();
             Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
             placeResponse.addOnCompleteListener(task -> {
                 if (task.isSuccessful()){
@@ -144,12 +177,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
             });
         } else {
-            checkLocationPermission();
+            //checkLocationPermission();
         }
-
     }
 
-    void getCurrentData() {
+    private void getCurrentWeather() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BaseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -200,13 +232,101 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
 
         mMap = googleMap;
-        setInitialZoomMap();
+        mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+
+        if(mapView != null && mapView.findViewById(Integer.parseInt("1")) != null){
+            View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP,0);
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+            layoutParams.setMargins(0,0,40,180);
+        }
+
+        places();
+
+
+        // Controllo se il gps è attivato
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(5000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+        SettingsClient settingsClient = LocationServices.getSettingsClient(this);
+        Task<LocationSettingsResponse> task = settingsClient.checkLocationSettings(builder.build());
+        task.addOnSuccessListener(this, locationSettingsResponse -> getDeviceLocation());
+
+        task.addOnFailureListener(this, e -> {
+            if(e instanceof ResolvableApiException) {
+                ResolvableApiException resolvable = (ResolvableApiException) e;
+                try {
+                    resolvable.startResolutionForResult(MapActivity.this, 51);
+                } catch (IntentSender.SendIntentException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+
+
+
+
+        //setInitialZoomMap();
         //setInitialMarkers();
-        //filtriMarker();
+        filtriMarker();
 
         //Circoscrizione Torino
         circoscrizioneTorino();
 
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == 51) {
+            if(resultCode == RESULT_OK) {
+                getDeviceLocation();
+            }
+        }
+
+    }
+
+    private void getDeviceLocation() {
+        mFusedLocationProviderClient.getLastLocation()
+                .addOnCompleteListener(new OnCompleteListener<Location>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Location> task) {
+                        if(task.isSuccessful()) {
+                            mLastLocation = task.getResult();
+                            if(mLastLocation != null) {
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()), DEFAULT_ZOOM));
+                            } else {
+                                final LocationRequest locationRequest = LocationRequest.create();
+                                locationRequest.setInterval(10000);
+                                locationRequest.setFastestInterval(5000);
+                                locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                                locationCallback = new LocationCallback() {
+                                    @Override
+                                    public void onLocationResult(LocationResult locationResult) {
+                                        super.onLocationResult(locationResult);
+                                        if (locationResult == null){
+                                            return;
+                                        }
+                                        mLastLocation = locationResult.getLastLocation();
+                                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()), DEFAULT_ZOOM));
+                                        mFusedLocationProviderClient.removeLocationUpdates(locationCallback);
+                                    }
+                                };
+                                mFusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
+                            }
+                        } else {
+                            Toast.makeText(MapActivity.this, "Non è possibile trovare l'ultima posizione nota", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 
     @Override
@@ -221,7 +341,33 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }).setNegativeButton("ANNULLA", (dialogInterface, i) -> { }).show();
     }
 
+    private void filtriMarker(){
+        Button btnMusei = findViewById(R.id.btnMusei);
+        Button btnCinema = findViewById(R.id.btnCinema);
+        Button btnRisto = findViewById(R.id.btnRistoranti);
+
+        btnMusei.setOnClickListener(view -> {
+            setInitialZoomMap();
+
+        });
+
+        btnCinema.setOnClickListener(view -> {
+            setInitialZoomMap();
+
+        });
+
+        btnRisto.setOnClickListener(view -> {
+            setInitialZoomMap();
+
+        });
+    }
+
     /*
+    private void removeMarkers(ArrayList<Marker> markers){
+        for(Marker m : markers){
+            m.remove();
+        }
+
     private Marker addMarker(LatLng coords, String title, float color){
         return mMap.addMarker(new MarkerOptions().position(coords).title(title).icon(BitmapDescriptorFactory.defaultMarker(color)));
     }
@@ -231,41 +377,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         setInitialZoomMap();
         mMusei.add(addMarker(new LatLng(45.070935, 7.685048),"Centro Musei",BitmapDescriptorFactory.HUE_RED));
     }
-
-    private void filtriMarker(){
-        Button btnMusei = findViewById(R.id.btnMusei);
-        Button btnCinema = findViewById(R.id.btnCinema);
-        Button btnRisto = findViewById(R.id.btnRistoranti);
-        ArrayList<Marker> mCinema = new ArrayList<>();
-        ArrayList<Marker> mRisto = new ArrayList<>();
-
-        btnMusei.setOnClickListener(view -> {
-            setInitialZoomMap();
-            mMusei.add(addMarker(new LatLng(45.070935, 7.685048),"Centro Musei",BitmapDescriptorFactory.HUE_RED));
-            removeMarkers(mCinema);
-            removeMarkers(mRisto);
-        });
-
-        btnCinema.setOnClickListener(view -> {
-            setInitialZoomMap();
-            mCinema.add(addMarker(new LatLng(45.070935, 7.685048),"Centro Cinema",BitmapDescriptorFactory.HUE_ORANGE));
-            mCinema.add(addMarker(new LatLng(45.107147, 7.678741),"Centro Cinema",BitmapDescriptorFactory.HUE_ORANGE));
-            removeMarkers(mRisto);
-            removeMarkers(mMusei);
-        });
-
-        btnRisto.setOnClickListener(view -> {
-            setInitialZoomMap();
-            mRisto.add(addMarker(new LatLng(45.044114, 7.664933),"Centro Ristoranti",BitmapDescriptorFactory.HUE_GREEN));
-            removeMarkers(mCinema);
-            removeMarkers(mMusei);
-        });
-    }
-
-    private void removeMarkers(ArrayList<Marker> markers){
-        for(Marker m : markers){
-            m.remove();
-        }
     }*/
 
     private void setInitialZoomMap(){
@@ -288,14 +399,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void visualizzaMappa(){
-        FragmentManager fm = getSupportFragmentManager();
-        SupportMapFragment mapFragment = SupportMapFragment.newInstance();
-        fm.beginTransaction().replace(R.id.map2,mapFragment).commit();
-        mapFragment.getMapAsync(this);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            checkLocationPermission();
-        }
+        SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map2);
+        assert fm != null;
+        fm.getMapAsync(this);
+        mapView = fm.getView();
     }
 
     //Si utilizza questa funzione per prendere la larghezza e la lunghezza della toolbar quando finisce di creare la view
@@ -477,7 +584,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-*/
+
+
+    @Override
+    public void onConnectionSuspended(int i) { }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) { }
+
+
     public boolean checkLocationPermission() {
         if(ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION)  != PackageManager.PERMISSION_GRANTED ) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, ACCESS_FINE_LOCATION)) {
@@ -491,11 +606,5 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
     }
-/*
-    @Override
-    public void onConnectionSuspended(int i) { }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) { }
 */
 }

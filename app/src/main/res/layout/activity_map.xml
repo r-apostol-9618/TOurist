@@ -1,55 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <FrameLayout
+    <fragment
         android:id="@+id/map2"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
+        android:layout_alignParentBottom="true"
         android:orientation="horizontal">
 
         <Button
             android:id="@+id/btnMusei"
-            android:onClick="onClick"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/btn_musei"
             style="?android:attr/buttonBarButtonStyle"
             android:background="@color/colorPrimary"
-            android:textColor="@color/white"/>
+            android:textColor="@color/white"
+            android:textStyle="bold"/>
 
         <Button
             android:id="@+id/btnCinema"
-            android:onClick="onClick"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/btn_cinema"
             style="?android:attr/buttonBarButtonStyle"
             android:background="@color/colorPrimary"
-            android:textColor="@color/white"/>
+            android:textColor="@color/white"
+            android:textStyle="bold"/>
 
         <Button
             android:id="@+id/btnRistoranti"
-            android:onClick="onClick"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/btn_ristoranti"
             style="?android:attr/buttonBarButtonStyle"
             android:background="@color/colorPrimary"
-            android:textColor="@color/white"/>
+            android:textColor="@color/white"
+            android:textStyle="bold"/>
 
     </LinearLayout>
 
@@ -94,4 +95,4 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</RelativeLayout>

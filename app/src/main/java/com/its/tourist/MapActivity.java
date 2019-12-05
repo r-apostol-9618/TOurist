@@ -1,13 +1,6 @@
 package com.its.tourist;
 
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -23,6 +16,13 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -45,8 +45,6 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.AutocompletePrediction;
-import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.PlaceLikelihood;
@@ -81,6 +79,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Location mLastLocation;
     private LocationCallback  locationCallback;
     private View mapView;
+    private GlobalVariable global;
 
     private final float DEFAULT_ZOOM = 10;
 
@@ -90,6 +89,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public static String lat = "45.070935";
     public static String lon = "7.685048";
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,7 +97,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_map);
 
-        GlobalVariable global = GlobalVariable.getInstance();
+        global = GlobalVariable.getInstance();
         global.setBackPeople(true);
         global.setHandlerPeople(true);
 
@@ -228,6 +228,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void places(){
+        int prezzoSelezionato = gestioneDatiPrezzo();
         //List<Place.Field> placeFields = Collections.singletonList(Place.Field.NAME);
         List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG,Place.Field.PHOTO_METADATAS,Place.Field.PRICE_LEVEL);
         FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(placeFields);
@@ -240,63 +241,66 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     FindCurrentPlaceResponse response = task.getResult();
                     assert response != null;
                     for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
+                        if((placeLikelihood.getPlace().getPriceLevel() != null) && (placeLikelihood.getPlace().getPriceLevel() == prezzoSelezionato)){
 
 
-                        Log.i("posto", String.format("Place '%s' has likelihood: %f",
-                                placeLikelihood.getPlace().getName(),
-                                placeLikelihood.getLikelihood()));
-                        Log.i("latLng",":"+placeLikelihood.getPlace().getLatLng());
 
-                        MarkerOptions markerOptions = new MarkerOptions();
+                                Log.i("posto", String.format("Place '%s' has likelihood: %f",
+                                        placeLikelihood.getPlace().getName(),
+                                        placeLikelihood.getLikelihood()));
+                                Log.i("latLng",":"+placeLikelihood.getPlace().getLatLng());
 
-                        Place place = placeLikelihood.getPlace();
+                                MarkerOptions markerOptions = new MarkerOptions();
 
-                        // Get the first photo in the list.
-                        if (place.getPhotoMetadatas() != null) {
-                            PhotoMetadata photoMetadata;
-                            photoMetadata = place.getPhotoMetadatas().get(0);
+                                Place place = placeLikelihood.getPlace();
 
-                            String attributions = photoMetadata.getAttributions();
-                            // Create a FetchPhotoRequest.
-                            FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
-                                    .setMaxWidth(500) // Optional.
-                                    .setMaxHeight(300) // Optional.
-                                    .build();
-                            placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
-                                Bitmap bitmap = fetchPhotoResponse.getBitmap();
-                                //imageView.setImageBitmap(bitmap);
-                                markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
-                            }).addOnFailureListener((exception) -> {
-                                if (exception instanceof ApiException) {
-                                    ApiException apiException = (ApiException) exception;
-                                    int statusCode = apiException.getStatusCode();
-                                    // Handle error with given status code.
-                                    Log.e("cazz", "Place not found: " + exception.getMessage());
+                                // Get the first photo in the list.
+                                if (place.getPhotoMetadatas() != null) {
+                                    PhotoMetadata photoMetadata;
+                                    photoMetadata = place.getPhotoMetadatas().get(0);
+
+                                    String attributions = photoMetadata.getAttributions();
+                                    // Create a FetchPhotoRequest.
+                                    FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
+                                            .setMaxWidth(500) // Optional.
+                                            .setMaxHeight(300) // Optional.
+                                            .build();
+                                    placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
+                                        Bitmap bitmap = fetchPhotoResponse.getBitmap();
+                                        //imageView.setImageBitmap(bitmap);
+                                        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
+                                    }).addOnFailureListener((exception) -> {
+                                        if (exception instanceof ApiException) {
+                                            ApiException apiException = (ApiException) exception;
+                                            int statusCode = apiException.getStatusCode();
+                                            // Handle error with given status code.
+                                            Log.e("cazz", "Place not found: " + exception.getMessage());
+                                        }
+                                    });
                                 }
-                            });
+
+
+
+                                markerOptions.position(placeLikelihood.getPlace().getLatLng());
+                                markerOptions.title(placeLikelihood.getPlace().getPhotoMetadatas()+ " : ");
+                                //markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+
+                                mMap.addMarker(markerOptions);
+                                mMap.moveCamera(CameraUpdateFactory.newLatLng(placeLikelihood.getPlace().getLatLng()));
+                                mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
+                            }
+                        }} else {
+                            Exception exception = task.getException();
+                            if (exception instanceof ApiException) {
+                                ApiException apiException = (ApiException) exception;
+                                Log.e("Not found", "Place not found: " + apiException.getStatusCode());
+                            }
                         }
-
-
-
-                        markerOptions.position(placeLikelihood.getPlace().getLatLng());
-                        markerOptions.title(placeLikelihood.getPlace().getPhotoMetadatas()+ " : ");
-                        //markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-
-                        mMap.addMarker(markerOptions);
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(placeLikelihood.getPlace().getLatLng()));
-                        mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
-                    }
+                    });
                 } else {
-                    Exception exception = task.getException();
-                    if (exception instanceof ApiException) {
-                        ApiException apiException = (ApiException) exception;
-                        Log.e("Not found", "Place not found: " + apiException.getStatusCode());
-                    }
+                    //checkLocationPermission();
                 }
-            });
-        } else {
-            //checkLocationPermission();
-        }
+
     }
 
     private void getCurrentWeather() {
@@ -442,5 +446,46 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             throw new RuntimeException(e);
         }
     }
+    public int gestioneDatiPrezzo() {
+        int priceS = global.getBudgetStart();
+        int priceE = global.getBudgetEnd();
+        String personT = global.getTypePerson();
 
+        int priceValue=0;
+
+        if((priceS>0 && priceE<20)&& personT.equals("singolo")){
+            priceValue = 1;
+        } else if((priceS>0 && priceE<50)&& personT.equals("singolo")){
+            priceValue = 2;
+        } else if((priceS>0 && priceE<100)&& personT.equals("singolo")){
+            priceValue = 3;
+        } else if((priceS>0 && priceE<200)&& personT.equals("singolo")){
+            priceValue = 4;
+        } else if((priceS>0 && priceE<30)&& personT.equals("coppia")){
+            priceValue = 1;
+        } else if((priceS>0 && priceE<70)&& personT.equals("coppia")){
+            priceValue = 2;
+        } else if((priceS>0 && priceE<120)&& personT.equals("coppia")){
+            priceValue = 3;
+        } else if((priceS>0 && priceE<200)&& personT.equals("coppia")){
+            priceValue = 4;
+        } else if((priceS>0 && priceE<50)&& personT.equals("gruppo")){
+            priceValue = 1;
+        } else if((priceS>0 && priceE<100)&& personT.equals("gruppo")){
+            priceValue = 2;
+        } else if((priceS>0 && priceE<150)&& personT.equals("gruppo")){
+            priceValue = 3;
+        } else if((priceS>0 && priceE<200)&& personT.equals("gruppo")){
+            priceValue = 4;
+        }
+
+        return priceValue;
+    }
+    /*   public String gestioneCalendario(){
+
+        String timeS = global.getTimeStart();
+        String timeE = global.getTimeEnd();
+        String timeD = global.getCalendarDay();
+
+    }*/
 }

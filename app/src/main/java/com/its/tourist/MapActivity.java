@@ -78,7 +78,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private PlacesClient placesClient;
-    private List<AutocompletePrediction> predicationList;
     private Location mLastLocation;
     private LocationCallback  locationCallback;
     private View mapView;
@@ -109,7 +108,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         placesClient = Places.createClient(this);
-        AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
 
         visualizzaMappa();
         treeObserve();
@@ -119,8 +117,117 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
+        mMap = googleMap;
+        mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+
+        createBtnGeo();
+        places();
+        checkGPS();
+
+        filtriMarker();
+
+        circoscrizioneTorino();
+
+    }
+
+    private void checkGPS(){
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(5000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+        SettingsClient settingsClient = LocationServices.getSettingsClient(this);
+        Task<LocationSettingsResponse> task = settingsClient.checkLocationSettings(builder.build());
+        task.addOnSuccessListener(this, locationSettingsResponse -> getDeviceLocation());
+
+        task.addOnFailureListener(this, e -> {
+            if(e instanceof ResolvableApiException) {
+                ResolvableApiException resolvable = (ResolvableApiException) e;
+                try {
+                    resolvable.startResolutionForResult(MapActivity.this, 51);
+                } catch (IntentSender.SendIntentException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private void createBtnGeo(){
+        if(mapView != null && mapView.findViewById(Integer.parseInt("1")) != null){
+            View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP,0);
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+            layoutParams.setMargins(0,0,40,180);
+        }
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == 51) {
+            if(resultCode == RESULT_OK) {
+                getDeviceLocation();
+            }
+        }
+
+    }
+
+    private void getDeviceLocation() {
+        mFusedLocationProviderClient.getLastLocation()
+                .addOnCompleteListener(new OnCompleteListener<Location>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Location> task) {
+                        if(task.isSuccessful()) {
+                            mLastLocation = task.getResult();
+                            if(mLastLocation != null) {
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()), DEFAULT_ZOOM));
+                            } else {
+                                final LocationRequest locationRequest = LocationRequest.create();
+                                locationRequest.setInterval(10000);
+                                locationRequest.setFastestInterval(5000);
+                                locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                                locationCallback = new LocationCallback() {
+                                    @Override
+                                    public void onLocationResult(LocationResult locationResult) {
+                                        super.onLocationResult(locationResult);
+                                        if (locationResult == null){
+                                            return;
+                                        }
+                                        mLastLocation = locationResult.getLastLocation();
+                                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()), DEFAULT_ZOOM));
+                                        mFusedLocationProviderClient.removeLocationUpdates(locationCallback);
+                                    }
+                                };
+                                mFusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
+                            }
+                        } else {
+                            Toast.makeText(MapActivity.this, "Non è possibile trovare l'ultima posizione nota", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this).setTitle("Chiudi").setMessage("Sei sicuro di voler uscire?")
+                .setPositiveButton("ESCI", (dialogInterface, i) -> {
+                    Intent intent = new Intent(MapActivity.this, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.putExtra("Exit", true);
+                    startActivity(intent);
+                    finish();
+                }).setNegativeButton("ANNULLA", (dialogInterface, i) -> { }).show();
+    }
+
     private void places(){
-        PlacesClient placesClient = Places.createClient(this);
         //List<Place.Field> placeFields = Collections.singletonList(Place.Field.NAME);
         List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG,Place.Field.PHOTO_METADATAS,Place.Field.PRICE_LEVEL);
         FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(placeFields);
@@ -133,12 +240,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     FindCurrentPlaceResponse response = task.getResult();
                     assert response != null;
                     for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
+
+
                         Log.i("posto", String.format("Place '%s' has likelihood: %f",
                                 placeLikelihood.getPlace().getName(),
                                 placeLikelihood.getLikelihood()));
                         Log.i("latLng",":"+placeLikelihood.getPlace().getLatLng());
-
-
 
                         MarkerOptions markerOptions = new MarkerOptions();
 
@@ -171,8 +278,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 
 
-                        markerOptions.position(
-                                placeLikelihood.getPlace().getLatLng());
+                        markerOptions.position(placeLikelihood.getPlace().getLatLng());
                         markerOptions.title(placeLikelihood.getPlace().getPhotoMetadatas()+ " : ");
                         //markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
 
@@ -238,113 +344,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     double kelvinToCelsius(double grades) {
         return grades - 273.15;
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-
-        mMap = googleMap;
-        mMap.setMyLocationEnabled(true);
-        mMap.getUiSettings().setMyLocationButtonEnabled(true);
-
-        if(mapView != null && mapView.findViewById(Integer.parseInt("1")) != null){
-            View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
-            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
-            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP,0);
-            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-            layoutParams.setMargins(0,0,40,180);
-        }
-
-        places();
-
-
-        // Controllo se il gps è attivato
-        LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(5000);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
-        SettingsClient settingsClient = LocationServices.getSettingsClient(this);
-        Task<LocationSettingsResponse> task = settingsClient.checkLocationSettings(builder.build());
-        task.addOnSuccessListener(this, locationSettingsResponse -> getDeviceLocation());
-
-        task.addOnFailureListener(this, e -> {
-            if(e instanceof ResolvableApiException) {
-                ResolvableApiException resolvable = (ResolvableApiException) e;
-                try {
-                    resolvable.startResolutionForResult(MapActivity.this, 51);
-                } catch (IntentSender.SendIntentException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        });
-
-        filtriMarker();
-
-        //Circoscrizione Torino
-        circoscrizioneTorino();
-
-    }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if(requestCode == 51) {
-            if(resultCode == RESULT_OK) {
-                getDeviceLocation();
-            }
-        }
-
-    }
-
-    private void getDeviceLocation() {
-        mFusedLocationProviderClient.getLastLocation()
-                .addOnCompleteListener(new OnCompleteListener<Location>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        if(task.isSuccessful()) {
-                            mLastLocation = task.getResult();
-                            if(mLastLocation != null) {
-                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()), DEFAULT_ZOOM));
-                            } else {
-                                final LocationRequest locationRequest = LocationRequest.create();
-                                locationRequest.setInterval(10000);
-                                locationRequest.setFastestInterval(5000);
-                                locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-                                locationCallback = new LocationCallback() {
-                                    @Override
-                                    public void onLocationResult(LocationResult locationResult) {
-                                        super.onLocationResult(locationResult);
-                                        if (locationResult == null){
-                                            return;
-                                        }
-                                        mLastLocation = locationResult.getLastLocation();
-                                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()), DEFAULT_ZOOM));
-                                        mFusedLocationProviderClient.removeLocationUpdates(locationCallback);
-                                    }
-                                };
-                                mFusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
-                            }
-                        } else {
-                            Toast.makeText(MapActivity.this, "Non è possibile trovare l'ultima posizione nota", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-    }
-
-    @Override
-    public void onBackPressed() {
-        new AlertDialog.Builder(this).setTitle("Chiudi").setMessage("Sei sicuro di voler uscire?")
-                .setPositiveButton("ESCI", (dialogInterface, i) -> {
-                    Intent intent = new Intent(MapActivity.this, MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    intent.putExtra("Exit", true);
-                    startActivity(intent);
-                    finish();
-                }).setNegativeButton("ANNULLA", (dialogInterface, i) -> { }).show();
     }
 
     private void filtriMarker(){

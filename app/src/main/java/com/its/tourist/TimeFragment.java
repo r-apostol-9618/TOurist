@@ -91,7 +91,6 @@ public class TimeFragment extends Fragment {
 
         });
 
-
     }
 
     private void updateLabelCalendar(){
@@ -116,10 +115,9 @@ public class TimeFragment extends Fragment {
 
     private void toMap(){
         Button avanti = Objects.requireNonNull(getView()).findViewById(R.id.btnAvanti3);
-        FrameLayout timeFrame = getView().findViewById(R.id.timeFrame);
         avanti.setOnClickListener(v -> {
             if(timeRangeError()){
-                Snackbar.make(timeFrame,"Inserisci un range temporale valido!",Snackbar.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "Inserisci un range temporale valido!", Toast.LENGTH_SHORT).show();
             }else{
                 permessi();
             }

@@ -12,6 +12,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
@@ -37,13 +38,19 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.AutocompletePrediction;
+import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
+import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.PlaceLikelihood;
+import com.google.android.libraries.places.api.net.FetchPhotoRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
@@ -52,7 +59,7 @@ import com.google.android.material.appbar.AppBarLayout;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import retrofit2.Call;
@@ -70,6 +77,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private AppBarLayout mAppBarLayout;
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
+    private PlacesClient placesClient;
+    private List<AutocompletePrediction> predicationList;
     private Location mLastLocation;
     private LocationCallback  locationCallback;
     private View mapView;
@@ -99,6 +108,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Places.initialize(this, getResources().getString(R.string.google_maps_key));
 
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        placesClient = Places.createClient(this);
+        AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
 
         visualizzaMappa();
         treeObserve();
@@ -110,7 +121,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void places(){
         PlacesClient placesClient = Places.createClient(this);
-        List<Place.Field> placeFields = Collections.singletonList(Place.Field.NAME);
+        //List<Place.Field> placeFields = Collections.singletonList(Place.Field.NAME);
+        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG,Place.Field.PHOTO_METADATAS,Place.Field.PRICE_LEVEL);
         FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(placeFields);
 
         // Call findCurrentPlace and handle the response (first check that the user has granted permission).
@@ -124,6 +136,49 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         Log.i("posto", String.format("Place '%s' has likelihood: %f",
                                 placeLikelihood.getPlace().getName(),
                                 placeLikelihood.getLikelihood()));
+                        Log.i("latLng",":"+placeLikelihood.getPlace().getLatLng());
+
+
+
+                        MarkerOptions markerOptions = new MarkerOptions();
+
+                        Place place = placeLikelihood.getPlace();
+
+                        // Get the first photo in the list.
+                        if (place.getPhotoMetadatas() != null) {
+                            PhotoMetadata photoMetadata;
+                            photoMetadata = place.getPhotoMetadatas().get(0);
+
+                            String attributions = photoMetadata.getAttributions();
+                            // Create a FetchPhotoRequest.
+                            FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
+                                    .setMaxWidth(500) // Optional.
+                                    .setMaxHeight(300) // Optional.
+                                    .build();
+                            placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
+                                Bitmap bitmap = fetchPhotoResponse.getBitmap();
+                                //imageView.setImageBitmap(bitmap);
+                                markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
+                            }).addOnFailureListener((exception) -> {
+                                if (exception instanceof ApiException) {
+                                    ApiException apiException = (ApiException) exception;
+                                    int statusCode = apiException.getStatusCode();
+                                    // Handle error with given status code.
+                                    Log.e("cazz", "Place not found: " + exception.getMessage());
+                                }
+                            });
+                        }
+
+
+
+                        markerOptions.position(
+                                placeLikelihood.getPlace().getLatLng());
+                        markerOptions.title(placeLikelihood.getPlace().getPhotoMetadatas()+ " : ");
+                        //markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+
+                        mMap.addMarker(markerOptions);
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(placeLikelihood.getPlace().getLatLng()));
+                        mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
                     }
                 } else {
                     Exception exception = task.getException();

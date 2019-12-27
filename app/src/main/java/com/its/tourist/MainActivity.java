@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void toPeople(){
         run = () -> {
-            //Per poterci inserire all'interno della view il logo prima dell'avvio dei fragment
             findViewById(R.id.frame_main).setVisibility(View.VISIBLE);
             findViewById(R.id.mainIntro).setVisibility(View.GONE);
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();

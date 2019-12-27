@@ -23,7 +23,6 @@ public class BudgetFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_budget, container, false);
     }
 
@@ -42,9 +41,7 @@ public class BudgetFragment extends Fragment {
 
 
     private void gestionePicker(){
-        //seekbar
         RubberRangePicker rubberRangePicker = Objects.requireNonNull(getView()).findViewById(R.id.seekbar);
-        // textView seekbar start / end
         seekbarStart = getView().findViewById(R.id.txtSeekbarStart);
         seekbarEnd = getView().findViewById(R.id.txtSeekbarEnd);
 
@@ -55,7 +52,6 @@ public class BudgetFragment extends Fragment {
         rubberRangePicker.setOnRubberRangePickerChangeListener(new RubberRangePicker.OnRubberRangePickerChangeListener() {
             @Override
             public void onProgressChanged(RubberRangePicker rubberRangePicker, int startThumbValue, int endThumbValue, boolean b) {
-                //Gestione seekbar doppia
                 if(b && (startThumbValue != Integer.parseInt(seekbarStart.getText().toString()) || endThumbValue != Integer.parseInt(seekbarEnd.getText().toString()))) {
                     if(endThumbValue == 200 && startThumbValue == 200){
                         startThumbValue -= 1;
@@ -69,15 +65,12 @@ public class BudgetFragment extends Fragment {
             }
 
             @Override
-            public void onStartTrackingTouch(RubberRangePicker rubberRangePicker, boolean b) {
-
-            }
+            public void onStartTrackingTouch(RubberRangePicker rubberRangePicker, boolean b) { }
 
             @Override
             public void onStopTrackingTouch(RubberRangePicker rubberRangePicker, boolean b) { }
 
         });
-
     }
 
     private void toTime(){

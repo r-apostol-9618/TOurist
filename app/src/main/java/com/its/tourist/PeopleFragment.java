@@ -32,7 +32,6 @@ public class PeopleFragment extends Fragment {
         global.setBackPeople(true);
         global.setHandlerPeople(false);
         chooseImageGroup();
-
     }
 
     private void chooseImageGroup(){

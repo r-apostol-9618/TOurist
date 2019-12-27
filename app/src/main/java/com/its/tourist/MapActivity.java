@@ -1,18 +1,9 @@
 package com.its.tourist;
 
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
@@ -22,7 +13,15 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -38,15 +37,12 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.AutocompletePrediction;
-import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.PlaceLikelihood;
@@ -61,6 +57,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -71,7 +68,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback{
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private ToolbarArcBackground mToolbarArcBackground;
     private AppBarLayout mAppBarLayout;
@@ -79,16 +76,18 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private PlacesClient placesClient;
     private Location mLastLocation;
-    private LocationCallback  locationCallback;
+    private LocationCallback locationCallback;
     private View mapView;
+    private GlobalVariable global;
 
-    private final float DEFAULT_ZOOM = 10;
+    private final float DEFAULT_ZOOM = 18;
 
 
     public static String BaseUrl = "http://api.openweathermap.org/";
     public static String AppId = "c96e8bd7dcf26eab873b1b5417951ba7";
     public static String lat = "45.070935";
     public static String lon = "7.685048";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +96,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_map);
 
-        GlobalVariable global = GlobalVariable.getInstance();
+        global = GlobalVariable.getInstance();
         global.setBackPeople(true);
         global.setHandlerPeople(true);
 
@@ -119,10 +118,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-
         mMap = googleMap;
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
+        mMap.setMinZoomPreference(11);
+        CustomMarkerInfoWindowView adapter = new CustomMarkerInfoWindowView(MapActivity.this);
+        mMap.setInfoWindowAdapter(adapter);
 
         createBtnGeo();
         places();
@@ -131,10 +132,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         filtriMarker();
 
         circoscrizioneTorino();
-
     }
 
-    private void checkGPS(){
+    private void checkGPS() {
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setInterval(10000);
         locationRequest.setFastestInterval(5000);
@@ -146,7 +146,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         task.addOnSuccessListener(this, locationSettingsResponse -> getDeviceLocation());
 
         task.addOnFailureListener(this, e -> {
-            if(e instanceof ResolvableApiException) {
+            if (e instanceof ResolvableApiException) {
                 ResolvableApiException resolvable = (ResolvableApiException) e;
                 try {
                     resolvable.startResolutionForResult(MapActivity.this, 51);
@@ -157,23 +157,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
     }
 
-    private void createBtnGeo(){
-        if(mapView != null && mapView.findViewById(Integer.parseInt("1")) != null){
+    private void createBtnGeo() {
+        if (mapView != null && mapView.findViewById(Integer.parseInt("1")) != null) {
             View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
             RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
-            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP,0);
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-            layoutParams.setMargins(0,0,40,180);
+            layoutParams.setMargins(0, 0, 40, 180);
         }
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == 51) {
-            if(resultCode == RESULT_OK) {
+        if (requestCode == 51) {
+            if (resultCode == RESULT_OK) {
                 getDeviceLocation();
             }
         }
@@ -185,10 +184,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .addOnCompleteListener(new OnCompleteListener<Location>() {
                     @Override
                     public void onComplete(@NonNull Task<Location> task) {
-                        if(task.isSuccessful()) {
+                        if (task.isSuccessful()) {
                             mLastLocation = task.getResult();
-                            if(mLastLocation != null) {
-                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()), DEFAULT_ZOOM));
+                            if (mLastLocation != null) {
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()), DEFAULT_ZOOM));
                             } else {
                                 final LocationRequest locationRequest = LocationRequest.create();
                                 locationRequest.setInterval(10000);
@@ -198,11 +197,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                     @Override
                                     public void onLocationResult(LocationResult locationResult) {
                                         super.onLocationResult(locationResult);
-                                        if (locationResult == null){
+                                        if (locationResult == null) {
                                             return;
                                         }
                                         mLastLocation = locationResult.getLastLocation();
-                                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()), DEFAULT_ZOOM));
+                                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()), DEFAULT_ZOOM));
                                         mFusedLocationProviderClient.removeLocationUpdates(locationCallback);
                                     }
                                 };
@@ -224,67 +223,54 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     intent.putExtra("Exit", true);
                     startActivity(intent);
                     finish();
-                }).setNegativeButton("ANNULLA", (dialogInterface, i) -> { }).show();
+                }).setNegativeButton("ANNULLA", (dialogInterface, i) -> {
+        }).show();
     }
 
-    private void places(){
-        //List<Place.Field> placeFields = Collections.singletonList(Place.Field.NAME);
-        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG,Place.Field.PHOTO_METADATAS,Place.Field.PRICE_LEVEL);
+    private void places() {
+        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID,
+                Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.RATING,
+                Place.Field.PHOTO_METADATAS, Place.Field.PRICE_LEVEL);
         FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(placeFields);
 
-        // Call findCurrentPlace and handle the response (first check that the user has granted permission).
         if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
             placeResponse.addOnCompleteListener(task -> {
-                if (task.isSuccessful()){
+                if (task.isSuccessful()) {
                     FindCurrentPlaceResponse response = task.getResult();
                     assert response != null;
                     for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
-
-
-                        Log.i("posto", String.format("Place '%s' has likelihood: %f",
-                                placeLikelihood.getPlace().getName(),
-                                placeLikelihood.getLikelihood()));
-                        Log.i("latLng",":"+placeLikelihood.getPlace().getLatLng());
+                        //if ((placeLikelihood.getPlace().getPriceLevel() != null) && (placeLikelihood.getPlace().getPriceLevel() == gestioneDatiPrezzo())) {
 
                         MarkerOptions markerOptions = new MarkerOptions();
-
                         Place place = placeLikelihood.getPlace();
 
-                        // Get the first photo in the list.
+                        markerOptions.title(place.getName());
+                        markerOptions.position(Objects.requireNonNull(place.getLatLng()));
+
+                        if(place.getRating() != null) {
+                            markerOptions.snippet("Indirizzo: "+place.getAddress()+"\nRating: "+place.getRating());
+                        } else {
+                            markerOptions.snippet("Indirizzo: "+place.getAddress());
+                        }
+
                         if (place.getPhotoMetadatas() != null) {
                             PhotoMetadata photoMetadata;
                             photoMetadata = place.getPhotoMetadatas().get(0);
 
-                            String attributions = photoMetadata.getAttributions();
-                            // Create a FetchPhotoRequest.
-                            FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
-                                    .setMaxWidth(500) // Optional.
-                                    .setMaxHeight(300) // Optional.
-                                    .build();
-                            placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
-                                Bitmap bitmap = fetchPhotoResponse.getBitmap();
-                                //imageView.setImageBitmap(bitmap);
-                                markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
-                            }).addOnFailureListener((exception) -> {
+                            FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata).build();
+                            placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) ->
+                                    mMap.addMarker(markerOptions).setTag(fetchPhotoResponse.getBitmap())
+                            ).addOnFailureListener((exception) -> {
                                 if (exception instanceof ApiException) {
-                                    ApiException apiException = (ApiException) exception;
-                                    int statusCode = apiException.getStatusCode();
-                                    // Handle error with given status code.
-                                    Log.e("cazz", "Place not found: " + exception.getMessage());
+                                    Log.e("PlaceNotFound", "Place not found: " + exception.getMessage());
                                 }
                             });
+                        } else {
+                            mMap.addMarker(markerOptions).setTag(null);
                         }
 
-
-
-                        markerOptions.position(placeLikelihood.getPlace().getLatLng());
-                        markerOptions.title(placeLikelihood.getPlace().getPhotoMetadatas()+ " : ");
-                        //markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-
-                        mMap.addMarker(markerOptions);
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(placeLikelihood.getPlace().getLatLng()));
-                        mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
+                        //}
                     }
                 } else {
                     Exception exception = task.getException();
@@ -294,85 +280,84 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     }
                 }
             });
-        } else {
-            //checkLocationPermission();
         }
+        /*else {
+            //checkLocationPermission();
+        }*/
+
     }
 
     private void getCurrentWeather() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BaseUrl)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+
+        Log.d("giusto", "debug");
+
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(BaseUrl).addConverterFactory(GsonConverterFactory.create()).build();
         WeatherService service = retrofit.create(WeatherService.class);
         Call<WeatherResponse> call = service.getCurrentWeatherData(lat, lon, AppId);
         call.enqueue(new Callback<WeatherResponse>() {
             @Override
             public void onResponse(@NonNull Call<WeatherResponse> call, @NonNull Response<WeatherResponse> response) {
+
                 if (response.code() == 200) {
                     WeatherResponse weatherResponse = response.body();
                     assert weatherResponse != null;
 
-                    @SuppressLint("DefaultLocale") String stringBuilder = "Country: " +
-                            weatherResponse.sys.country +
-                            "\n" +
-                            "Temperatura: " +
-                            String.format("%.2f",kelvinToCelsius(weatherResponse.main.temp)) +
-                            "\n" +
-                            "Minima: " +
-                            String.format("%.2f",kelvinToCelsius(weatherResponse.main.temp_min)) +
-                            "\n" +
-                            "Massima: " +
-                            String.format("%.2f",kelvinToCelsius(weatherResponse.main.temp_max)) +
-                            "\n" +
-                            "Umidità: " +
-                            weatherResponse.main.humidity +
-                            "\n" +
-                            "Pressione atmosferica: " +
-                            weatherResponse.main.pressure;
+                    @SuppressLint("DefaultLocale") String stringBuilder =
+                            String.format("%.0f", kelvinToCelsius(weatherResponse.main.temp)) + "°" +
+                                    "\n" +
+                                    "Min: " +
+                                    String.format("%.0f", kelvinToCelsius(weatherResponse.main.temp_min)) +
+                                    "\n" +
+                                    "Max: " +
+                                    String.format("%.0f", kelvinToCelsius(weatherResponse.main.temp_max)) +
+                                    "\n" +
+                                    "Umidità: " +
+                                    weatherResponse.main.humidity;
 
-                    Toast.makeText(MapActivity.this, stringBuilder, Toast.LENGTH_SHORT).show();
+                    TextView txtMeteo = findViewById(R.id.txtMeteo);
+                    txtMeteo.setText(stringBuilder);
+                    //meteoString(stringBuilder);
+                    Log.e("giusto", "meteo");
 
                 }
             }
 
+
             @Override
-            public void onFailure(@NonNull Call<WeatherResponse> call, @NonNull Throwable t) { }
+            public void onFailure(@NonNull Call<WeatherResponse> call, @NonNull Throwable t) {
+                Log.d("giusto", "errore");
+                TextView txtMeteo = findViewById(R.id.txtMeteo);
+                String testoBase = "Temperatura: 3, Minima: 0, Massima: 3, Umidità: 60";
+                txtMeteo.setText(testoBase);
+            }
 
         });
+
     }
 
-    double kelvinToCelsius(double grades) {
+    double kelvinToCelsius ( double grades){
         return grades - 273.15;
     }
 
-    private void filtriMarker(){
+    private void filtriMarker () {
         Button btnMusei = findViewById(R.id.btnMusei);
         Button btnCinema = findViewById(R.id.btnCinema);
         Button btnRisto = findViewById(R.id.btnRistoranti);
 
         btnMusei.setOnClickListener(view -> {
-            setInitialZoomMap();
 
         });
 
         btnCinema.setOnClickListener(view -> {
-            setInitialZoomMap();
 
         });
 
         btnRisto.setOnClickListener(view -> {
-            setInitialZoomMap();
 
         });
     }
 
-    private void setInitialZoomMap(){
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.070935, 7.685048), (float) 11));
-        mMap.setMinZoomPreference(11);
-    }
-
-    private void circoscrizioneTorino(){
+    private void circoscrizioneTorino () {
         String[] coordinate = metodoLetturaCoordinate().split(";");
         List<LatLng> latlngs = new ArrayList<>();
         for (String s : coordinate) {
@@ -383,10 +368,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         rectOptions.color(Color.RED);
         rectOptions.width(8);
         mMap.addPolyline(rectOptions);
-        setInitialZoomMap();
     }
 
-    private void visualizzaMappa(){
+    private void visualizzaMappa () {
         SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map2);
         assert fm != null;
         fm.getMapAsync(this);
@@ -394,9 +378,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     //Si utilizza questa funzione per prendere la larghezza e la lunghezza della toolbar quando finisce di creare la view
-    private void treeObserve(){
+    private void treeObserve () {
         ViewTreeObserver vto = mAppBarLayout.getViewTreeObserver();
-        vto.addOnGlobalLayoutListener (new ViewTreeObserver.OnGlobalLayoutListener() {
+        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
                 mAppBarLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
@@ -406,13 +390,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
     }
 
-    private void toolbar(){
+    private void toolbar () {
         //Collego la toolbar al relativo toolbar del xml
         Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        setTitle("TOurist");
+        //toolbar.setTitle(getResources().getString(R.string.app_name));
+
+
         mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             int scrollRange = -1;
+
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
                 if (scrollRange == -1) {
@@ -425,8 +411,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
     }
 
+    // Funzione che mette i dati meteo in una TextView, ancora da modificare
+    private void meteoString (String meteoInfo){
+        TextView txtMeteo = findViewById(R.id.txtMeteo);
+        txtMeteo.setText(meteoInfo);
+    }
+
     // Questa funzione converte un flusso di dati, restituendolo in una stringa dove all'interno vi è il contenuto del file txt
-    public String metodoLetturaCoordinate(){
+    public String metodoLetturaCoordinate () {
         try {
             InputStream is = getAssets().open("turinCoordinates.txt");
             int size = is.available();
@@ -442,5 +434,49 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             throw new RuntimeException(e);
         }
     }
+
+    public int gestioneDatiPrezzo () {
+        int priceS = global.getBudgetStart();
+        int priceE = global.getBudgetEnd();
+        String personT = global.getTypePerson();
+
+        int priceValue = 0;
+
+        if ((priceS > 0 && priceE < 20) && personT.equals("singolo")) {
+            priceValue = 1;
+        } else if ((priceS > 0 && priceE < 50) && personT.equals("singolo")) {
+            priceValue = 2;
+        } else if ((priceS > 0 && priceE < 100) && personT.equals("singolo")) {
+            priceValue = 3;
+        } else if ((priceS > 0 && priceE < 200) && personT.equals("singolo")) {
+            priceValue = 4;
+        } else if ((priceS > 0 && priceE < 30) && personT.equals("coppia")) {
+            priceValue = 1;
+        } else if ((priceS > 0 && priceE < 70) && personT.equals("coppia")) {
+            priceValue = 2;
+        } else if ((priceS > 0 && priceE < 120) && personT.equals("coppia")) {
+            priceValue = 3;
+        } else if ((priceS > 0 && priceE < 200) && personT.equals("coppia")) {
+            priceValue = 4;
+        } else if ((priceS > 0 && priceE < 50) && personT.equals("gruppo")) {
+            priceValue = 1;
+        } else if ((priceS > 0 && priceE < 100) && personT.equals("gruppo")) {
+            priceValue = 2;
+        } else if ((priceS > 0 && priceE < 150) && personT.equals("gruppo")) {
+            priceValue = 3;
+        } else if ((priceS > 0 && priceE < 200) && personT.equals("gruppo")) {
+            priceValue = 4;
+        }
+
+        return priceValue;
+    }
+
+    /*public String gestioneCalendario(){
+
+        String timeS = global.getTimeStart();
+        String timeE = global.getTimeEnd();
+        String timeD = global.getCalendarDay();
+
+    }*/
 
 }

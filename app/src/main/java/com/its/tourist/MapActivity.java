@@ -82,7 +82,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private final float DEFAULT_ZOOM = 18;
 
-
     public static String BaseUrl = "http://api.openweathermap.org/";
     public static String AppId = "c96e8bd7dcf26eab873b1b5417951ba7";
     public static String lat = "45.070935";
@@ -134,6 +133,68 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         circoscrizioneTorino();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 51) {
+            if (resultCode == RESULT_OK) {
+                getDeviceLocation();
+            }
+        }
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this).setTitle("Chiudi").setMessage("Sei sicuro di voler uscire?")
+                .setPositiveButton("ESCI", (dialogInterface, i) -> {
+                    Intent intent = new Intent(MapActivity.this, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.putExtra("Exit", true);
+                    startActivity(intent);
+                    finish();
+                }).setNegativeButton("ANNULLA", (dialogInterface, i) -> {
+        }).show();
+    }
+
+    private void visualizzaMappa () {
+        SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map2);
+        assert fm != null;
+        fm.getMapAsync(this);
+        mapView = fm.getView();
+    }
+
+    public String metodoLetturaCoordinate () {
+        try {
+            InputStream is = getAssets().open("turinCoordinates.txt");
+            int size = is.available();
+            byte[] buffer = new byte[size];
+
+            //noinspection ResultOfMethodCallIgnored
+            is.read(buffer);
+            is.close();
+
+            return new String(buffer);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void circoscrizioneTorino () {
+        String[] coordinate = metodoLetturaCoordinate().split(";");
+        List<LatLng> latlngs = new ArrayList<>();
+        for (String s : coordinate) {
+            String[] LatLng = s.split(",");
+            latlngs.add(new LatLng(Double.parseDouble(LatLng[1]), Double.parseDouble(LatLng[0])));
+        }
+        PolylineOptions rectOptions = new PolylineOptions().addAll(latlngs);
+        rectOptions.color(Color.RED);
+        rectOptions.width(8);
+        mMap.addPolyline(rectOptions);
+    }
+
     private void checkGPS() {
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setInterval(10000);
@@ -165,18 +226,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
             layoutParams.setMargins(0, 0, 40, 180);
         }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == 51) {
-            if (resultCode == RESULT_OK) {
-                getDeviceLocation();
-            }
-        }
-
     }
 
     private void getDeviceLocation() {
@@ -212,19 +261,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         }
                     }
                 });
-    }
-
-    @Override
-    public void onBackPressed() {
-        new AlertDialog.Builder(this).setTitle("Chiudi").setMessage("Sei sicuro di voler uscire?")
-                .setPositiveButton("ESCI", (dialogInterface, i) -> {
-                    Intent intent = new Intent(MapActivity.this, MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    intent.putExtra("Exit", true);
-                    startActivity(intent);
-                    finish();
-                }).setNegativeButton("ANNULLA", (dialogInterface, i) -> {
-        }).show();
     }
 
     private void places() {
@@ -287,6 +323,59 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
+    private void filtriMarker () {
+        Button btnMusei = findViewById(R.id.btnMusei);
+        Button btnCinema = findViewById(R.id.btnCinema);
+        Button btnRisto = findViewById(R.id.btnRistoranti);
+
+        btnMusei.setOnClickListener(view -> {
+
+        });
+
+        btnCinema.setOnClickListener(view -> {
+
+        });
+
+        btnRisto.setOnClickListener(view -> {
+
+        });
+    }
+
+    //Si utilizza questa funzione per prendere la larghezza e la lunghezza della toolbar quando finisce di creare la view
+    private void treeObserve () {
+        ViewTreeObserver vto = mAppBarLayout.getViewTreeObserver();
+        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                mAppBarLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                int height = mAppBarLayout.getMeasuredHeight();
+                mToolbarArcBackground.setHeight(height);
+            }
+        });
+    }
+
+    private void toolbar () {
+        /*
+        //Collego la toolbar al relativo toolbar del xml
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle(getResources().getString(R.string.app_name));
+        */
+
+        mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            int scrollRange = -1;
+
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                if (scrollRange == -1) {
+                    scrollRange = appBarLayout.getTotalScrollRange();
+                }
+                float scale = (float) Math.abs(verticalOffset) / scrollRange;
+                mToolbarArcBackground.setScale(1 - scale);
+
+            }
+        });
+    }
+
     private void getCurrentWeather() {
 
         Log.d("giusto", "debug");
@@ -335,80 +424,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
-    double kelvinToCelsius ( double grades){
+    private double kelvinToCelsius ( double grades){
         return grades - 273.15;
-    }
-
-    private void filtriMarker () {
-        Button btnMusei = findViewById(R.id.btnMusei);
-        Button btnCinema = findViewById(R.id.btnCinema);
-        Button btnRisto = findViewById(R.id.btnRistoranti);
-
-        btnMusei.setOnClickListener(view -> {
-
-        });
-
-        btnCinema.setOnClickListener(view -> {
-
-        });
-
-        btnRisto.setOnClickListener(view -> {
-
-        });
-    }
-
-    private void circoscrizioneTorino () {
-        String[] coordinate = metodoLetturaCoordinate().split(";");
-        List<LatLng> latlngs = new ArrayList<>();
-        for (String s : coordinate) {
-            String[] LatLng = s.split(",");
-            latlngs.add(new LatLng(Double.parseDouble(LatLng[1]), Double.parseDouble(LatLng[0])));
-        }
-        PolylineOptions rectOptions = new PolylineOptions().addAll(latlngs);
-        rectOptions.color(Color.RED);
-        rectOptions.width(8);
-        mMap.addPolyline(rectOptions);
-    }
-
-    private void visualizzaMappa () {
-        SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map2);
-        assert fm != null;
-        fm.getMapAsync(this);
-        mapView = fm.getView();
-    }
-
-    //Si utilizza questa funzione per prendere la larghezza e la lunghezza della toolbar quando finisce di creare la view
-    private void treeObserve () {
-        ViewTreeObserver vto = mAppBarLayout.getViewTreeObserver();
-        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                mAppBarLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                int height = mAppBarLayout.getMeasuredHeight();
-                mToolbarArcBackground.setHeight(height);
-            }
-        });
-    }
-
-    private void toolbar () {
-        //Collego la toolbar al relativo toolbar del xml
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        //toolbar.setTitle(getResources().getString(R.string.app_name));
-
-
-        mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            int scrollRange = -1;
-
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                if (scrollRange == -1) {
-                    scrollRange = appBarLayout.getTotalScrollRange();
-                }
-                float scale = (float) Math.abs(verticalOffset) / scrollRange;
-                mToolbarArcBackground.setScale(1 - scale);
-
-            }
-        });
     }
 
     // Funzione che mette i dati meteo in una TextView, ancora da modificare
@@ -417,25 +434,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         txtMeteo.setText(meteoInfo);
     }
 
-    // Questa funzione converte un flusso di dati, restituendolo in una stringa dove all'interno vi è il contenuto del file txt
-    public String metodoLetturaCoordinate () {
-        try {
-            InputStream is = getAssets().open("turinCoordinates.txt");
-            int size = is.available();
-            byte[] buffer = new byte[size];
-
-            //noinspection ResultOfMethodCallIgnored
-            is.read(buffer);
-            is.close();
-
-            return new String(buffer);
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public int gestioneDatiPrezzo () {
+    private int gestioneDatiPrezzo () {
         int priceS = global.getBudgetStart();
         int priceE = global.getBudgetEnd();
         String personT = global.getTypePerson();

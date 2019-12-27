@@ -47,6 +47,7 @@ import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.PlaceLikelihood;
 import com.google.android.libraries.places.api.net.FetchPhotoRequest;
+import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
@@ -56,6 +57,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -264,10 +266,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void places() {
-        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID,
+
+        //Lista delle informazioni reperibili in un posto --POSSONO ESSERE INSERITE TUTTE QUELLE CONTENUTE IN Place.Field--
+        List<Place.Field> placeFetchFields = Arrays.asList(Place.Field.ID,
                 Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.RATING,
-                Place.Field.PHOTO_METADATAS, Place.Field.PRICE_LEVEL);
-        FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(placeFields);
+                Place.Field.PHOTO_METADATAS, Place.Field.PRICE_LEVEL, Place.Field.OPENING_HOURS);
+
+        //Serve solo l'ID del posto da ricercare
+        FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(Collections.singletonList(Place.Field.ID));
 
         if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
@@ -276,43 +282,57 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     FindCurrentPlaceResponse response = task.getResult();
                     assert response != null;
                     for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
-                        //if ((placeLikelihood.getPlace().getPriceLevel() != null) && (placeLikelihood.getPlace().getPriceLevel() == gestioneDatiPrezzo())) {
 
-                        MarkerOptions markerOptions = new MarkerOptions();
-                        Place place = placeLikelihood.getPlace();
+                        //Chiedo di darmi tutte le informazioni all'interno del posto con il relativo ID
+                        FetchPlaceRequest requestFetch = FetchPlaceRequest.newInstance(Objects.requireNonNull(placeLikelihood.getPlace().getId()), placeFetchFields);
+                        placesClient.fetchPlace(requestFetch).addOnSuccessListener((responseFetch) -> {
 
-                        markerOptions.title(place.getName());
-                        markerOptions.position(Objects.requireNonNull(place.getLatLng()));
+                            Place place = responseFetch.getPlace();
+                            MarkerOptions markerOptions = new MarkerOptions();
 
-                        if(place.getRating() != null) {
-                            markerOptions.snippet("Indirizzo: "+place.getAddress()+"\nRating: "+place.getRating());
-                        } else {
-                            markerOptions.snippet("Indirizzo: "+place.getAddress());
-                        }
+                            //if ((place.getPriceLevel() != null) && (place.getPriceLevel() == gestioneDatiPrezzo())) {
 
-                        if (place.getPhotoMetadatas() != null) {
-                            PhotoMetadata photoMetadata;
-                            photoMetadata = place.getPhotoMetadatas().get(0);
+                            markerOptions.title(place.getName());
+                            markerOptions.position(Objects.requireNonNull(place.getLatLng()));
 
-                            FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata).build();
-                            placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) ->
-                                    mMap.addMarker(markerOptions).setTag(fetchPhotoResponse.getBitmap())
-                            ).addOnFailureListener((exception) -> {
-                                if (exception instanceof ApiException) {
-                                    Log.e("PlaceNotFound", "Place not found: " + exception.getMessage());
-                                }
-                            });
-                        } else {
-                            mMap.addMarker(markerOptions).setTag(null);
-                        }
+                            if(place.getRating() != null) {
+                                markerOptions.snippet("Indirizzo: "+place.getAddress()+"\nRating: "+place.getRating());
+                            } else {
+                                markerOptions.snippet("Indirizzo: "+place.getAddress());
+                            }
 
-                        //}
+                            if (place.getPhotoMetadatas() != null) {
+                                PhotoMetadata photoMetadata;
+                                photoMetadata = place.getPhotoMetadatas().get(0);
+
+                                FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata).build();
+                                placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) ->
+                                        mMap.addMarker(markerOptions).setTag(fetchPhotoResponse.getBitmap())
+                                ).addOnFailureListener((exception) -> {
+                                    if (exception instanceof ApiException) {
+                                        Log.e("PlaceNotFoundPhoto", "Place not found: " + exception.getMessage());
+                                    }
+                                });
+                            } else {
+                                mMap.addMarker(markerOptions).setTag(null);
+                            }
+
+                            Log.i("opening", "Opening: " + place.getOpeningHours());
+
+                            //}
+
+
+                        }).addOnFailureListener((exception) -> {
+                            if (exception instanceof ApiException) {
+                                Log.e("Fetch not found", "Place not found: " + exception.getMessage());
+                            }
+                        });
+
                     }
                 } else {
                     Exception exception = task.getException();
                     if (exception instanceof ApiException) {
-                        ApiException apiException = (ApiException) exception;
-                        Log.e("Not found", "Place not found: " + apiException.getStatusCode());
+                        Log.e("Find not found", "Place not found: " + exception.getMessage());
                     }
                 }
             });

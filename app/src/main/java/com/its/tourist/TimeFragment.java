@@ -172,10 +172,11 @@ public class TimeFragment extends Fragment {
     private void toMapActivity(){
         Bundle bundle = this.getArguments();
         GlobalVariable globalVariable = GlobalVariable.getInstance();
-        assert bundle != null;
-        globalVariable.setBudgetStart(bundle.getInt("startBudget"));
-        globalVariable.setBudgetEnd(bundle.getInt("endBudget"));
-        globalVariable.setTypePerson(bundle.getString("numberOfPeople"));
+        if(bundle != null) {
+            globalVariable.setBudgetStart(bundle.getInt("startBudget"));
+            globalVariable.setBudgetEnd(bundle.getInt("endBudget"));
+            globalVariable.setTypePerson(bundle.getString("numberOfPeople"));
+        }
         globalVariable.setCalendarDay(txtCalendar.getText().toString());
         globalVariable.setTimeStart(txtStartTime.getText().toString());
         globalVariable.setTimeEnd(txtEndTime.getText().toString());

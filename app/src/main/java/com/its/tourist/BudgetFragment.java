@@ -83,13 +83,17 @@ public class BudgetFragment extends Fragment {
     private void toTimeFragment(boolean free){
         assert getFragmentManager() != null;
         Bundle bundle = new Bundle();
+        Bundle peopleData = this.getArguments();
         TimeFragment timeFragment = new TimeFragment();
+        assert peopleData != null;
         if(free){
             bundle.putInt("startBudget",0);
             bundle.putInt("endBudget",0);
+            bundle.putString("numberOfPeople", peopleData.getString("numberOfPeople"));
         }else{
             bundle.putInt("startBudget",Integer.parseInt(seekbarStart.getText().toString()));
             bundle.putInt("endBudget",Integer.parseInt(seekbarEnd.getText().toString()));
+            bundle.putString("numberOfPeople", peopleData.getString("numberOfPeople"));
         }
         timeFragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();

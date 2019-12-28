@@ -155,8 +155,8 @@ public class TimeFragment extends Fragment {
         Bundle bundle = this.getArguments();
         GlobalVariable globalVariable = GlobalVariable.getInstance();
         if(bundle != null){
-            globalVariable.setBudgetStart(bundle.getInt("startBudgetPeople"));
-            globalVariable.setBudgetEnd(bundle.getInt("endBudgetPeople"));
+            globalVariable.setBudgetStart(bundle.getInt("startBudget"));
+            globalVariable.setBudgetEnd(bundle.getInt("endBudget"));
             globalVariable.setTypePerson(bundle.getString("numberOfPeople"));
         }
         globalVariable.setCalendarDay(txtCalendar.getText().toString());

@@ -6,6 +6,7 @@ import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.location.LocationListener;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -20,7 +21,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.common.api.ApiException;
@@ -290,37 +290,36 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             Place place = responseFetch.getPlace();
                             MarkerOptions markerOptions = new MarkerOptions();
 
-                            //if ((place.getPriceLevel() != null) && (place.getPriceLevel() == gestioneDatiPrezzo())) {
+                            if ((place.getPriceLevel() != null) && (place.getPriceLevel() == gestioneDatiPrezzo())) {
 
-                            markerOptions.title(place.getName());
-                            markerOptions.position(Objects.requireNonNull(place.getLatLng()));
+                                markerOptions.title(place.getName());
+                                markerOptions.position(Objects.requireNonNull(place.getLatLng()));
 
-                            if(place.getRating() != null) {
-                                markerOptions.snippet("Indirizzo: "+place.getAddress()+"\nRating: "+place.getRating());
-                            } else {
-                                markerOptions.snippet("Indirizzo: "+place.getAddress());
+                                if(place.getRating() != null) {
+                                    markerOptions.snippet("Indirizzo: "+place.getAddress()+"\nRating: "+place.getRating());
+                                } else {
+                                    markerOptions.snippet("Indirizzo: "+place.getAddress());
+                                }
+
+                                if (place.getPhotoMetadatas() != null) {
+                                    PhotoMetadata photoMetadata;
+                                    photoMetadata = place.getPhotoMetadatas().get(0);
+
+                                    FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata).build();
+                                    placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) ->
+                                            mMap.addMarker(markerOptions).setTag(fetchPhotoResponse.getBitmap())
+                                    ).addOnFailureListener((exception) -> {
+                                        if (exception instanceof ApiException) {
+                                            Log.e("PlaceNotFoundPhoto", "Place not found: " + exception.getMessage());
+                                        }
+                                    });
+                                } else {
+                                    mMap.addMarker(markerOptions).setTag(null);
+                                }
+
+                                Log.i("opening", "Opening: " + place.getOpeningHours());
+
                             }
-
-                            if (place.getPhotoMetadatas() != null) {
-                                PhotoMetadata photoMetadata;
-                                photoMetadata = place.getPhotoMetadatas().get(0);
-
-                                FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata).build();
-                                placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) ->
-                                        mMap.addMarker(markerOptions).setTag(fetchPhotoResponse.getBitmap())
-                                ).addOnFailureListener((exception) -> {
-                                    if (exception instanceof ApiException) {
-                                        Log.e("PlaceNotFoundPhoto", "Place not found: " + exception.getMessage());
-                                    }
-                                });
-                            } else {
-                                mMap.addMarker(markerOptions).setTag(null);
-                            }
-
-                            Log.i("opening", "Opening: " + place.getOpeningHours());
-
-                            //}
-
 
                         }).addOnFailureListener((exception) -> {
                             if (exception instanceof ApiException) {
@@ -459,35 +458,35 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         int priceE = global.getBudgetEnd();
         String personT = global.getTypePerson();
 
-        int priceValue = 0;
-
-        if ((priceS > 0 && priceE < 20) && personT.equals("singolo")) {
-            priceValue = 1;
-        } else if ((priceS > 0 && priceE < 50) && personT.equals("singolo")) {
-            priceValue = 2;
-        } else if ((priceS > 0 && priceE < 100) && personT.equals("singolo")) {
-            priceValue = 3;
-        } else if ((priceS > 0 && priceE < 200) && personT.equals("singolo")) {
-            priceValue = 4;
-        } else if ((priceS > 0 && priceE < 30) && personT.equals("coppia")) {
-            priceValue = 1;
-        } else if ((priceS > 0 && priceE < 70) && personT.equals("coppia")) {
-            priceValue = 2;
-        } else if ((priceS > 0 && priceE < 120) && personT.equals("coppia")) {
-            priceValue = 3;
-        } else if ((priceS > 0 && priceE < 200) && personT.equals("coppia")) {
-            priceValue = 4;
-        } else if ((priceS > 0 && priceE < 50) && personT.equals("gruppo")) {
-            priceValue = 1;
-        } else if ((priceS > 0 && priceE < 100) && personT.equals("gruppo")) {
-            priceValue = 2;
-        } else if ((priceS > 0 && priceE < 150) && personT.equals("gruppo")) {
-            priceValue = 3;
-        } else if ((priceS > 0 && priceE < 200) && personT.equals("gruppo")) {
-            priceValue = 4;
+        if (priceE == 0) {
+            return 0;
+        } else if ((priceS >= 0 && priceE <= 20) && personT.equals("singolo")) {
+            return 1;
+        } else if ((priceS >= 0 && priceE <= 50) && personT.equals("singolo")) {
+            return 2;
+        } else if ((priceS >= 0 && priceE <= 100) && personT.equals("singolo")) {
+            return 3;
+        } else if ((priceS >= 0 && priceE <= 200) && personT.equals("singolo")) {
+            return 4;
+        } else if ((priceS >= 0 && priceE <= 30) && personT.equals("coppia")) {
+            return 1;
+        } else if ((priceS >= 0 && priceE <= 70) && personT.equals("coppia")) {
+            return 2;
+        } else if ((priceS >= 0 && priceE <= 120) && personT.equals("coppia")) {
+            return 3;
+        } else if ((priceS >= 0 && priceE <= 200) && personT.equals("coppia")) {
+            return 4;
+        } else if ((priceS >= 0 && priceE <= 50) && personT.equals("gruppo")) {
+            return 1;
+        } else if ((priceS >= 0 && priceE <= 100) && personT.equals("gruppo")) {
+            return 2;
+        } else if ((priceS >= 0 && priceE <= 150) && personT.equals("gruppo")) {
+            return 3;
+        } else if ((priceS >= 0 && priceE <= 200) && personT.equals("gruppo")) {
+            return 4;
         }
 
-        return priceValue;
+        return 0;
     }
 
     /*public String gestioneCalendario(){

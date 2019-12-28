@@ -317,7 +317,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                 mMap.addMarker(markerOptions).setTag(null);
                             }
 
-                            Log.i("opening", "Opening: " + place.getOpeningHours());
+                            /*
+                            List<String> open = Objects.requireNonNull(place.getOpeningHours()).getWeekdayText();
+
+                            for(String i: open) {
+                                Log.i("opening", "Opening: " + i);
+                            }
+                            */
+
+
 
                             //}
 

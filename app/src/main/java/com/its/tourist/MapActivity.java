@@ -419,8 +419,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                     "Max: " +
                                     String.format("%.0f", kelvinToCelsius(weatherResponse.main.temp_max)) +
                                     "\n" +
-                                    "Umidità: " +
-                                    weatherResponse.main.humidity;
+                                    "Umidità: " + weatherResponse.main.humidity;
 
                     TextView txtMeteo = findViewById(R.id.txtMeteo);
                     txtMeteo.setText(stringBuilder);

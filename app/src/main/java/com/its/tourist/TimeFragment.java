@@ -108,6 +108,24 @@ public class TimeFragment extends Fragment {
         });
     }
 
+    @SuppressLint({"SetTextI18n", "DefaultLocale"})
+    private void disableDalleAlle(){
+        Switch allDay = Objects.requireNonNull(getView()).findViewById(R.id.switchGiorno);
+        allDay.setOnCheckedChangeListener((compoundButton, isChecked) -> {
+            if(isChecked) {
+                txtStartTime.setEnabled(false);
+                txtEndTime.setEnabled(false);
+                txtStartTime.setText("00:00");
+                txtEndTime.setText("23:59");
+            } else {
+                txtStartTime.setEnabled(true);
+                txtEndTime.setEnabled(true);
+                txtStartTime.setText(String.format("%02d:%02d", hour, minute));
+                txtEndTime.setText("00:00");
+            }
+        });
+    }
+
     private void toMap(){
         Button avanti = Objects.requireNonNull(getView()).findViewById(R.id.btnAvanti3);
         avanti.setOnClickListener(v -> {
@@ -154,11 +172,10 @@ public class TimeFragment extends Fragment {
     private void toMapActivity(){
         Bundle bundle = this.getArguments();
         GlobalVariable globalVariable = GlobalVariable.getInstance();
-        if(bundle != null){
-            globalVariable.setBudgetStart(bundle.getInt("startBudget"));
-            globalVariable.setBudgetEnd(bundle.getInt("endBudget"));
-            globalVariable.setTypePerson(bundle.getString("numberOfPeople"));
-        }
+        assert bundle != null;
+        globalVariable.setBudgetStart(bundle.getInt("startBudget"));
+        globalVariable.setBudgetEnd(bundle.getInt("endBudget"));
+        globalVariable.setTypePerson(bundle.getString("numberOfPeople"));
         globalVariable.setCalendarDay(txtCalendar.getText().toString());
         globalVariable.setTimeStart(txtStartTime.getText().toString());
         globalVariable.setTimeEnd(txtEndTime.getText().toString());
@@ -168,24 +185,6 @@ public class TimeFragment extends Fragment {
 
     private boolean timeRangeError(){
         return txtStartTime.getText().toString().equals(txtEndTime.getText().toString());
-    }
-
-    @SuppressLint({"SetTextI18n", "DefaultLocale"})
-    private void disableDalleAlle(){
-        Switch allDay = Objects.requireNonNull(getView()).findViewById(R.id.switchGiorno);
-        allDay.setOnCheckedChangeListener((compoundButton, isChecked) -> {
-            if(isChecked) {
-                txtStartTime.setEnabled(false);
-                txtEndTime.setEnabled(false);
-                txtStartTime.setText("00:00");
-                txtEndTime.setText("23:59");
-            } else {
-                txtStartTime.setEnabled(true);
-                txtEndTime.setEnabled(true);
-                txtStartTime.setText(String.format("%02d:%02d", hour, minute));
-                txtEndTime.setText("00:00");
-            }
-        });
     }
 
 }

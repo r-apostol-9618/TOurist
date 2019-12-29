@@ -313,78 +313,45 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
                             Place place = responseFetch.getPlace();
                             MarkerOptions markerOptions = new MarkerOptions();
+                            List<Place.Type> types = place.getTypes();
+                            assert types!= null;
 
-if((place.getPriceLevel() == null)){
-    List<Place.Type> types = place.getTypes();
-    assert types!= null;
+                            //Dato che tourist_attraction non c'è questo if serve per mettere le cose che secondo me sono per "turisti"
+                            if(types.contains(AMUSEMENT_PARK) || types.contains(AQUARIUM) || types.contains(ART_GALLERY) || types.contains(NIGHT_CLUB)|| types.contains(RESTAURANT)|| types.contains(BOWLING_ALLEY)|| types.contains(MOVIE_THEATER)|| types.contains(SHOPPING_MALL)|| types.contains(PARK)|| types.contains(MUSEUM)) {
+                                markerOptions.title(place.getName());
+                                markerOptions.position(Objects.requireNonNull(place.getLatLng()));
 
-    //Dato che tourist_attraction non c'è questo if serve per mettere le cose che secondo me sono per "turisti"
-    if(types.contains(AMUSEMENT_PARK) || types.contains(AQUARIUM) || types.contains(ART_GALLERY) || types.contains(NIGHT_CLUB)|| types.contains(RESTAURANT)|| types.contains(BOWLING_ALLEY)|| types.contains(MOVIE_THEATER)|| types.contains(SHOPPING_MALL)|| types.contains(PARK)|| types.contains(MUSEUM)) {
-        markerOptions.title(place.getName());
-        markerOptions.position(Objects.requireNonNull(place.getLatLng()));
+                                if (place.getPriceLevel() == null) {
+                                    markerOptions.snippet("Indirizzo: " + place.getAddress()+"\nI prezzi possono variare");
+                                } else if (place.getPriceLevel() == gestioneDatiPrezzo()) {
+                                    if (place.getRating() != null) {
+                                        markerOptions.snippet("Indirizzo: " + place.getAddress() + "\nRating: " + place.getRating());
+                                    } else {
+                                        markerOptions.snippet("Indirizzo: " + place.getAddress());
+                                    }
+                                }
 
-        if (place.getRating() != null) {
-            markerOptions.snippet("Indirizzo: " + place.getAddress() + "\nRating: " + place.getRating()+"I prezzi non sono stati pubblicati");
-        } else {
-            markerOptions.snippet("Indirizzo: " + place.getAddress()+"I prezzi non sono stati pubblicati");
-        }
+                                if (place.getPriceLevel() == null || place.getPriceLevel() == gestioneDatiPrezzo()) {
+                                    if (place.getPhotoMetadatas() != null) {
+                                        PhotoMetadata photoMetadata;
+                                        photoMetadata = place.getPhotoMetadatas().get(0);
 
-        if (place.getPhotoMetadatas() != null) {
-            PhotoMetadata photoMetadata;
-            photoMetadata = place.getPhotoMetadatas().get(0);
+                                        FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata).build();
+                                        placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) ->
+                                                mMap.addMarker(markerOptions).setTag(fetchPhotoResponse.getBitmap())
+                                        ).addOnFailureListener((exception) -> {
+                                            if (exception instanceof ApiException) {
+                                                Log.e("PlaceNotFoundPhoto", "Place not found: " + exception.getMessage());
+                                            }
+                                        });
+                                    } else {
+                                        mMap.addMarker(markerOptions).setTag(null);
+                                    }
+                                }
+                                Log.i("opening", "Opening: " + place.getOpeningHours());
 
-            FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata).build();
-            placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) ->
-                    mMap.addMarker(markerOptions).setTag(fetchPhotoResponse.getBitmap())
-            ).addOnFailureListener((exception) -> {
-                if (exception instanceof ApiException) {
-                    Log.e("PlaceNotFoundPhoto", "Place not found: " + exception.getMessage());
-                }
-            });
-        } else {
-            mMap.addMarker(markerOptions).setTag(null);
-        }
+                            }
 
-        Log.i("opening", "Opening: " + place.getOpeningHours());
-
-    }
-
-}else if ((place.getPriceLevel() == gestioneDatiPrezzo())) {
-    List<Place.Type> types = place.getTypes();
-    assert types!= null;
-
-    //Dato che tourist_attraction non c'è questo if serve per mettere le cose che secondo me sono per "turisti"
-    if(types.contains(AMUSEMENT_PARK) || types.contains(AQUARIUM) || types.contains(ART_GALLERY) || types.contains(NIGHT_CLUB)|| types.contains(RESTAURANT)|| types.contains(BOWLING_ALLEY)|| types.contains(MOVIE_THEATER)|| types.contains(SHOPPING_MALL)|| types.contains(PARK)|| types.contains(MUSEUM)) {
-        markerOptions.title(place.getName());
-        markerOptions.position(Objects.requireNonNull(place.getLatLng()));
-
-        if (place.getRating() != null) {
-            markerOptions.snippet("Indirizzo: " + place.getAddress() + "\nRating: " + place.getRating());
-        } else {
-            markerOptions.snippet("Indirizzo: " + place.getAddress());
-        }
-
-        if (place.getPhotoMetadatas() != null) {
-            PhotoMetadata photoMetadata;
-            photoMetadata = place.getPhotoMetadatas().get(0);
-
-            FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata).build();
-            placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) ->
-                    mMap.addMarker(markerOptions).setTag(fetchPhotoResponse.getBitmap())
-            ).addOnFailureListener((exception) -> {
-                if (exception instanceof ApiException) {
-                    Log.e("PlaceNotFoundPhoto", "Place not found: " + exception.getMessage());
-                }
-            });
-        } else {
-            mMap.addMarker(markerOptions).setTag(null);
-        }
-
-        Log.i("opening", "Opening: " + place.getOpeningHours());
-
-    }
-
-}
                         }).addOnFailureListener((exception) -> {
                             if (exception instanceof ApiException) {
                                 Log.e("Fetch not found", "Place not found: " + exception.getMessage());

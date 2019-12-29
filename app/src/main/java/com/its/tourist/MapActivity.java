@@ -68,6 +68,20 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static com.google.android.libraries.places.api.model.Place.Type.POINT_OF_INTEREST;
+//Nuova strategia per le attrazioni turistiche, le scegliamo noi a mano, mostriamo tutti questi dati
+//per i pulsanti sotto mettiamo solo dei casi specifici come Musei,Restaurant,
+
+import static com.google.android.libraries.places.api.model.Place.Type.AMUSEMENT_PARK;
+import static com.google.android.libraries.places.api.model.Place.Type.AQUARIUM;
+import static com.google.android.libraries.places.api.model.Place.Type.ART_GALLERY;
+import static com.google.android.libraries.places.api.model.Place.Type.NIGHT_CLUB;
+import static com.google.android.libraries.places.api.model.Place.Type.RESTAURANT;
+import static com.google.android.libraries.places.api.model.Place.Type.BOWLING_ALLEY;
+import static com.google.android.libraries.places.api.model.Place.Type.MOVIE_THEATER;
+import static com.google.android.libraries.places.api.model.Place.Type.SHOPPING_MALL;
+import static com.google.android.libraries.places.api.model.Place.Type.PARK;
+import static com.google.android.libraries.places.api.model.Place.Type.MUSEUM;
 
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -270,7 +284,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         //Lista delle informazioni reperibili in un posto --POSSONO ESSERE INSERITE TUTTE QUELLE CONTENUTE IN Place.Field--
         List<Place.Field> placeFetchFields = Arrays.asList(Place.Field.ID,
                 Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.RATING,
-                Place.Field.PHOTO_METADATAS, Place.Field.PRICE_LEVEL, Place.Field.OPENING_HOURS);
+                Place.Field.PHOTO_METADATAS, Place.Field.PRICE_LEVEL, Place.Field.OPENING_HOURS, Place.Field.TYPES);
 
         //Serve solo l'ID del posto da ricercare
         FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(Collections.singletonList(Place.Field.ID));
@@ -290,46 +304,77 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             Place place = responseFetch.getPlace();
                             MarkerOptions markerOptions = new MarkerOptions();
 
-                            //if ((place.getPriceLevel() != null) && (place.getPriceLevel() == gestioneDatiPrezzo())) {
+if((place.getPriceLevel() == null)){
+    List<Place.Type> types = place.getTypes();
+    assert types!= null;
 
-                            markerOptions.title(place.getName());
-                            markerOptions.position(Objects.requireNonNull(place.getLatLng()));
+    //Dato che tourist_attraction non c'è questo if serve per mettere le cose che secondo me sono per "turisti"
+    if(types.contains(AMUSEMENT_PARK) || types.contains(AQUARIUM) || types.contains(ART_GALLERY) || types.contains(NIGHT_CLUB)|| types.contains(RESTAURANT)|| types.contains(BOWLING_ALLEY)|| types.contains(MOVIE_THEATER)|| types.contains(SHOPPING_MALL)|| types.contains(PARK)|| types.contains(MUSEUM)) {
+        markerOptions.title(place.getName());
+        markerOptions.position(Objects.requireNonNull(place.getLatLng()));
 
-                            if(place.getRating() != null) {
-                                markerOptions.snippet("Indirizzo: "+place.getAddress()+"\nRating: "+place.getRating());
-                            } else {
-                                markerOptions.snippet("Indirizzo: "+place.getAddress());
-                            }
+        if (place.getRating() != null) {
+            markerOptions.snippet("Indirizzo: " + place.getAddress() + "\nRating: " + place.getRating()+"I prezzi non sono stati pubblicati");
+        } else {
+            markerOptions.snippet("Indirizzo: " + place.getAddress()+"I prezzi non sono stati pubblicati");
+        }
 
-                            if (place.getPhotoMetadatas() != null) {
-                                PhotoMetadata photoMetadata;
-                                photoMetadata = place.getPhotoMetadatas().get(0);
+        if (place.getPhotoMetadatas() != null) {
+            PhotoMetadata photoMetadata;
+            photoMetadata = place.getPhotoMetadatas().get(0);
 
-                                FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata).build();
-                                placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) ->
-                                        mMap.addMarker(markerOptions).setTag(fetchPhotoResponse.getBitmap())
-                                ).addOnFailureListener((exception) -> {
-                                    if (exception instanceof ApiException) {
-                                        Log.e("PlaceNotFoundPhoto", "Place not found: " + exception.getMessage());
-                                    }
-                                });
-                            } else {
-                                mMap.addMarker(markerOptions).setTag(null);
-                            }
+            FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata).build();
+            placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) ->
+                    mMap.addMarker(markerOptions).setTag(fetchPhotoResponse.getBitmap())
+            ).addOnFailureListener((exception) -> {
+                if (exception instanceof ApiException) {
+                    Log.e("PlaceNotFoundPhoto", "Place not found: " + exception.getMessage());
+                }
+            });
+        } else {
+            mMap.addMarker(markerOptions).setTag(null);
+        }
 
-                            /*
-                            List<String> open = Objects.requireNonNull(place.getOpeningHours()).getWeekdayText();
+        Log.i("opening", "Opening: " + place.getOpeningHours());
 
-                            for(String i: open) {
-                                Log.i("opening", "Opening: " + i);
-                            }
-                            */
+    }
 
+}else if ((place.getPriceLevel() == gestioneDatiPrezzo())) {
+    List<Place.Type> types = place.getTypes();
+    assert types!= null;
 
+    //Dato che tourist_attraction non c'è questo if serve per mettere le cose che secondo me sono per "turisti"
+    if(types.contains(AMUSEMENT_PARK) || types.contains(AQUARIUM) || types.contains(ART_GALLERY) || types.contains(NIGHT_CLUB)|| types.contains(RESTAURANT)|| types.contains(BOWLING_ALLEY)|| types.contains(MOVIE_THEATER)|| types.contains(SHOPPING_MALL)|| types.contains(PARK)|| types.contains(MUSEUM)) {
+        markerOptions.title(place.getName());
+        markerOptions.position(Objects.requireNonNull(place.getLatLng()));
 
-                            //}
+        if (place.getRating() != null) {
+            markerOptions.snippet("Indirizzo: " + place.getAddress() + "\nRating: " + place.getRating());
+        } else {
+            markerOptions.snippet("Indirizzo: " + place.getAddress());
+        }
 
+        if (place.getPhotoMetadatas() != null) {
+            PhotoMetadata photoMetadata;
+            photoMetadata = place.getPhotoMetadatas().get(0);
 
+            FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata).build();
+            placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) ->
+                    mMap.addMarker(markerOptions).setTag(fetchPhotoResponse.getBitmap())
+            ).addOnFailureListener((exception) -> {
+                if (exception instanceof ApiException) {
+                    Log.e("PlaceNotFoundPhoto", "Place not found: " + exception.getMessage());
+                }
+            });
+        } else {
+            mMap.addMarker(markerOptions).setTag(null);
+        }
+
+        Log.i("opening", "Opening: " + place.getOpeningHours());
+
+    }
+
+}
                         }).addOnFailureListener((exception) -> {
                             if (exception instanceof ApiException) {
                                 Log.e("Fetch not found", "Place not found: " + exception.getMessage());
@@ -420,7 +465,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     assert weatherResponse != null;
 
                     @SuppressLint("DefaultLocale") String stringBuilder =
-                            String.format("%.0f", kelvinToCelsius(weatherResponse.main.temp)) + "°" +
+                            String.format("%.0f", kelvinToCelsius(weatherResponse.main.temp)) + "°" /*+
                                     "\n" +
                                     "Min: " +
                                     String.format("%.0f", kelvinToCelsius(weatherResponse.main.temp_min)) +
@@ -428,7 +473,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                     "Max: " +
                                     String.format("%.0f", kelvinToCelsius(weatherResponse.main.temp_max)) +
                                     "\n" +
-                                    "Umidità: " + weatherResponse.main.humidity;
+                                    "Umidità: " +
+                                    weatherResponse.main.humidity*/
+                            ;
 
                     TextView txtMeteo = findViewById(R.id.txtMeteo);
                     txtMeteo.setText(stringBuilder);
@@ -466,35 +513,35 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         int priceE = global.getBudgetEnd();
         String personT = global.getTypePerson();
 
-        if (priceE == 0) {
-            return 0;
-        } else if ((priceS >= 0 && priceE <= 20) && personT.equals("singolo")) {
-            return 1;
-        } else if ((priceS >= 0 && priceE <= 50) && personT.equals("singolo")) {
-            return 2;
-        } else if ((priceS >= 0 && priceE <= 100) && personT.equals("singolo")) {
-            return 3;
-        } else if ((priceS >= 0 && priceE <= 200) && personT.equals("singolo")) {
-            return 4;
-        } else if ((priceS >= 0 && priceE <= 30) && personT.equals("coppia")) {
-            return 1;
-        } else if ((priceS >= 0 && priceE <= 70) && personT.equals("coppia")) {
-            return 2;
-        } else if ((priceS >= 0 && priceE <= 120) && personT.equals("coppia")) {
-            return 3;
-        } else if ((priceS >= 0 && priceE <= 200) && personT.equals("coppia")) {
-            return 4;
-        } else if ((priceS >= 0 && priceE <= 50) && personT.equals("gruppo")) {
-            return 1;
-        } else if ((priceS >= 0 && priceE <= 100) && personT.equals("gruppo")) {
-            return 2;
-        } else if ((priceS >= 0 && priceE <= 150) && personT.equals("gruppo")) {
-            return 3;
-        } else if ((priceS >= 0 && priceE <= 200) && personT.equals("gruppo")) {
-            return 4;
+        int priceValue = 0;
+
+        if ((priceS > 0 && priceE < 20) && personT.equals("singolo")) {
+            priceValue = 1;
+        } else if ((priceS > 0 && priceE < 50) && personT.equals("singolo")) {
+            priceValue = 2;
+        } else if ((priceS > 0 && priceE < 100) && personT.equals("singolo")) {
+            priceValue = 3;
+        } else if ((priceS > 0 && priceE < 200) && personT.equals("singolo")) {
+            priceValue = 4;
+        } else if ((priceS > 0 && priceE < 30) && personT.equals("coppia")) {
+            priceValue = 1;
+        } else if ((priceS > 0 && priceE < 70) && personT.equals("coppia")) {
+            priceValue = 2;
+        } else if ((priceS > 0 && priceE < 120) && personT.equals("coppia")) {
+            priceValue = 3;
+        } else if ((priceS > 0 && priceE < 200) && personT.equals("coppia")) {
+            priceValue = 4;
+        } else if ((priceS > 0 && priceE < 50) && personT.equals("gruppo")) {
+            priceValue = 1;
+        } else if ((priceS > 0 && priceE < 100) && personT.equals("gruppo")) {
+            priceValue = 2;
+        } else if ((priceS > 0 && priceE < 150) && personT.equals("gruppo")) {
+            priceValue = 3;
+        } else if ((priceS > 0 && priceE < 200) && personT.equals("gruppo")) {
+            priceValue = 4;
         }
 
-        return 0;
+        return priceValue;
     }
 
     /*public String gestioneCalendario(){

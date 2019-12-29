@@ -523,35 +523,35 @@ if((place.getPriceLevel() == null)){
         int priceE = global.getBudgetEnd();
         String personT = global.getTypePerson();
 
-        int priceValue = 0;
-
-        if ((priceS > 0 && priceE < 20) && personT.equals("singolo")) {
-            priceValue = 1;
-        } else if ((priceS > 0 && priceE < 50) && personT.equals("singolo")) {
-            priceValue = 2;
-        } else if ((priceS > 0 && priceE < 100) && personT.equals("singolo")) {
-            priceValue = 3;
-        } else if ((priceS > 0 && priceE < 200) && personT.equals("singolo")) {
-            priceValue = 4;
-        } else if ((priceS > 0 && priceE < 30) && personT.equals("coppia")) {
-            priceValue = 1;
-        } else if ((priceS > 0 && priceE < 70) && personT.equals("coppia")) {
-            priceValue = 2;
-        } else if ((priceS > 0 && priceE < 120) && personT.equals("coppia")) {
-            priceValue = 3;
-        } else if ((priceS > 0 && priceE < 200) && personT.equals("coppia")) {
-            priceValue = 4;
-        } else if ((priceS > 0 && priceE < 50) && personT.equals("gruppo")) {
-            priceValue = 1;
-        } else if ((priceS > 0 && priceE < 100) && personT.equals("gruppo")) {
-            priceValue = 2;
-        } else if ((priceS > 0 && priceE < 150) && personT.equals("gruppo")) {
-            priceValue = 3;
-        } else if ((priceS > 0 && priceE < 200) && personT.equals("gruppo")) {
-            priceValue = 4;
+        if (priceE == 0) {
+            return 0;
+        } if ((priceS >= 0 && priceE <= 20) && personT.equals("singolo")) {
+            return 1;
+        } else if ((priceS >= 0 && priceE <= 50) && personT.equals("singolo")) {
+            return 2;
+        } else if ((priceS >= 0 && priceE <= 100) && personT.equals("singolo")) {
+            return 3;
+        } else if ((priceS >= 0 && priceE <= 200) && personT.equals("singolo")) {
+            return 4;
+        } else if ((priceS >= 0 && priceE <= 30) && personT.equals("coppia")) {
+            return 1;
+        } else if ((priceS >= 0 && priceE <= 70) && personT.equals("coppia")) {
+            return 2;
+        } else if ((priceS >= 0 && priceE <= 120) && personT.equals("coppia")) {
+            return 3;
+        } else if ((priceS >= 0 && priceE <= 200) && personT.equals("coppia")) {
+            return 4;
+        } else if ((priceS >= 0 && priceE <= 50) && personT.equals("gruppo")) {
+            return 1;
+        } else if ((priceS >= 0 && priceE <= 100) && personT.equals("gruppo")) {
+            return 2;
+        } else if ((priceS >= 0 && priceE <= 150) && personT.equals("gruppo")) {
+            return 3;
+        } else if ((priceS >= 0 && priceE <= 200) && personT.equals("gruppo")) {
+            return 4;
         }
 
-        return priceValue;
+        return 0;
     }
 
 

@@ -20,7 +20,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.common.api.ApiException;
@@ -52,6 +51,7 @@ import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.maps.android.PolyUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -81,6 +81,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private LocationCallback locationCallback;
     private View mapView;
     private GlobalVariable global;
+    private List<LatLng> polyline;
 
     private final float DEFAULT_ZOOM = 18;
 
@@ -126,13 +127,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         CustomMarkerInfoWindowView adapter = new CustomMarkerInfoWindowView(MapActivity.this);
         mMap.setInfoWindowAdapter(adapter);
 
+        circoscrizioneTorino();
+
         createBtnGeo();
-        places();
         checkGPS();
+        places();
 
         filtriMarker();
 
-        circoscrizioneTorino();
     }
 
     @Override
@@ -149,15 +151,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onBackPressed() {
-        new AlertDialog.Builder(this).setTitle("Chiudi").setMessage("Sei sicuro di voler uscire?")
-                .setPositiveButton("ESCI", (dialogInterface, i) -> {
-                    Intent intent = new Intent(MapActivity.this, MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    intent.putExtra("Exit", true);
-                    startActivity(intent);
-                    finish();
-                }).setNegativeButton("ANNULLA", (dialogInterface, i) -> {
-        }).show();
+        makeAlertDialog("Chiudi","Sei sicuro di voler uscire?",true);
     }
 
     private void visualizzaMappa () {
@@ -186,12 +180,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void circoscrizioneTorino () {
         String[] coordinate = metodoLetturaCoordinate().split(";");
-        List<LatLng> latlngs = new ArrayList<>();
+        polyline = new ArrayList<>();
         for (String s : coordinate) {
             String[] LatLng = s.split(",");
-            latlngs.add(new LatLng(Double.parseDouble(LatLng[1]), Double.parseDouble(LatLng[0])));
+            polyline.add(new LatLng(Double.parseDouble(LatLng[1]), Double.parseDouble(LatLng[0])));
         }
-        PolylineOptions rectOptions = new PolylineOptions().addAll(latlngs);
+        PolylineOptions rectOptions = new PolylineOptions().addAll(polyline);
         rectOptions.color(Color.RED);
         rectOptions.width(8);
         mMap.addPolyline(rectOptions);
@@ -238,7 +232,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         if (task.isSuccessful()) {
                             mLastLocation = task.getResult();
                             if (mLastLocation != null) {
-                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()), DEFAULT_ZOOM));
+                                LatLng mLastLocationLatLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLastLocationLatLng, DEFAULT_ZOOM));
+                                if(!PolyUtil.containsLocation(mLastLocationLatLng, polyline, true)){
+                                    makeAlertDialog(
+                                            "Attenzione",
+                                            "Attualmente non ti trovi nella città di Torino.\nVerranno comunque visulizzati i luoghi di interesse intorno a te \uD83D\uDE09",
+                                            false
+                                    );
+                                }
                             } else {
                                 final LocationRequest locationRequest = LocationRequest.create();
                                 locationRequest.setInterval(10000);
@@ -252,7 +254,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                             return;
                                         }
                                         mLastLocation = locationResult.getLastLocation();
-                                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()), DEFAULT_ZOOM));
+                                        LatLng mLastLocationLatLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLastLocationLatLng, DEFAULT_ZOOM));
+                                        if(!PolyUtil.containsLocation(mLastLocationLatLng, polyline, true)){
+                                            makeAlertDialog(
+                                                    "Attenzione",
+                                                    "Attualmente non ti trovi nella città di Torino.\nVerranno comunque visulizzati i luoghi di interesse intorno a te! \uD83D\uDE09",
+                                                    false
+                                            );
+                                        }
                                         mFusedLocationProviderClient.removeLocationUpdates(locationCallback);
                                     }
                                 };
@@ -495,6 +505,26 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         return 0;
+    }
+
+
+    private void makeAlertDialog(String title, String text, boolean exit) {
+        if (exit) {
+            new AlertDialog.Builder(this).setTitle(title).setMessage(text)
+                    .setPositiveButton("ESCI", (dialogInterface, i) -> {
+                        Intent intent = new Intent(MapActivity.this, MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.putExtra("Exit", true);
+                        startActivity(intent);
+                        finish();
+                    }).setNegativeButton("ANNULLA", (dialogInterface, i) -> { })
+                    .show();
+        } else {
+            new AlertDialog.Builder(this).setTitle(title).setMessage(text)
+                    .setPositiveButton("OK", (dialogInterface, i) -> { })
+                    .show();
+        }
+
     }
 
     /*public String gestioneCalendario(){

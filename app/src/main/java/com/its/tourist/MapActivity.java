@@ -75,12 +75,13 @@ import static com.google.android.libraries.places.api.model.Place.Type.AMUSEMENT
 import static com.google.android.libraries.places.api.model.Place.Type.AQUARIUM;
 import static com.google.android.libraries.places.api.model.Place.Type.ART_GALLERY;
 import static com.google.android.libraries.places.api.model.Place.Type.NIGHT_CLUB;
-import static com.google.android.libraries.places.api.model.Place.Type.RESTAURANT;
 import static com.google.android.libraries.places.api.model.Place.Type.BOWLING_ALLEY;
-import static com.google.android.libraries.places.api.model.Place.Type.MOVIE_THEATER;
 import static com.google.android.libraries.places.api.model.Place.Type.SHOPPING_MALL;
 import static com.google.android.libraries.places.api.model.Place.Type.PARK;
+
 import static com.google.android.libraries.places.api.model.Place.Type.MUSEUM;
+import static com.google.android.libraries.places.api.model.Place.Type.MOVIE_THEATER;
+import static com.google.android.libraries.places.api.model.Place.Type.RESTAURANT;
 
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -133,8 +134,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.setMinZoomPreference(11);
-        CustomMarkerInfoWindowView adapter = new CustomMarkerInfoWindowView(MapActivity.this);
-        mMap.setInfoWindowAdapter(adapter);
+        mMap.setInfoWindowAdapter(new CustomMarkerInfoWindowView(MapActivity.this));
         mMap.setPadding(0,mToolbarArcBackground.getHeight(),0,findViewById(R.id.buttonContainer).getHeight());
 
         circoscrizioneTorino();
@@ -144,6 +144,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         places();
 
         filtriMarker();
+
     }
 
 
@@ -202,6 +203,26 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
 
+    private void setPositionBtnGeo() {
+        if (mapView != null && mapView.findViewById(Integer.parseInt("1")) != null) {
+            View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+            layoutParams.setMargins(0, 0, 40, 180);
+        }
+    }
+
+
+    private LocationRequest getLocationRequest() {
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(5000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        return locationRequest;
+    }
+
+
     private void checkGPS() {
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(getLocationRequest());
         SettingsClient settingsClient = LocationServices.getSettingsClient(this);
@@ -218,17 +239,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
             }
         });
-    }
-
-
-    private void setPositionBtnGeo() {
-        if (mapView != null && mapView.findViewById(Integer.parseInt("1")) != null) {
-            View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
-            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
-            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
-            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-            layoutParams.setMargins(0, 0, 40, 180);
-        }
     }
 
 
@@ -281,14 +291,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    private LocationRequest getLocationRequest() {
-        LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(5000);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        return locationRequest;
-    }
-
 
     private void places() {
 
@@ -324,7 +326,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
                                 if (place.getPriceLevel() == null) {
                                     markerOptions.snippet("Indirizzo: " + place.getAddress()+"\nI prezzi possono variare");
-                                } else if (place.getPriceLevel() == gestioneDatiPrezzo()) {
+                                } else if (place.getPriceLevel() <= gestioneDatiPrezzo()) {
                                     if (place.getRating() != null) {
                                         markerOptions.snippet("Indirizzo: " + place.getAddress() + "\nRating: " + place.getRating());
                                     } else {
@@ -332,10 +334,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                     }
                                 }
 
-                                if (place.getPriceLevel() == null || place.getPriceLevel() == gestioneDatiPrezzo()) {
+                                if (place.getPriceLevel() == null || place.getPriceLevel() <= gestioneDatiPrezzo()) {
                                     if (place.getPhotoMetadatas() != null) {
-                                        PhotoMetadata photoMetadata;
-                                        photoMetadata = place.getPhotoMetadatas().get(0);
+                                        PhotoMetadata photoMetadata = place.getPhotoMetadatas().get(0);
 
                                         FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata).build();
                                         placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) ->
@@ -450,7 +451,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     TextView txtMeteo = findViewById(R.id.txtMeteo);
                     txtMeteo.setText(stringBuilder);
                     Log.e("giusto", "meteo");
-
                 }
             }
 
@@ -458,9 +458,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             public void onFailure(@NonNull Call<WeatherResponse> call, @NonNull Throwable t) {
                 Log.d("giusto", "errore");
                 TextView txtMeteo = findViewById(R.id.txtMeteo);
-                String testoBase = "Temperatura: 3, Minima: 0, Massima: 3, Umidità: 60";
-                txtMeteo.setText(testoBase);
-
+                txtMeteo.setText("E°");
             }
 
         });

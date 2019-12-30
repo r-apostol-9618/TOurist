@@ -34,18 +34,26 @@ import java.util.Objects;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
+
+/**
+ *  TimeFragment
+ *  Classe usata per gestire il tempo che l'utente ha a disposizione per visitare la città
+ */
 public class TimeFragment extends Fragment {
 
     private Calendar myCalendar;
-    private TextView txtCalendar,txtStartTime,txtEndTime;
-    private int hour,minute;
+    private TextView txtCalendar, txtStartTime, txtEndTime;
+    private int hour, minute;
+
 
     public TimeFragment() { }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_time, container, false);
     }
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -64,17 +72,23 @@ public class TimeFragment extends Fragment {
         setDateCalendar();
 
         toMap();
-
     }
 
+
+    /**
+     *  Metodo per la gestione del calendario
+     *  Viene visualizzato un calendario, tramite Date Picker, dal quale sarà possibile selezionare, dalla data attuale,
+     *  un possibile giorno di arrivo in città, per poi visulaizzarlo in una TextView
+     */
     @SuppressLint("SetTextI18n")
-    private void setDateCalendar(){
+    private void setDateCalendar() {
         txtCalendar.setText(myCalendar.get(Calendar.DAY_OF_MONTH)+"/"+myCalendar.get(Calendar.MONTH)+"/"+myCalendar.get(Calendar.YEAR));
         DatePickerDialog.OnDateSetListener date = (datePicker, year, month, day) -> {
             myCalendar.set(Calendar.YEAR, year);
             myCalendar.set(Calendar.MONTH, month);
             myCalendar.set(Calendar.DAY_OF_MONTH, day);
-            updateLabelCalendar();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.ITALIAN);
+            txtCalendar.setText(sdf.format(myCalendar.getTime()));
         };
         ImageView calendar = Objects.requireNonNull(getView()).findViewById(R.id.imgViewCalendar);
         calendar.setOnClickListener(view -> {
@@ -83,19 +97,19 @@ public class TimeFragment extends Fragment {
                     myCalendar.get(Calendar.DAY_OF_MONTH));
             datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
             datePickerDialog.show();
-
         });
-
     }
 
-    private void updateLabelCalendar(){
-        String myFormat = "dd/MM/yyyy";
-        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.ITALIAN);
-        txtCalendar.setText(sdf.format(myCalendar.getTime()));
-    }
 
+    /**
+     *  Metodo per la gestione dell'orario
+     *  Viene visualizzato un orologio, tramite Time Picker, dal quale sarà possibile selezionare
+     *  un possibile orario di inizio e fine della visita in città, per poi visulaizzarlo in una TextView
+     *  @param txtTime La TextView alla quale verrà selezionato e visualizzato l'orario
+     *  @param start Flag per determinare se la TextView utilizzata è quella di inizio, per settarla all'orario attuale
+     */
     @SuppressLint("DefaultLocale")
-    private void setTime(TextView txtTime, boolean start){
+    private void setTime(TextView txtTime, boolean start) {
         if (start) {
             txtTime.setText(String.format("%02d:%02d", hour, minute));
         }
@@ -103,16 +117,22 @@ public class TimeFragment extends Fragment {
             TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), (timePicker, selectedHour, selectedMinute) -> {
                 String textTime = String.format("%02d:%02d", selectedHour, selectedMinute);
                 txtTime.setText(textTime);
-            },hour,minute,true);
+            }, hour, minute, true);
             timePickerDialog.show();
         });
     }
 
+
+    /**
+     *  Metodo per la gestione della possibilità di visita per tutta la durata odierna
+     *  Quando lo Switch è abilitato, l'utente ha la possibilità di poter visitare per tutto il giorno, o per quel che ne rimane,
+     *  la città di Torino, altrimenti vengono resettate le TextView e può essere di nuovo possibile scegliere un orario
+     */
     @SuppressLint({"SetTextI18n", "DefaultLocale"})
-    private void disableDalleAlle(){
+    private void disableDalleAlle() {
         Switch allDay = Objects.requireNonNull(getView()).findViewById(R.id.switchGiorno);
         allDay.setOnCheckedChangeListener((compoundButton, isChecked) -> {
-            if(isChecked) {
+            if (isChecked) {
                 txtStartTime.setEnabled(false);
                 txtEndTime.setEnabled(false);
                 txtStartTime.setText("00:00");
@@ -126,18 +146,34 @@ public class TimeFragment extends Fragment {
         });
     }
 
-    private void toMap(){
+
+    /**
+     *  Metodo per la gestione del pulsante Avanti
+     *  Se occorre un errore, verrà visualizzato un Toast di avvertimento,
+     *  altriemnti si passerà alla sezione per i permessi di geoclocalizzazione
+     */
+    private void toMap() {
         Button avanti = Objects.requireNonNull(getView()).findViewById(R.id.btnAvanti3);
         avanti.setOnClickListener(v -> {
-            if(timeRangeError()){
+            if (timeRangeError()) {
                 Toast.makeText(getActivity(), "Inserisci un range temporale valido!", Toast.LENGTH_SHORT).show();
-            }else{
+            } else {
                 permessi();
             }
         });
     }
 
-    private void permessi(){
+
+    /**
+     *  Metodo che gestisce i permessi di geolocalizzazione
+     *  Utilizzando una libreria per semplificare la procedura, chiamata Dexter, è possibile poter richiedere all'utente i permessi
+     *  per poter utilizzare la mappa nella prossima Activity.
+     *  Se l'utente darà i permessi, si passerà al salvataggio dei dati e al passaggio verso MapActivity.
+     *  Se l'utente negherà i permessi, apparirà un Toast di errore e al prossimo avvio dell'app verranno richiesti nuovamente.
+     *  Se l'utente negherà permanentemente i permessi, apparirà un messaggio di errore per poi far chiudere l'app,
+     *  costringendo l'utente a dare i permessi solamente tramite le impostazioni dello smartphone.
+     */
+    private void permessi() {
         Dexter.withActivity(getActivity())
                 .withPermission(ACCESS_FINE_LOCATION)
                 .withListener(new PermissionListener() {
@@ -148,11 +184,11 @@ public class TimeFragment extends Fragment {
 
                     @Override
                     public void onPermissionDenied(PermissionDeniedResponse response) {
-                        if(response.isPermanentlyDenied()){
+                        if (response.isPermanentlyDenied()) {
                             new AlertDialog
                                     .Builder(Objects.requireNonNull(getActivity()))
                                     .setTitle("Accesso ai permessi")
-                                    .setMessage("L'accesso alla localizzazione è permanentemente negato. \nRecarsi nelle impostazioni per attivare il servizio")
+                                    .setMessage("L'accesso alla localizzazione è permanentemente negato.\nRecarsi nelle impostazioni per attivare il servizio")
                                     .setNegativeButton("Cancel", null)
                                     .setPositiveButton("OK", (dialog, which) -> getActivity().finish())
                                     .show();
@@ -169,7 +205,13 @@ public class TimeFragment extends Fragment {
                 .check();
     }
 
-    private void toMapActivity(){
+
+    /**
+     *  Metodo per salvare i dati complessivi e passare a MapActivity
+     *  Vengono infine salvati i dati raccolti precedentemente dai Fragment all'interno del Singleton per poi
+     *  avviare la mappa contenuta all'interno di MapActivity
+     */
+    private void toMapActivity() {
         Bundle bundle = this.getArguments();
         GlobalVariable globalVariable = GlobalVariable.getInstance();
         assert bundle != null;
@@ -183,7 +225,14 @@ public class TimeFragment extends Fragment {
         startActivity(intent);
     }
 
-    private boolean timeRangeError(){
+
+    /**
+     *  Metodo per la gestione dell'errore temporale
+     *  Viene eseguito un controllo per verificare se l'orario di inizio e di fine non coincidano,
+     *  così da non avere un range temporale di 0 min
+     *  @return boolean
+     */
+    private boolean timeRangeError() {
         return txtStartTime.getText().toString().equals(txtEndTime.getText().toString());
     }
 

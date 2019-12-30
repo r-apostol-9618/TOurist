@@ -14,7 +14,10 @@ import android.widget.ImageView;
 
 import java.util.Objects;
 
-
+/**
+ *  PeopleFragment
+ *  Classe per la gestione del numero di persone che viaggiano assieme
+ */
 public class PeopleFragment extends Fragment {
 
     public PeopleFragment() { }
@@ -29,11 +32,20 @@ public class PeopleFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         GlobalVariable global = GlobalVariable.getInstance();
+
+        // L'utente avrà la possibilità di uscire dall'app tramite messaggio quando si trova in questo Fragment
         global.setBackPeople(true);
+
+        // Per la gestione dell'handler all'interno di MainActivity, il delay così non verrà ripetuto
         global.setHandlerPeople(false);
         chooseImageGroup();
     }
 
+
+    /**
+     *  Metodo per la gestione del numero di persone
+     *  In base alla scelta dell'utente, verranno salvate il numero di persone in viaggio
+     */
     private void chooseImageGroup(){
         ImageView imgSingolo = Objects.requireNonNull(getView()).findViewById(R.id.imgViewSingolo);
         imgSingolo.setOnClickListener(v -> toBudget("singolo"));
@@ -45,6 +57,12 @@ public class PeopleFragment extends Fragment {
         imgGruppo.setOnClickListener(v -> toBudget("gruppo"));
     }
 
+
+    /**
+     *  Metodo per la gestione del salvataggio del numero di persone e della prosecuzione
+     *  Prima di visualizzare il prossimo Fragment, verranno salvate il numero di persone all'interno del prossimo Fragment tramite Bundle
+     *  @param txtPeople Il numero di persone selezionate
+     */
     private void toBudget(String txtPeople) {
         assert getFragmentManager() != null;
         Bundle bundle = new Bundle();

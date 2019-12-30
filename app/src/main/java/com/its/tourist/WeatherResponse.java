@@ -4,9 +4,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 
-/**
- * Created by Mushtaq on 05-11-2018.
- */
 
 public class WeatherResponse {
 
@@ -15,9 +12,9 @@ public class WeatherResponse {
     @SerializedName("sys")
     public Sys sys;
     @SerializedName("weather")
-    public ArrayList<Weather> weather = new ArrayList<Weather>();
+    public ArrayList<Weather> weather = new ArrayList<>();
     @SerializedName("main")
-    public Main main;
+     Main main;
     @SerializedName("wind")
     public Wind wind;
     @SerializedName("rain")
@@ -64,7 +61,7 @@ class Wind {
 
 class Main {
     @SerializedName("temp")
-    public float temp;
+    float temp;
     @SerializedName("humidity")
     public float humidity;
     @SerializedName("pressure")

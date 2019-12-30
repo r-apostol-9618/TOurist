@@ -1,6 +1,12 @@
 package com.its.tourist;
 
+
+/**
+ *  GlobalVariable
+ *  Classe Singleton usata per poter salvare ed ottenere i dati necessari al corretto funzionamento dell'applicazione
+ */
 class GlobalVariable {
+
     private static final GlobalVariable ourInstance = new GlobalVariable();
 
     static GlobalVariable getInstance() {
@@ -28,7 +34,7 @@ class GlobalVariable {
     }
 
 
-    public int getBudgetStart() {
+    int getBudgetStart() {
         return budgetStart;
     }
 
@@ -36,7 +42,7 @@ class GlobalVariable {
         this.budgetStart = budgetStart;
     }
 
-    public int getBudgetEnd() {
+    int getBudgetEnd() {
         return budgetEnd;
     }
 
@@ -44,7 +50,7 @@ class GlobalVariable {
         this.budgetEnd = budgetEnd;
     }
 
-    public String getTypePerson() {
+    String getTypePerson() {
         return typePerson;
     }
 

@@ -36,7 +36,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:textColor="@color/nero"
-            android:textSize="@dimen/base_text"
+            android:textSize="@dimen/text_marker"
             android:padding="10dp"/>
 
     </LinearLayout>

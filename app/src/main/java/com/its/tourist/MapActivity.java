@@ -126,6 +126,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -143,25 +144,25 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         places();
 
         filtriMarker();
-
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == 51) {
             if (resultCode == RESULT_OK) {
                 getDeviceLocation();
             }
         }
-
     }
+
 
     @Override
     public void onBackPressed() {
         makeAlertDialog("Chiudi","Sei sicuro di voler uscire?",true);
     }
+
 
     private void visualizzaMappa () {
         SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map2);
@@ -169,6 +170,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         fm.getMapAsync(this);
         mapView = fm.getView();
     }
+
 
     public String metodoLetturaCoordinate () {
         try {
@@ -185,6 +187,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+
     private void circoscrizioneTorino () {
         String[] coordinate = metodoLetturaCoordinate().split(";");
         polyline = new ArrayList<>();
@@ -198,13 +201,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMap.addPolyline(rectOptions);
     }
 
-    private void checkGPS() {
-        LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(5000);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+    private void checkGPS() {
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(getLocationRequest());
         SettingsClient settingsClient = LocationServices.getSettingsClient(this);
         Task<LocationSettingsResponse> task = settingsClient.checkLocationSettings(builder.build());
         task.addOnSuccessListener(this, locationSettingsResponse -> getDeviceLocation());
@@ -221,6 +220,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
     }
 
+
     private void setPositionBtnGeo() {
         if (mapView != null && mapView.findViewById(Integer.parseInt("1")) != null) {
             View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
@@ -230,6 +230,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             layoutParams.setMargins(0, 0, 40, 180);
         }
     }
+
 
     private void getDeviceLocation() {
         mFusedLocationProviderClient.getLastLocation()
@@ -241,6 +242,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     }
                 });
     }
+
 
     private void providerDeviceLocation(Task<Location> task) {
         mLastLocation = task.getResult();
@@ -255,10 +257,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 );
             }
         } else {
-            final LocationRequest locationRequest = LocationRequest.create();
-            locationRequest.setInterval(10000);
-            locationRequest.setFastestInterval(5000);
-            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
             locationCallback = new LocationCallback() {
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
@@ -279,9 +277,18 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     mFusedLocationProviderClient.removeLocationUpdates(locationCallback);
                 }
             };
-            mFusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
+            mFusedLocationProviderClient.requestLocationUpdates(getLocationRequest(), locationCallback, null);
         }
     }
+
+    private LocationRequest getLocationRequest() {
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(5000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        return locationRequest;
+    }
+
 
     private void places() {
 
@@ -361,11 +368,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
             });
         }
-        /*else {
-            //checkLocationPermission();
-        }*/
 
     }
+
 
     private void filtriMarker () {
         Button btnMusei = findViewById(R.id.btnMusei);
@@ -383,6 +388,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         btnRisto.setOnClickListener(view -> {
 
         });
+
     }
 
     //Si utilizza questa funzione per prendere la larghezza e la lunghezza della toolbar quando finisce di creare la view
@@ -398,13 +404,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
     }
 
-    private void toolbar () {
-        /*
-        //Collego la toolbar al relativo toolbar del xml
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle(getResources().getString(R.string.app_name));
-        */
 
+    private void toolbar () {
         mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             int scrollRange = -1;
 
@@ -420,8 +421,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
     }
 
-    private void getCurrentWeather() {
 
+    private void getCurrentWeather() {
         Log.d("giusto", "debug");
 
         Retrofit retrofit = new Retrofit.Builder().baseUrl("http://api.openweathermap.org/").addConverterFactory(GsonConverterFactory.create()).build();
@@ -434,7 +435,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 if (response.code() == 200) {
                     WeatherResponse weatherResponse = response.body();
                     assert weatherResponse != null;
-
                     @SuppressLint("DefaultLocale") String stringBuilder =
                             String.format("%.0f", kelvinToCelsius(weatherResponse.main.temp)) + "°" /*+
                                     "\n" +
@@ -447,15 +447,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                     "Umidità: " +
                                     weatherResponse.main.humidity*/
                             ;
-
                     TextView txtMeteo = findViewById(R.id.txtMeteo);
                     txtMeteo.setText(stringBuilder);
-                    //meteoString(stringBuilder);
                     Log.e("giusto", "meteo");
 
                 }
             }
-
 
             @Override
             public void onFailure(@NonNull Call<WeatherResponse> call, @NonNull Throwable t) {
@@ -463,21 +460,18 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 TextView txtMeteo = findViewById(R.id.txtMeteo);
                 String testoBase = "Temperatura: 3, Minima: 0, Massima: 3, Umidità: 60";
                 txtMeteo.setText(testoBase);
+
             }
 
         });
 
     }
 
+
     private double kelvinToCelsius ( double grades){
         return grades - 273.15;
     }
 
-    // Funzione che mette i dati meteo in una TextView, ancora da modificare
-    private void meteoString (String meteoInfo){
-        TextView txtMeteo = findViewById(R.id.txtMeteo);
-        txtMeteo.setText(meteoInfo);
-    }
 
     private int gestioneDatiPrezzo () {
         int priceS = global.getBudgetStart();

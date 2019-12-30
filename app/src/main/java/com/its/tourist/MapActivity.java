@@ -39,7 +39,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
@@ -140,10 +139,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMap.setMinZoomPreference(11);
         CustomMarkerInfoWindowView adapter = new CustomMarkerInfoWindowView(MapActivity.this);
         mMap.setInfoWindowAdapter(adapter);
+        mMap.setPadding(0,mToolbarArcBackground.getHeight(),0,findViewById(R.id.buttonContainer).getHeight());
 
         circoscrizioneTorino();
 
-        createBtnGeo();
+        setPositionBtnGeo();
         checkGPS();
         places();
 
@@ -184,9 +184,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             //noinspection ResultOfMethodCallIgnored
             is.read(buffer);
             is.close();
-
             return new String(buffer);
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -228,7 +226,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
     }
 
-    private void createBtnGeo() {
+    private void setPositionBtnGeo() {
         if (mapView != null && mapView.findViewById(Integer.parseInt("1")) != null) {
             View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
             RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
@@ -240,53 +238,54 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void getDeviceLocation() {
         mFusedLocationProviderClient.getLastLocation()
-                .addOnCompleteListener(new OnCompleteListener<Location>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        if (task.isSuccessful()) {
-                            mLastLocation = task.getResult();
-                            if (mLastLocation != null) {
-                                LatLng mLastLocationLatLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLastLocationLatLng, DEFAULT_ZOOM));
-                                if(!PolyUtil.containsLocation(mLastLocationLatLng, polyline, true)){
-                                    makeAlertDialog(
-                                            "Attenzione",
-                                            "Attualmente non ti trovi nella città di Torino.\nVerranno comunque visulizzati i luoghi di interesse intorno a te \uD83D\uDE09",
-                                            false
-                                    );
-                                }
-                            } else {
-                                final LocationRequest locationRequest = LocationRequest.create();
-                                locationRequest.setInterval(10000);
-                                locationRequest.setFastestInterval(5000);
-                                locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-                                locationCallback = new LocationCallback() {
-                                    @Override
-                                    public void onLocationResult(LocationResult locationResult) {
-                                        super.onLocationResult(locationResult);
-                                        if (locationResult == null) {
-                                            return;
-                                        }
-                                        mLastLocation = locationResult.getLastLocation();
-                                        LatLng mLastLocationLatLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-                                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLastLocationLatLng, DEFAULT_ZOOM));
-                                        if(!PolyUtil.containsLocation(mLastLocationLatLng, polyline, true)){
-                                            makeAlertDialog(
-                                                    "Attenzione",
-                                                    "Attualmente non ti trovi nella città di Torino.\nVerranno comunque visulizzati i luoghi di interesse intorno a te! \uD83D\uDE09",
-                                                    false
-                                            );
-                                        }
-                                        mFusedLocationProviderClient.removeLocationUpdates(locationCallback);
-                                    }
-                                };
-                                mFusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
-                            }
-                        } else {
-                            Toast.makeText(MapActivity.this, "Non è possibile trovare l'ultima posizione nota", Toast.LENGTH_SHORT).show();
-                        }
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        providerDeviceLocation(task);
+                    } else {
+                        Toast.makeText(MapActivity.this, "Non è possibile trovare l'ultima posizione nota", Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    private void providerDeviceLocation(Task<Location> task) {
+        mLastLocation = task.getResult();
+        if (mLastLocation != null) {
+            LatLng mLastLocationLatLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLastLocationLatLng, DEFAULT_ZOOM));
+            if(!PolyUtil.containsLocation(mLastLocationLatLng, polyline, true)){
+                makeAlertDialog(
+                        "Attenzione",
+                        "Attualmente non ti trovi nella città di Torino.\nVerranno comunque visulizzati i luoghi di interesse intorno a te \uD83D\uDE09",
+                        false
+                );
+            }
+        } else {
+            final LocationRequest locationRequest = LocationRequest.create();
+            locationRequest.setInterval(10000);
+            locationRequest.setFastestInterval(5000);
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            locationCallback = new LocationCallback() {
+                @Override
+                public void onLocationResult(LocationResult locationResult) {
+                    super.onLocationResult(locationResult);
+                    if (locationResult == null) {
+                        return;
+                    }
+                    mLastLocation = locationResult.getLastLocation();
+                    LatLng mLastLocationLatLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLastLocationLatLng, DEFAULT_ZOOM));
+                    if(!PolyUtil.containsLocation(mLastLocationLatLng, polyline, true)){
+                        makeAlertDialog(
+                                "Attenzione",
+                                "Attualmente non ti trovi nella città di Torino.\nVerranno comunque visulizzati i luoghi di interesse intorno a te! \uD83D\uDE09",
+                                false
+                        );
+                    }
+                    mFusedLocationProviderClient.removeLocationUpdates(locationCallback);
+                }
+            };
+            mFusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
+        }
     }
 
     private void places() {

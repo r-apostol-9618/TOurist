@@ -332,7 +332,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                     }
                                 }
 
-                                if (place.getPriceLevel() == null || place.getPriceLevel() == gestioneDatiPrezzo()) {
+                                if (place.getPriceLevel() == null || place.getPriceLevel() <= gestioneDatiPrezzo()) {
                                     if (place.getPhotoMetadatas() != null) {
                                         PhotoMetadata photoMetadata;
                                         photoMetadata = place.getPhotoMetadatas().get(0);

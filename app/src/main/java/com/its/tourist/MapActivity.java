@@ -98,11 +98,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private final float DEFAULT_ZOOM = 18;
 
-    public static String BaseUrl = "http://api.openweathermap.org/";
-    public static String AppId = "c96e8bd7dcf26eab873b1b5417951ba7";
-    public static String lat = "45.070935";
-    public static String lon = "7.685048";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -429,9 +424,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         Log.d("giusto", "debug");
 
-        Retrofit retrofit = new Retrofit.Builder().baseUrl(BaseUrl).addConverterFactory(GsonConverterFactory.create()).build();
+        Retrofit retrofit = new Retrofit.Builder().baseUrl("http://api.openweathermap.org/").addConverterFactory(GsonConverterFactory.create()).build();
         WeatherService service = retrofit.create(WeatherService.class);
-        Call<WeatherResponse> call = service.getCurrentWeatherData(lat, lon, AppId);
+        Call<WeatherResponse> call = service.getCurrentWeatherData("45.070935", "7.685048", "c96e8bd7dcf26eab873b1b5417951ba7");
         call.enqueue(new Callback<WeatherResponse>() {
             @Override
             public void onResponse(@NonNull Call<WeatherResponse> call, @NonNull Response<WeatherResponse> response) {

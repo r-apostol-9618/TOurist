@@ -31,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
@@ -62,7 +63,7 @@ public class TimeFragment extends Fragment {
         txtCalendar = Objects.requireNonNull(getView()).findViewById(R.id.txtData);
         txtStartTime = getView().findViewById(R.id.timeBegin);
         txtEndTime = getView().findViewById(R.id.timeEnd);
-        myCalendar = Calendar.getInstance();
+        myCalendar = Calendar.getInstance(TimeZone.getTimeZone("Europe/Rome"), Locale.ITALIAN);
         hour = myCalendar.get(Calendar.HOUR_OF_DAY);
         minute = myCalendar.get(Calendar.MINUTE);
 
@@ -82,7 +83,7 @@ public class TimeFragment extends Fragment {
      */
     @SuppressLint("SetTextI18n")
     private void setDateCalendar() {
-        txtCalendar.setText(myCalendar.get(Calendar.DAY_OF_MONTH)+"/"+myCalendar.get(Calendar.MONTH)+"/"+myCalendar.get(Calendar.YEAR));
+        txtCalendar.setText(myCalendar.get(Calendar.DAY_OF_MONTH)+"/"+(myCalendar.get(Calendar.MONTH)+1)+"/"+myCalendar.get(Calendar.YEAR));
         DatePickerDialog.OnDateSetListener date = (datePicker, year, month, day) -> {
             myCalendar.set(Calendar.YEAR, year);
             myCalendar.set(Calendar.MONTH, month);

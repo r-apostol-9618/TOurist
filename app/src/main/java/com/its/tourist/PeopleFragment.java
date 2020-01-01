@@ -67,7 +67,7 @@ public class PeopleFragment extends Fragment {
         assert getFragmentManager() != null;
         Bundle bundle = new Bundle();
         BudgetFragment budgetFragment = new BudgetFragment();
-        bundle.putString("numberOfPeople",txtPeople);
+        bundle.putString("numberOfPeople", txtPeople);
         budgetFragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.frame_main, budgetFragment);

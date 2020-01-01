@@ -22,6 +22,8 @@ public class MainActivity extends AppCompatActivity {
     private Handler handler;
     private GlobalVariable global;
 
+    private final int DELAY = 3000;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
             fragmentTransaction.commit();
         };
         handler = new Handler();
-        handler.postDelayed(run,3000);
+        handler.postDelayed(run, DELAY);
     }
 
 
@@ -94,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         super.onRestart();
         if (global.isHandlerPeople()) {
             handler.removeCallbacks(run);
-            handler.postDelayed(run, 3000);
+            handler.postDelayed(run, DELAY);
         }
     }
 

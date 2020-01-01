@@ -114,10 +114,9 @@ public class TimeFragment extends Fragment {
             txtTime.setText(String.format("%02d:%02d", hour, minute));
         }
         txtTime.setOnClickListener(view -> {
-            TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), (timePicker, selectedHour, selectedMinute) -> {
-                String textTime = String.format("%02d:%02d", selectedHour, selectedMinute);
-                txtTime.setText(textTime);
-            }, hour, minute, true);
+            TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), (timePicker, selectedHour, selectedMinute) ->
+                    txtTime.setText(String.format("%02d:%02d", selectedHour, selectedMinute)),
+                    hour, minute, true);
             timePickerDialog.show();
         });
     }
@@ -149,13 +148,14 @@ public class TimeFragment extends Fragment {
 
     /**
      *  Metodo per la gestione del pulsante Avanti
-     *  Se occorre un errore, verrà visualizzato un Toast di avvertimento,
+     *  Se l'orario di inizio e di fine coincidano, così da avere un range temporale di 0 min,
+     *  verrà visualizzato un Toast di avvertimento,
      *  altriemnti si passerà alla sezione per i permessi di geoclocalizzazione
      */
     private void toMap() {
         Button avanti = Objects.requireNonNull(getView()).findViewById(R.id.btnAvanti3);
         avanti.setOnClickListener(v -> {
-            if (timeRangeError()) {
+            if (txtStartTime.getText().toString().equals(txtEndTime.getText().toString())) {
                 Toast.makeText(getActivity(), "Inserisci un range temporale valido!", Toast.LENGTH_SHORT).show();
             } else {
                 permessi();
@@ -223,17 +223,6 @@ public class TimeFragment extends Fragment {
         globalVariable.setTimeEnd(txtEndTime.getText().toString());
         Intent intent = new Intent(getActivity(), MapActivity.class);
         startActivity(intent);
-    }
-
-
-    /**
-     *  Metodo per la gestione dell'errore temporale
-     *  Viene eseguito un controllo per verificare se l'orario di inizio e di fine non coincidano,
-     *  così da non avere un range temporale di 0 min
-     *  @return boolean
-     */
-    private boolean timeRangeError() {
-        return txtStartTime.getText().toString().equals(txtEndTime.getText().toString());
     }
 
 }

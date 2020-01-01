@@ -466,7 +466,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
 
-    private double kelvinToCelsius ( double grades){
+    private double kelvinToCelsius (double grades){
         return grades - 273.15;
     }
 

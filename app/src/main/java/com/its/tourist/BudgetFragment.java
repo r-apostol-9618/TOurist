@@ -95,7 +95,7 @@ public class BudgetFragment extends Fragment {
         Button avanti = Objects.requireNonNull(getView()).findViewById(R.id.btnAvanti);
         Button free = Objects.requireNonNull(getView()).findViewById(R.id.btnFree);
         avanti.setOnClickListener(v -> toTimeFragment(false));
-        free.setOnClickListener(view -> toTimeFragment(true));
+        free.setOnClickListener(v -> toTimeFragment(true));
     }
 
 
@@ -106,16 +106,16 @@ public class BudgetFragment extends Fragment {
      */
     private void toTimeFragment(boolean free) {
         assert getFragmentManager() != null;
+        assert this.getArguments() != null;
         Bundle bundle = new Bundle();
         Bundle peopleData = this.getArguments();
         TimeFragment timeFragment = new TimeFragment();
-        assert peopleData != null;
         if (free) {
-            bundle.putInt("startBudget",0);
-            bundle.putInt("endBudget",0);
+            bundle.putInt("startBudget", 0);
+            bundle.putInt("endBudget", 0);
         } else {
-            bundle.putInt("startBudget",Integer.parseInt(seekbarStart.getText().toString()));
-            bundle.putInt("endBudget",Integer.parseInt(seekbarEnd.getText().toString()));
+            bundle.putInt("startBudget", Integer.parseInt(seekbarStart.getText().toString()));
+            bundle.putInt("endBudget", Integer.parseInt(seekbarEnd.getText().toString()));
         }
         bundle.putString("numberOfPeople", peopleData.getString("numberOfPeople"));
         timeFragment.setArguments(bundle);

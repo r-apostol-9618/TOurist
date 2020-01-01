@@ -212,9 +212,9 @@ public class TimeFragment extends Fragment {
      *  avviare la mappa contenuta all'interno di MapActivity
      */
     private void toMapActivity() {
+        assert this.getArguments() != null;
         Bundle bundle = this.getArguments();
         GlobalVariable globalVariable = GlobalVariable.getInstance();
-        assert bundle != null;
         globalVariable.setBudgetStart(bundle.getInt("startBudget"));
         globalVariable.setBudgetEnd(bundle.getInt("endBudget"));
         globalVariable.setTypePerson(bundle.getString("numberOfPeople"));

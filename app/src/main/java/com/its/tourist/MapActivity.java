@@ -517,12 +517,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         intent.putExtra("Exit", true);
                         startActivity(intent);
                         finish();
-                    }).setNegativeButton("ANNULLA", (dialogInterface, i) -> { })
+                    }).setNegativeButton("ANNULLA", null)
                     .show();
         } else {
             new AlertDialog.Builder(this).setTitle(title).setMessage(text)
-                    .setPositiveButton("OK", (dialogInterface, i) -> { })
-                    .show();
+                    .setPositiveButton("OK", null).show();
         }
 
     }

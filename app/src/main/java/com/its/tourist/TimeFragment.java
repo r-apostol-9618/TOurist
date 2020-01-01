@@ -81,7 +81,6 @@ public class TimeFragment extends Fragment {
      *  Viene visualizzato un calendario, tramite Date Picker, dal quale sarà possibile selezionare, dalla data attuale,
      *  un possibile giorno di arrivo in città, per poi visulaizzarlo in una TextView
      */
-    @SuppressLint("SetTextI18n")
     private void setDateCalendar() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.ITALIAN);
         txtCalendar.setText(sdf.format(myCalendar.getTime()));

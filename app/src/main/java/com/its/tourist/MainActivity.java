@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
             new AlertDialog.Builder(this).setTitle("Chiudi").setMessage("Sei sicuro di voler uscire?")
                     .setPositiveButton("ESCI", (dialogInterface, i) ->
                             finish()
-                    ).setNegativeButton("ANNULLA", (dialogInterface, i) -> { }).show();
+                    ).setNegativeButton("ANNULLA", null).show();
         }else{
             super.onBackPressed();
         }

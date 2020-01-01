@@ -83,12 +83,12 @@ public class TimeFragment extends Fragment {
      */
     @SuppressLint("SetTextI18n")
     private void setDateCalendar() {
-        txtCalendar.setText(myCalendar.get(Calendar.DAY_OF_MONTH)+"/"+(myCalendar.get(Calendar.MONTH)+1)+"/"+myCalendar.get(Calendar.YEAR));
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.ITALIAN);
+        txtCalendar.setText(sdf.format(myCalendar.getTime()));
         DatePickerDialog.OnDateSetListener date = (datePicker, year, month, day) -> {
             myCalendar.set(Calendar.YEAR, year);
             myCalendar.set(Calendar.MONTH, month);
             myCalendar.set(Calendar.DAY_OF_MONTH, day);
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.ITALIAN);
             txtCalendar.setText(sdf.format(myCalendar.getTime()));
         };
         ImageView calendar = Objects.requireNonNull(getView()).findViewById(R.id.imgViewCalendar);

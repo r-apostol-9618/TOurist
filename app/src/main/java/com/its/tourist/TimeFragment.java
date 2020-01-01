@@ -114,9 +114,9 @@ public class TimeFragment extends Fragment {
             txtTime.setText(String.format("%02d:%02d", hour, minute));
         }
         txtTime.setOnClickListener(view -> {
-            TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), (timePicker, selectedHour, selectedMinute) ->
-                    txtTime.setText(String.format("%02d:%02d", selectedHour, selectedMinute)),
-                    hour, minute, true);
+            TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), (timePicker, selectedHour, selectedMinute) -> {
+                    txtTime.setText(String.format("%02d:%02d", selectedHour, selectedMinute));
+            }, hour, minute, true);
             timePickerDialog.show();
         });
     }

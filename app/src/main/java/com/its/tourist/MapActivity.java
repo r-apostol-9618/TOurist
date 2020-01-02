@@ -214,17 +214,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
 
-    private LocationRequest getLocationRequest() {
+    private void checkGPS() {
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setInterval(10000);
         locationRequest.setFastestInterval(5000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        return locationRequest;
-    }
 
-
-    private void checkGPS() {
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(getLocationRequest());
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
         SettingsClient settingsClient = LocationServices.getSettingsClient(this);
         Task<LocationSettingsResponse> task = settingsClient.checkLocationSettings(builder.build());
         task.addOnSuccessListener(this, locationSettingsResponse -> getDeviceLocation());
@@ -267,6 +263,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 );
             }
         } else {
+            final LocationRequest locationRequest = LocationRequest.create();
+            locationRequest.setInterval(10000);
+            locationRequest.setFastestInterval(5000);
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
             locationCallback = new LocationCallback() {
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
@@ -287,7 +288,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     mFusedLocationProviderClient.removeLocationUpdates(locationCallback);
                 }
             };
-            mFusedLocationProviderClient.requestLocationUpdates(getLocationRequest(), locationCallback, null);
+            mFusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
         }
     }
 
@@ -337,7 +338,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                 if (place.getPriceLevel() == null || place.getPriceLevel() <= gestioneDatiPrezzo()) {
                                     if (place.getPhotoMetadatas() != null) {
                                         PhotoMetadata photoMetadata = place.getPhotoMetadatas().get(0);
-
                                         FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata).build();
                                         placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) ->
                                                 mMap.addMarker(markerOptions).setTag(fetchPhotoResponse.getBitmap())
@@ -392,6 +392,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
+
     //Si utilizza questa funzione per prendere la larghezza e la lunghezza della toolbar quando finisce di creare la view
     private void treeObserve () {
         ViewTreeObserver vto = mAppBarLayout.getViewTreeObserver();
@@ -424,40 +425,25 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 
     private void getCurrentWeather() {
-        Log.d("giusto", "debug");
-
         Retrofit retrofit = new Retrofit.Builder().baseUrl("http://api.openweathermap.org/").addConverterFactory(GsonConverterFactory.create()).build();
         WeatherService service = retrofit.create(WeatherService.class);
         Call<WeatherResponse> call = service.getCurrentWeatherData("45.070935", "7.685048", "c96e8bd7dcf26eab873b1b5417951ba7");
+        TextView txtMeteo = findViewById(R.id.txtMeteo);
         call.enqueue(new Callback<WeatherResponse>() {
             @Override
             public void onResponse(@NonNull Call<WeatherResponse> call, @NonNull Response<WeatherResponse> response) {
 
                 if (response.code() == 200) {
+                    assert response.body() != null;
                     WeatherResponse weatherResponse = response.body();
-                    assert weatherResponse != null;
                     @SuppressLint("DefaultLocale") String stringBuilder =
-                            String.format("%.0f", kelvinToCelsius(weatherResponse.main.temp)) + "°" /*+
-                                    "\n" +
-                                    "Min: " +
-                                    String.format("%.0f", kelvinToCelsius(weatherResponse.main.temp_min)) +
-                                    "\n" +
-                                    "Max: " +
-                                    String.format("%.0f", kelvinToCelsius(weatherResponse.main.temp_max)) +
-                                    "\n" +
-                                    "Umidità: " +
-                                    weatherResponse.main.humidity*/
-                            ;
-                    TextView txtMeteo = findViewById(R.id.txtMeteo);
+                            String.format("%.0f", kelvinToCelsius(weatherResponse.main.temp)) + "°";
                     txtMeteo.setText(stringBuilder);
-                    Log.e("giusto", "meteo");
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<WeatherResponse> call, @NonNull Throwable t) {
-                Log.d("giusto", "errore");
-                TextView txtMeteo = findViewById(R.id.txtMeteo);
                 txtMeteo.setText("E°");
             }
 

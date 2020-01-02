@@ -6,8 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_content"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent" >
 
     <fragment
         android:id="@+id/map2"
@@ -21,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:orientation="horizontal">
+        android:orientation="horizontal" >
 
         <Button
             android:id="@+id/btnMusei"
@@ -32,7 +31,7 @@
             style="?android:attr/buttonBarButtonStyle"
             android:background="@color/colorPrimary"
             android:textColor="@color/white"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/btnCinema"
@@ -43,7 +42,7 @@
             style="?android:attr/buttonBarButtonStyle"
             android:background="@color/colorPrimary"
             android:textColor="@color/white"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/btnRistoranti"
@@ -54,7 +53,7 @@
             style="?android:attr/buttonBarButtonStyle"
             android:background="@color/colorPrimary"
             android:textColor="@color/white"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
     </LinearLayout>
 
@@ -69,13 +68,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fitsSystemWindows="true"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            >
+            app:layout_scrollFlags="scroll|exitUntilCollapsed" >
 
             <com.its.tourist.ToolbarArcBackground
                 android:id="@+id/toolbarArcBackground"
                 android:layout_width="match_parent"
-                android:layout_height="150dp" /> <!-- L'altezza del arco -->
+                android:layout_height="150dp" />
 
             <RelativeLayout
                 android:layout_width="match_parent"

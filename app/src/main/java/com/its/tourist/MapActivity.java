@@ -244,7 +244,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     if (task.isSuccessful()) {
                         providerDeviceLocation(task);
                     } else {
-                        Toast.makeText(MapActivity.this, "Non è possibile trovare l'ultima posizione nota", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MapActivity.this,
+                                "Non è possibile trovare l'ultima posizione nota",
+                                Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -321,7 +323,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             assert types!= null;
 
                             //Dato che tourist_attraction non c'è questo if serve per mettere le cose che secondo me sono per "turisti"
-                            if(types.contains(AMUSEMENT_PARK) || types.contains(AQUARIUM) || types.contains(ART_GALLERY) || types.contains(NIGHT_CLUB)|| types.contains(RESTAURANT)|| types.contains(BOWLING_ALLEY)|| types.contains(MOVIE_THEATER)|| types.contains(SHOPPING_MALL)|| types.contains(PARK)|| types.contains(MUSEUM)) {
+                            if(types.contains(AMUSEMENT_PARK) || types.contains(AQUARIUM) || types.contains(ART_GALLERY) ||
+                                    types.contains(NIGHT_CLUB)|| types.contains(RESTAURANT)|| types.contains(BOWLING_ALLEY)||
+                                    types.contains(MOVIE_THEATER)|| types.contains(SHOPPING_MALL)|| types.contains(PARK)|| types.contains(MUSEUM)) {
                                 markerOptions.title(place.getName());
                                 markerOptions.position(Objects.requireNonNull(place.getLatLng()));
 

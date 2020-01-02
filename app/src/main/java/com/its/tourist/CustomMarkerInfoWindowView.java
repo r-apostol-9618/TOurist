@@ -17,7 +17,7 @@ import com.google.android.gms.maps.model.Marker;
  */
 public class CustomMarkerInfoWindowView implements GoogleMap.InfoWindowAdapter {
 
-    private Activity context;
+    private View markerItemView;
 
 
     /**
@@ -25,8 +25,9 @@ public class CustomMarkerInfoWindowView implements GoogleMap.InfoWindowAdapter {
      *  Viene richiesta un'Activity, un contesto, alla quale collegarsi per modificare il suo interno
      *  @param context L'Activity collegata
      */
+    @SuppressLint("InflateParams")
     CustomMarkerInfoWindowView(Activity context) {
-        this.context = context;
+        markerItemView = context.getLayoutInflater().inflate(R.layout.layout_markers, null);
     }
 
 
@@ -39,7 +40,6 @@ public class CustomMarkerInfoWindowView implements GoogleMap.InfoWindowAdapter {
      */
     @Override
     public View getInfoWindow(Marker marker) {
-        @SuppressLint("InflateParams") View markerItemView = context.getLayoutInflater().inflate(R.layout.layout_markers, null);
         TextView titoloCard = markerItemView.findViewById(R.id.titoloCard);
         TextView infoCard = markerItemView.findViewById(R.id.infoCard);
         ImageView imageCard = markerItemView.findViewById(R.id.imageCard);

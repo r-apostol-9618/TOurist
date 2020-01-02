@@ -148,7 +148,7 @@ public class TimeFragment extends Fragment {
 
     /**
      *  Metodo per la gestione del pulsante Avanti
-     *  Se l'orario di inizio e di fine coincidano, così da avere un range temporale di 0 min,
+     *  Se l'orario di inizio e di fine coincidono, così da avere un range temporale di 0 min,
      *  verrà visualizzato un Toast di avvertimento,
      *  altriemnti si passerà alla sezione per i permessi di geoclocalizzazione
      */

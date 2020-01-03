@@ -28,5 +28,7 @@ Nella parte inferiori vengono visualizzzti 3 pulsanti: musei, cinema, ristoranti
 Tecnologie principali
 
 Maps SDK - per la gestione della mappa
+
 Places SDK - per accedere al database di Google di informazioni sui posti attorno all'utente
+
 OpenWeather - per la gestione dei dati meteorologici

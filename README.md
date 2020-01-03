@@ -1,29 +1,31 @@
 Progetto TOurist
 
-Salve a tutti, questo spazio github è dedicato al progetto TOurist durante il periodo ITS.
-Questo è il master, cioè il progetto completo.
-Qui vengono salvate le modifiche apportate al progetto finale visibile agli altri membri e, se nel caso si debbano salvare informazioni da ricordare per le prossime build o per informare gli altri utenti, questo file README è disponibile e modificabile.
+Questo spazio github è dedicato al progetto TOurist.
+L'Idea
+TOurist è un progetto nato come esame di Android, l'idea è quella di dare una mano ai turisti che vengono a visitare la città di Torino.
+Volevamo dare ai nostri utenti un resoconto veloce dei posti di loro interesse, in pochi passi, rapido, senza registrazioni o pagamenti in app. Ogni volta che si apre l'app vengono chieste 3 informazioni all'utente
+• Selezionare il numero di persone
+• Selezionare il budget a disposizione
+• Selezionare il tempo a disposizione
+Dopo che vengono inseriti i dati viene subito mostrata una mappa con i punti di interesse relativi e in alto come toolbar la temperatura in quel preciso istante, ogni scelta dell'utente nelle prime 3 schermate modificheranno il risultato finale.
 
-Per inizaiare a lavorare sul progetto basta seguire questi passi:
-- Scaricare git Windows / OsX ed installarlo (premendo sempre avanti)
-- Aprire Android Studio
-- Nella schermata iniziale premere "Check out project from Version Control" e poi su "Git"
-- Nella finestra che si apre inserire l'URL reperibile su github, andando nel master del progetto condiviso, tramite il pulsante "Clone or download"
-- Copiare il link ed inserirlo su Android Studio
-- Inserire le proprie credenziali di github ed il progetto infine è pronto
-- Se si volesse aggiornare il progetto all'ultima build presente sul master, premere la freccia blu (update project) nella sezione Git in alto a destra e premere OK
+La prima schermata quella relativa al numero di persone l'utente può selezionare tra 3 scelte: "Singolo", "In coppia", "In gruppo".
+La seconda schermata quella relativa al budget a disposizione l'utente può selezionare tra 2 scelte "Gratuito" o può inserire quanti soldi vuole spendere tramite un "Range Picker"
 
-Dopo che sono state effettuate le modifiche sul progetto e si volesse caricarlo su github bisogna seguire questi passi:
-- Se si sta lavorando su un'altro branch diverso dal master, posizionarsi in basso a destra per vedere una piccola sezione denominata Git:nomeBranch, cliccare e selezionarne un altro per il commit
-- In alto a destra sarà visibile una sezione dedicata a Git, premere la spunta verde (Commit) per vedere i cambiamenti e poter inserire dati e commenti per l'invio su github
-- Premere commit anche se sono presenti errori (Gialli)
-- Infine, premere la combinazione CTRL-SHIFT-K per eseguire il Push all'interno del master e renderlo condiviso con gli altri utenti (potrebbe essere necessario inserire le proprie credenziali di git)
+Le prime 2 schermate sono strettamente collegate tra loro:
+Ogni scelta condizionerà la schermata successiva. Per esempio se si seleziona "Singolo" allora la gestione della seconda schermata quella relativa al budget verrà trattata in modo diverso, mettere 100 euro come budget a disposizione per un "Singolo" darà un risultato diverso rispetto a selezionare 100 euro per un "Gruppo".
 
+La terza schermata quella relativa al tempo a disposizione l'utente può selezionare il giorno tramite un calendario, se ha tutto il giorno a disposizione o solo un range di ore.
 
-Consigli utili:
-- Tenere sempre aggiornato Android Studio
-- Disinstallare la build precedente dell'app prima di installare quella successiva
-- Ricordate di controllare se sono state apportate modifiche all'interno del master dagli altri utenti mentre si sta per eseguire un commit oppure si sta per lavorare su una build vecchia
-- Inserire un commento ad ogni Build per informare gli utenti dei cambiamenti avvenuti
-- Create una copia di backup all'interno del vostro PC per non perdere eventuali dati
-- Inviate una copia dell'APK all'interno del gruppo Telegram, oppure avvertire gli altri Dev di un eventuale Push, per segnalare dei cambiamenti apportati
+Parte la quarta e ultima schermata con la toolbar, la mappa e 3 pulsanti nella parte in basso, qua viene chiesto all'utente di attivare il gps, per la geolocalizzazione, se l'utente si troverà al di fuori di Torino verrà mostrato un pop up ma si potrà comunque usare l'app anche se non alle sue massime prestazioni. 
+Nella toolbar viene visualizzato a sinitra il nome dell'app ed a destra i gradi in quel preciso momento.
+Sulla mappa vengono mostrati i punti di interesse tramite dei marker in base alle scelte fatte fino ad ora, al click sull'marker che ci interessa vengono fuori le informazioni principali del posto selezionato tramite un fragment: titolo, via, rating, foto, se il rating o la foto non sono note verranno dei messaggi di attenzione all'interno di questo nuovo fragment.
+La mappa come anche la toolbar cambieranno in base all'ora, se l'app viene aperta di notte lo stile della mappa e della toolbar cambieranno, abbiamo utilizzato 2 stili diversi per il giorno e la notte.
+Nella parte inferiori vengono visualizzzti 3 pulsanti: musei, cinema, ristoranti, sempre tenendo conto delle informazioni inserite nelle prime 3 schermate vengono visualizzate queste 3 tipologie di posti.
+
+Tecnologie principali
+
+Maps SDK - per la gestione della mappa
+Places SDK - per accedere al database di Google di informazioni sui posti attorno all'utente
+OpenWeather - per la gestione dei dati meteorologici
+

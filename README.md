@@ -31,9 +31,15 @@ Qui verrà chiesto all'utente di attivare il gps, per la geolocalizzazione, e se
 
 Nella toolbar viene visualizzato a sinitra il nome dell'app ed a destra la temperatura esterna in quel preciso momento.
 
-Sulla mappa vengono mostrati i punti di interesse tramite dei marker in base alle scelte fatte fino ad ora, al click sull'marker che ci interessa vengono fuori le informazioni principali del posto selezionato tramite un fragment: titolo, via, rating, foto, se il rating o la foto non sono note verranno dei messaggi di attenzione all'interno di questo nuovo fragment.
-La mappa come anche la toolbar cambieranno in base all'ora, se l'app viene aperta di notte lo stile della mappa e della toolbar cambieranno, abbiamo utilizzato 2 stili diversi per il giorno e la notte.
-Nella parte inferiori vengono visualizzzti 3 pulsanti: musei, cinema, ristoranti, sempre tenendo conto delle informazioni inserite nelle prime 3 schermate vengono visualizzate queste 3 tipologie di posti.
+Sulla mappa vengono mostrati i punti di interesse tramite dei marker in base alle scelte fatte fino ad ora. 
+
+Al click sull'marker che ci interessa, verranno visualizzate le informazioni principali del posto selezionato tramite un custom layout, se alcuni dati non sono stati resi noti, verrà modificato il layout di conseguenza.
+
+La mappa, come anche la toolbar, cambieranno in base all'ora. 
+
+Se l'app viene aperta di notte, lo stile della mappa e della toolbar cambieranno, sono stati utilizzati due stili differenti per il giorno e la notte.
+
+Nella parte inferiore, vengono visualizzati tre pulsanti: musei, cinema e ristoranti, utilizzati per filtrare il tipo di posto visualizzato nella mappa.
 
 
 Tecnologie principali

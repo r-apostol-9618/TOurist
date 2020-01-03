@@ -1,7 +1,5 @@
 Progetto TOurist
 
-Questo spazio Github è dedicato al progetto TOurist.
-
 L'Idea TOurist è un progetto Android nato con lo scopo di dare una mano ai turisti che vengono a visitare la città di Torino.
 
 Volevamo dare ai nostri utenti un resoconto veloce dei posti di interesse, in modo rapido, senza registrazioni o pagamenti in app.
@@ -41,6 +39,7 @@ Se l'app viene aperta di notte, lo stile della mappa e della toolbar cambieranno
 
 Nella parte inferiore, vengono visualizzati tre pulsanti: musei, cinema e ristoranti, utilizzati per filtrare il tipo di posto visualizzato nella mappa.
 
+-
 
 Tecnologie principali
 

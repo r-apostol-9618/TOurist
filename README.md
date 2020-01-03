@@ -4,9 +4,9 @@ Questo spazio github è dedicato al progetto TOurist.
 L'Idea TOurist è un progetto nato come esame di Android, l'idea è quella di dare una mano ai turisti che vengono a visitare la città di Torino.
 Volevamo dare ai nostri utenti un resoconto veloce dei posti di loro interesse, in pochi passi, rapido, senza registrazioni o pagamenti in app. 
 Ogni volta che si apre l'app vengono chieste 3 informazioni all'utente:
-• Selezionare il numero di persone
-• Selezionare il budget a disposizione
-• Selezionare il tempo a disposizione
+ - Selezionare il numero di persone
+ - Selezionare il budget a disposizione
+ - Selezionare il tempo a disposizione
 Dopo che vengono inseriti i dati viene subito mostrata una mappa con i punti di interesse relativi e in alto come toolbar la temperatura in quel preciso istante, ogni scelta dell'utente nelle prime 3 schermate modificheranno il risultato finale.
 
 La prima schermata quella relativa al numero di persone l'utente può selezionare tra 3 scelte: "Singolo", "In coppia", "In gruppo".

@@ -39,7 +39,7 @@ Se l'app viene aperta di notte, lo stile della mappa e della toolbar cambieranno
 
 Nella parte inferiore, vengono visualizzati tre pulsanti: musei, cinema e ristoranti, utilizzati per filtrare il tipo di posto visualizzato nella mappa.
 
--
+---
 
 Tecnologie principali
 

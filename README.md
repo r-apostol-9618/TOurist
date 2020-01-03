@@ -9,7 +9,7 @@ All'avvio, l'app richiede 3 informazioni all'utente:
  - Selezionare il budget in possesso
  - Selezionare il tempo a disposizione
  
-Dopo che vengono inseriti i dati, verrà mostrata una mappa con i punti di interesse relativi e in alto, all'interno della toolbar, la temperatura all'esterno in quel momento. 
+Dopo che vengono inseriti i dati, verrà mostrata una mappa con i punti di interesse relativi e in alto, all'interno della toolbar, la temperatura esterna in quel momento. 
 
 Ogni scelta dell'utente nelle prime 3 schermate modificheranno il risultato finale.
 
@@ -27,7 +27,7 @@ Infine, si avvia la quarta ed ultima schermata, con toolbar, mappa e tre pulsant
 
 Qui verrà chiesto all'utente di attivare il gps, per la geolocalizzazione, e se l'utente si troverà al di fuori di Torino, verrà mostrato un popup di informazione, potendo comunque usare l'app anche se non nella sua funzione principale.
 
-Nella toolbar viene visualizzato a sinitra il nome dell'app ed a destra la temperatura esterna in quel preciso momento.
+Nella toolbar viene visualizzato a sinistra il nome dell'app ed a destra la temperatura esterna in quel preciso momento.
 
 Sulla mappa vengono mostrati i punti di interesse tramite dei marker in base alle scelte fatte fino ad ora. 
 

@@ -37,6 +37,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.Task;
@@ -57,6 +58,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -100,7 +102,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private final float DEFAULT_ZOOM = 18;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -128,10 +129,25 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        //Stili mappa
+        MapStyleOptions style;
+        Calendar cal = Calendar.getInstance();
+        int hour = cal.get(Calendar.HOUR_OF_DAY);
+        if(hour < 6 || hour > 18){
+            style = MapStyleOptions.loadRawResourceStyle(
+                    this,R.raw.map_style_night);
+        } else {
+            style = MapStyleOptions.loadRawResourceStyle(
+                    this,R.raw.map_style_day);
+        }
+
+
+        mMap.setMapStyle(style);
+
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.setMinZoomPreference(11);
@@ -148,7 +164,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -159,12 +174,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-
     @Override
     public void onBackPressed() {
         makeAlertDialog("Chiudi","Sei sicuro di voler uscire?",true);
     }
-
 
     private void visualizzaMappa () {
         SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map2);
@@ -172,7 +185,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         fm.getMapAsync(this);
         mapView = fm.getView();
     }
-
 
     public String metodoLetturaCoordinate () {
         try {
@@ -189,7 +201,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-
     private void circoscrizioneTorino () {
         String[] coordinate = metodoLetturaCoordinate().split(";");
         polyline = new ArrayList<>();
@@ -198,11 +209,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             polyline.add(new LatLng(Double.parseDouble(LatLng[1]), Double.parseDouble(LatLng[0])));
         }
         PolylineOptions rectOptions = new PolylineOptions().addAll(polyline);
-        rectOptions.color(Color.RED);
+        rectOptions.color(Color.parseColor("#1c88e2"));
         rectOptions.width(8);
         mMap.addPolyline(rectOptions);
     }
-
 
     private void setPositionBtnGeo() {
         if (mapView != null && mapView.findViewById(Integer.parseInt("1")) != null) {
@@ -213,7 +223,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             layoutParams.setMargins(0, 0, 40, 180);
         }
     }
-
 
     private void checkGPS() {
         LocationRequest locationRequest = LocationRequest.create();
@@ -238,7 +247,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
     }
 
-
     private void getDeviceLocation() {
         mFusedLocationProviderClient.getLastLocation()
                 .addOnCompleteListener(task -> {
@@ -251,7 +259,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     }
                 });
     }
-
 
     private void providerDeviceLocation(Task<Location> task) {
         mLastLocation = task.getResult();
@@ -295,7 +302,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-
     private void places() {
 
         //Lista delle informazioni reperibili in un posto --POSSONO ESSERE INSERITE TUTTE QUELLE CONTENUTE IN Place.Field--
@@ -306,7 +312,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         //Serve solo l'ID del posto da ricercare
         FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(Collections.singletonList(Place.Field.ID));
 
-        if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
             placeResponse.addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
@@ -324,9 +329,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             assert types!= null;
 
                             //Dato che tourist_attraction non c'è questo if serve per mettere le cose che secondo me sono per "turisti"
-                            if(types.contains(AMUSEMENT_PARK) || types.contains(AQUARIUM) || types.contains(ART_GALLERY) ||
-                                    types.contains(NIGHT_CLUB)|| types.contains(RESTAURANT)|| types.contains(BOWLING_ALLEY)||
-                                    types.contains(MOVIE_THEATER)|| types.contains(SHOPPING_MALL)|| types.contains(PARK)|| types.contains(MUSEUM)) {
+                            if(types.contains(POINT_OF_INTEREST)){
                                 markerOptions.title(place.getName());
                                 markerOptions.position(Objects.requireNonNull(place.getLatLng()));
 
@@ -397,7 +400,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                     }
                                 }
                                 Log.i("opening", "Opening: " + place.getOpeningHours());
-
                             }
 
                         }).addOnFailureListener((exception) -> {
@@ -414,10 +416,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     }
                 }
             });
-        }
+
 
     }
-
 
     private void filtriMarker () {
         Button btnMusei = findViewById(R.id.btnMusei);
@@ -425,19 +426,375 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Button btnRisto = findViewById(R.id.btnRistoranti);
 
         btnMusei.setOnClickListener(view -> {
+            mMap.clear();
+            Toast.makeText(MapActivity.this,
+                    "Caricamento dei Musei attorno a te",
+                    Toast.LENGTH_SHORT).show();
+
+            //Lista delle informazioni reperibili in un posto --POSSONO ESSERE INSERITE TUTTE QUELLE CONTENUTE IN Place.Field--
+            List<Place.Field> placeFetchFields = Arrays.asList(Place.Field.ID,
+                    Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.RATING,
+                    Place.Field.PHOTO_METADATAS, Place.Field.PRICE_LEVEL, Place.Field.OPENING_HOURS, Place.Field.TYPES);
+
+            //Serve solo l'ID del posto da ricercare
+            FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(Collections.singletonList(Place.Field.ID));
+
+            if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
+                placeResponse.addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        FindCurrentPlaceResponse response = task.getResult();
+                        assert response != null;
+                        for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
+
+                            //Chiedo di darmi tutte le informazioni all'interno del posto con il relativo ID
+                            FetchPlaceRequest requestFetch = FetchPlaceRequest.newInstance(Objects.requireNonNull(placeLikelihood.getPlace().getId()), placeFetchFields);
+                            placesClient.fetchPlace(requestFetch).addOnSuccessListener((responseFetch) -> {
+
+                                Place place = responseFetch.getPlace();
+                                MarkerOptions markerOptions = new MarkerOptions();
+                                List<Place.Type> types = place.getTypes();
+                                assert types!= null;
+
+                                //Dato che tourist_attraction non c'è questo if serve per mettere le cose che secondo me sono per "turisti"
+                                if(types.contains(MUSEUM)) {
+                                    markerOptions.title(place.getName());
+                                    markerOptions.position(Objects.requireNonNull(place.getLatLng()));
+
+                                    if(place.getOpeningHours() != null) {
+                                        List<Period> periods = Objects.requireNonNull(place.getOpeningHours()).getPeriods();
+
+                                        for(Period p : periods) {
+
+                                            // verifico che il posto sia aperto nel giorno inserito dall'utente
+                                            if (((p.getOpen().getDay()).toString()).equals(gestioneDatiCalendario())) {
+
+                                                // separo la stringa dell'orario inserito dall'utente
+                                                String[] userTimeStart = (global.getTimeStart()).split(":");
+                                                String hourStart = userTimeStart[0];
+                                                String minuteStart = userTimeStart[1];
+
+                                                String[] userTimeEnd = (global.getTimeEnd()).split(":");
+                                                String hourEnd = userTimeEnd[0];
+                                                String minuteEnd = userTimeEnd[1];
+
+                                                // converto le ore da String a int per fare il confronto
+                                                // ORE
+                                                int hourStartInt = Integer.parseInt(hourStart);
+                                                int hourEndInt = Integer.parseInt(hourEnd);
+
+                                                // controllo se il locale è aperto nell'itervallo di ORE inserito dall'utente
+                                                if(((p.getOpen().getTime().getHours()) >= hourStartInt) && (hourEndInt < (p.getClose().getTime().getHours())))
+                                                {
+                                                    Log.i("locale", "aperto" );
+                                                    markerOptions.snippet("aperto");
+
+                                                    // se il locale è CHIUSO non mostro il marker
+                                                } else {
+                                                    Log.i("locale", "chiuso");
+                                                    markerOptions.visible(false);
+                                                }
+                                            }
+                                        }
+
+                                        // Se OpeningHours == null
+                                    } else {
+                                        markerOptions.snippet("Indirizzo: " + place.getAddress() + "\nGli orari possono variare");
+                                    }
+
+                                    if (place.getPriceLevel() == null) {
+                                        markerOptions.snippet("Indirizzo: " + place.getAddress()+"\nI prezzi possono variare");
+                                    } else if (place.getPriceLevel() <= gestioneDatiPrezzo()) {
+                                        if (place.getRating() != null) {
+                                            markerOptions.snippet("Indirizzo: " + place.getAddress() + "\nRating: " + place.getRating());
+                                        } else {
+                                            markerOptions.snippet("Indirizzo: " + place.getAddress());
+                                        }
+                                    }
+
+                                    if (place.getPriceLevel() == null || place.getPriceLevel() <= gestioneDatiPrezzo()) {
+                                        if (place.getPhotoMetadatas() != null) {
+                                            PhotoMetadata photoMetadata = place.getPhotoMetadatas().get(0);
+                                            FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata).build();
+                                            placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) ->
+                                                    mMap.addMarker(markerOptions).setTag(fetchPhotoResponse.getBitmap())
+                                            ).addOnFailureListener((exception) -> {
+                                                if (exception instanceof ApiException) {
+                                                    Log.e("PlaceNotFoundPhoto", "Place not found: " + exception.getMessage());
+                                                }
+                                            });
+                                        } else {
+                                            mMap.addMarker(markerOptions).setTag(null);
+                                        }
+                                    }
+                                    Log.i("opening", "Opening: " + place.getOpeningHours());
+                                }
+
+                            }).addOnFailureListener((exception) -> {
+                                if (exception instanceof ApiException) {
+                                    Log.e("Fetch not found", "Place not found: " + exception.getMessage());
+                                }
+                            });
+
+                        }
+                    } else {
+                        Exception exception = task.getException();
+                        if (exception instanceof ApiException) {
+                            Log.e("Find not found", "Place not found: " + exception.getMessage());
+                        }
+                    }
+                });
+            }
 
         });
 
         btnCinema.setOnClickListener(view -> {
+            mMap.clear();
+            Toast.makeText(MapActivity.this,
+                    "Caricamento dei Cinema attorno a te",
+                    Toast.LENGTH_SHORT).show();
+
+            //Lista delle informazioni reperibili in un posto --POSSONO ESSERE INSERITE TUTTE QUELLE CONTENUTE IN Place.Field--
+            List<Place.Field> placeFetchFields = Arrays.asList(Place.Field.ID,
+                    Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.RATING,
+                    Place.Field.PHOTO_METADATAS, Place.Field.PRICE_LEVEL, Place.Field.OPENING_HOURS, Place.Field.TYPES);
+
+            //Serve solo l'ID del posto da ricercare
+            FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(Collections.singletonList(Place.Field.ID));
+
+            if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
+                placeResponse.addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        FindCurrentPlaceResponse response = task.getResult();
+                        assert response != null;
+                        for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
+
+                            //Chiedo di darmi tutte le informazioni all'interno del posto con il relativo ID
+                            FetchPlaceRequest requestFetch = FetchPlaceRequest.newInstance(Objects.requireNonNull(placeLikelihood.getPlace().getId()), placeFetchFields);
+                            placesClient.fetchPlace(requestFetch).addOnSuccessListener((responseFetch) -> {
+
+                                Place place = responseFetch.getPlace();
+                                MarkerOptions markerOptions = new MarkerOptions();
+                                List<Place.Type> types = place.getTypes();
+                                assert types!= null;
+
+                                //Dato che tourist_attraction non c'è questo if serve per mettere le cose che secondo me sono per "turisti"
+                                if(types.contains(MOVIE_THEATER)) {
+                                    markerOptions.title(place.getName());
+                                    markerOptions.position(Objects.requireNonNull(place.getLatLng()));
+
+                                    if(place.getOpeningHours() != null) {
+                                        List<Period> periods = Objects.requireNonNull(place.getOpeningHours()).getPeriods();
+
+                                        for(Period p : periods) {
+
+                                            // verifico che il posto sia aperto nel giorno inserito dall'utente
+                                            if (((p.getOpen().getDay()).toString()).equals(gestioneDatiCalendario())) {
+
+                                                // separo la stringa dell'orario inserito dall'utente
+                                                String[] userTimeStart = (global.getTimeStart()).split(":");
+                                                String hourStart = userTimeStart[0];
+                                                String minuteStart = userTimeStart[1];
+
+                                                String[] userTimeEnd = (global.getTimeEnd()).split(":");
+                                                String hourEnd = userTimeEnd[0];
+                                                String minuteEnd = userTimeEnd[1];
+
+                                                // converto le ore da String a int per fare il confronto
+                                                // ORE
+                                                int hourStartInt = Integer.parseInt(hourStart);
+                                                int hourEndInt = Integer.parseInt(hourEnd);
+
+                                                // controllo se il locale è aperto nell'itervallo di ORE inserito dall'utente
+                                                if(((p.getOpen().getTime().getHours()) >= hourStartInt) && (hourEndInt < (p.getClose().getTime().getHours())))
+                                                {
+                                                    Log.i("locale", "aperto" );
+                                                    markerOptions.snippet("aperto");
+
+                                                    // se il locale è CHIUSO non mostro il marker
+                                                } else {
+                                                    Log.i("locale", "chiuso");
+                                                    markerOptions.visible(false);
+                                                }
+                                            }
+                                        }
+
+                                        // Se OpeningHours == null
+                                    } else {
+                                        markerOptions.snippet("Indirizzo: " + place.getAddress() + "\nGli orari possono variare");
+                                    }
+
+                                    if (place.getPriceLevel() == null) {
+                                        markerOptions.snippet("Indirizzo: " + place.getAddress()+"\nI prezzi possono variare");
+                                    } else if (place.getPriceLevel() <= gestioneDatiPrezzo()) {
+                                        if (place.getRating() != null) {
+                                            markerOptions.snippet("Indirizzo: " + place.getAddress() + "\nRating: " + place.getRating());
+                                        } else {
+                                            markerOptions.snippet("Indirizzo: " + place.getAddress());
+                                        }
+                                    }
+
+                                    if (place.getPriceLevel() == null || place.getPriceLevel() <= gestioneDatiPrezzo()) {
+                                        if (place.getPhotoMetadatas() != null) {
+                                            PhotoMetadata photoMetadata = place.getPhotoMetadatas().get(0);
+                                            FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata).build();
+                                            placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) ->
+                                                    mMap.addMarker(markerOptions).setTag(fetchPhotoResponse.getBitmap())
+                                            ).addOnFailureListener((exception) -> {
+                                                if (exception instanceof ApiException) {
+                                                    Log.e("PlaceNotFoundPhoto", "Place not found: " + exception.getMessage());
+                                                }
+                                            });
+                                        } else {
+                                            mMap.addMarker(markerOptions).setTag(null);
+                                        }
+                                    }
+                                    Log.i("opening", "Opening: " + place.getOpeningHours());
+                                }
+
+                            }).addOnFailureListener((exception) -> {
+                                if (exception instanceof ApiException) {
+                                    Log.e("Fetch not found", "Place not found: " + exception.getMessage());
+                                }
+                            });
+
+                        }
+                    } else {
+                        Exception exception = task.getException();
+                        if (exception instanceof ApiException) {
+                            Log.e("Find not found", "Place not found: " + exception.getMessage());
+                        }
+                    }
+                });
+            }
 
         });
 
         btnRisto.setOnClickListener(view -> {
+            mMap.clear();
+            Toast.makeText(MapActivity.this,
+                    "Caricamento dei Ristoranti attorno a te",
+                    Toast.LENGTH_SHORT).show();
+
+            //Lista delle informazioni reperibili in un posto --POSSONO ESSERE INSERITE TUTTE QUELLE CONTENUTE IN Place.Field--
+            List<Place.Field> placeFetchFields = Arrays.asList(Place.Field.ID,
+                    Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.RATING,
+                    Place.Field.PHOTO_METADATAS, Place.Field.PRICE_LEVEL, Place.Field.OPENING_HOURS, Place.Field.TYPES);
+
+            //Serve solo l'ID del posto da ricercare
+            FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(Collections.singletonList(Place.Field.ID));
+
+            if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
+                placeResponse.addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        FindCurrentPlaceResponse response = task.getResult();
+                        assert response != null;
+                        for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
+
+                            //Chiedo di darmi tutte le informazioni all'interno del posto con il relativo ID
+                            FetchPlaceRequest requestFetch = FetchPlaceRequest.newInstance(Objects.requireNonNull(placeLikelihood.getPlace().getId()), placeFetchFields);
+                            placesClient.fetchPlace(requestFetch).addOnSuccessListener((responseFetch) -> {
+
+                                Place place = responseFetch.getPlace();
+                                MarkerOptions markerOptions = new MarkerOptions();
+                                List<Place.Type> types = place.getTypes();
+                                assert types!= null;
+
+                                //Dato che tourist_attraction non c'è questo if serve per mettere le cose che secondo me sono per "turisti"
+                                if(types.contains(RESTAURANT)) {
+                                    markerOptions.title(place.getName());
+                                    markerOptions.position(Objects.requireNonNull(place.getLatLng()));
+
+                                    if(place.getOpeningHours() != null) {
+                                        List<Period> periods = Objects.requireNonNull(place.getOpeningHours()).getPeriods();
+
+                                        for(Period p : periods) {
+
+                                            // verifico che il posto sia aperto nel giorno inserito dall'utente
+                                            if (((p.getOpen().getDay()).toString()).equals(gestioneDatiCalendario())) {
+
+                                                // separo la stringa dell'orario inserito dall'utente
+                                                String[] userTimeStart = (global.getTimeStart()).split(":");
+                                                String hourStart = userTimeStart[0];
+                                                String minuteStart = userTimeStart[1];
+
+                                                String[] userTimeEnd = (global.getTimeEnd()).split(":");
+                                                String hourEnd = userTimeEnd[0];
+                                                String minuteEnd = userTimeEnd[1];
+
+                                                // converto le ore da String a int per fare il confronto
+                                                // ORE
+                                                int hourStartInt = Integer.parseInt(hourStart);
+                                                int hourEndInt = Integer.parseInt(hourEnd);
+
+                                                // controllo se il locale è aperto nell'itervallo di ORE inserito dall'utente
+                                                if(((p.getOpen().getTime().getHours()) >= hourStartInt) && (hourEndInt < (p.getClose().getTime().getHours())))
+                                                {
+                                                    Log.i("locale", "aperto" );
+                                                    markerOptions.snippet("aperto");
+
+                                                    // se il locale è CHIUSO non mostro il marker
+                                                } else {
+                                                    Log.i("locale", "chiuso");
+                                                    markerOptions.visible(false);
+                                                }
+                                            }
+                                        }
+
+                                        // Se OpeningHours == null
+                                    } else {
+                                        markerOptions.snippet("Indirizzo: " + place.getAddress() + "\nGli orari possono variare");
+                                    }
+
+                                    if (place.getPriceLevel() == null) {
+                                        markerOptions.snippet("Indirizzo: " + place.getAddress()+"\nI prezzi possono variare");
+                                    } else if (place.getPriceLevel() <= gestioneDatiPrezzo()) {
+                                        if (place.getRating() != null) {
+                                            markerOptions.snippet("Indirizzo: " + place.getAddress() + "\nRating: " + place.getRating());
+                                        } else {
+                                            markerOptions.snippet("Indirizzo: " + place.getAddress());
+                                        }
+                                    }
+
+                                    if (place.getPriceLevel() == null || place.getPriceLevel() <= gestioneDatiPrezzo()) {
+                                        if (place.getPhotoMetadatas() != null) {
+                                            PhotoMetadata photoMetadata = place.getPhotoMetadatas().get(0);
+                                            FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata).build();
+                                            placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) ->
+                                                    mMap.addMarker(markerOptions).setTag(fetchPhotoResponse.getBitmap())
+                                            ).addOnFailureListener((exception) -> {
+                                                if (exception instanceof ApiException) {
+                                                    Log.e("PlaceNotFoundPhoto", "Place not found: " + exception.getMessage());
+                                                }
+                                            });
+                                        } else {
+                                            mMap.addMarker(markerOptions).setTag(null);
+                                        }
+                                    }
+                                    Log.i("opening", "Opening: " + place.getOpeningHours());
+                                }
+
+                            }).addOnFailureListener((exception) -> {
+                                if (exception instanceof ApiException) {
+                                    Log.e("Fetch not found", "Place not found: " + exception.getMessage());
+                                }
+                            });
+
+                        }
+                    } else {
+                        Exception exception = task.getException();
+                        if (exception instanceof ApiException) {
+                            Log.e("Find not found", "Place not found: " + exception.getMessage());
+                        }
+                    }
+                });
+            }
 
         });
 
     }
-
 
     //Si utilizza questa funzione per prendere la larghezza e la lunghezza della toolbar quando finisce di creare la view
     private void treeObserve () {
@@ -451,7 +808,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
         });
     }
-
 
     private void toolbar () {
         mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
@@ -468,7 +824,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
         });
     }
-
 
     private void getCurrentWeather() {
         Retrofit retrofit = new Retrofit.Builder().baseUrl("http://api.openweathermap.org/").addConverterFactory(GsonConverterFactory.create()).build();
@@ -497,11 +852,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
-
     private double kelvinToCelsius (double grades){
         return grades - 273.15;
     }
-
 
     private int gestioneDatiPrezzo () {
         int priceS = global.getBudgetStart();
@@ -538,7 +891,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         return 0;
     }
-
 
     private void makeAlertDialog(String title, String text, boolean exit) {
         if (exit) {

@@ -41,6 +41,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Period;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.PlaceLikelihood;
@@ -329,6 +330,47 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                 markerOptions.title(place.getName());
                                 markerOptions.position(Objects.requireNonNull(place.getLatLng()));
 
+                                if(place.getOpeningHours() != null) {
+                                    List<Period> periods = Objects.requireNonNull(place.getOpeningHours()).getPeriods();
+
+                                    for(Period p : periods) {
+
+                                        // verifico che il posto sia aperto nel giorno inserito dall'utente
+                                        if (((p.getOpen().getDay()).toString()).equals(gestioneDatiCalendario())) {
+
+                                            // separo la stringa dell'orario inserito dall'utente
+                                            String[] userTimeStart = (global.getTimeStart()).split(":");
+                                            String hourStart = userTimeStart[0];
+                                            String minuteStart = userTimeStart[1];
+
+                                            String[] userTimeEnd = (global.getTimeEnd()).split(":");
+                                            String hourEnd = userTimeEnd[0];
+                                            String minuteEnd = userTimeEnd[1];
+
+                                            // converto le ore da String a int per fare il confronto
+                                            // ORE
+                                            int hourStartInt = Integer.parseInt(hourStart);
+                                            int hourEndInt = Integer.parseInt(hourEnd);
+
+                                            // controllo se il locale è aperto nell'itervallo di ORE inserito dall'utente
+                                            if(((p.getOpen().getTime().getHours()) >= hourStartInt) && (hourEndInt < (p.getClose().getTime().getHours())))
+                                            {
+                                                Log.i("locale", "aperto" );
+                                                markerOptions.snippet("aperto");
+
+                                                // se il locale è CHIUSO non mostro il marker
+                                            } else {
+                                                Log.i("locale", "chiuso");
+                                                markerOptions.visible(false);
+                                            }
+                                        }
+                                    }
+
+                                    // Se OpeningHours == null
+                                } else {
+                                    markerOptions.snippet("Indirizzo: " + place.getAddress() + "\nGli orari possono variare");
+                                }
+
                                 if (place.getPriceLevel() == null) {
                                     markerOptions.snippet("Indirizzo: " + place.getAddress()+"\nI prezzi possono variare");
                                 } else if (place.getPriceLevel() <= gestioneDatiPrezzo()) {
@@ -516,12 +558,33 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
-    /*public String gestioneCalendario(){
+    public String gestioneDatiCalendario() {
 
-        String timeS = global.getTimeStart();
-        String timeE = global.getTimeEnd();
-        String timeD = global.getCalendarDay();
+        int timeD = global.getCalendarDay();
 
-    }*/
+        if(timeD == 1) {
+            return "SUNDAY";
+        }
+        else if(timeD == 2) {
+            return "MONDAY";
+        }
+        else if(timeD == 3) {
+            return "TUESDAY";
+        }
+        else if (timeD == 4) {
+            return "WEDNESDAY";
+        }
+        else if(timeD == 5) {
+            return  "THURSDAY";
+        }
+        else if(timeD == 6) {
+            return "FRIDAY";
+        }
+        else if(timeD == 7) {
+            return "SATURDAY";
+        }
+
+        return "";
+    }
 
 }

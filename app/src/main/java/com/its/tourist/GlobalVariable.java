@@ -18,7 +18,7 @@ class GlobalVariable {
     private int budgetStart;
     private int budgetEnd;
     private String typePerson;
-    private String calendarDay;
+    private int calendarDay;
     private String timeStart;
     private String timeEnd;
 
@@ -28,7 +28,7 @@ class GlobalVariable {
         budgetStart = 0;
         budgetEnd = 0;
         typePerson = "singolo";
-        calendarDay = "0";
+        calendarDay = 0;
         timeStart = "0";
         timeEnd = "0";
     }
@@ -58,11 +58,11 @@ class GlobalVariable {
         this.typePerson = typePerson;
     }
 
-    public String getCalendarDay() {
+    public int getCalendarDay() {
         return calendarDay;
     }
 
-    void setCalendarDay(String calendarDay) {
+    void setCalendarDay(int calendarDay) {
         this.calendarDay = calendarDay;
     }
 

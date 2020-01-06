@@ -218,7 +218,7 @@ public class TimeFragment extends Fragment {
         globalVariable.setBudgetStart(bundle.getInt("startBudget"));
         globalVariable.setBudgetEnd(bundle.getInt("endBudget"));
         globalVariable.setTypePerson(bundle.getString("numberOfPeople"));
-        globalVariable.setCalendarDay(txtCalendar.getText().toString());
+        globalVariable.setCalendarDay(myCalendar.get(Calendar.DAY_OF_WEEK));
         globalVariable.setTimeStart(txtStartTime.getText().toString());
         globalVariable.setTimeEnd(txtEndTime.getText().toString());
         Intent intent = new Intent(getActivity(), MapActivity.class);

@@ -427,6 +427,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         btnMusei.setOnClickListener(view -> {
             mMap.clear();
+            circoscrizioneTorino();
             Toast.makeText(MapActivity.this,
                     "Caricamento dei Musei attorno a te",
                     Toast.LENGTH_SHORT).show();
@@ -550,6 +551,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         btnCinema.setOnClickListener(view -> {
             mMap.clear();
+            circoscrizioneTorino();
             Toast.makeText(MapActivity.this,
                     "Caricamento dei Cinema attorno a te",
                     Toast.LENGTH_SHORT).show();
@@ -673,6 +675,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         btnRisto.setOnClickListener(view -> {
             mMap.clear();
+            circoscrizioneTorino();
             Toast.makeText(MapActivity.this,
                     "Caricamento dei Ristoranti attorno a te",
                     Toast.LENGTH_SHORT).show();

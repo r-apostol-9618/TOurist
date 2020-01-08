@@ -11,7 +11,7 @@ import android.view.View;
 /**
  *
  *  TOurist
- *  Applicazione turistica per poter viaggiare e scoprire la città metropolitana di Torino
+ *  Applicazione turistica per poter visitare e scoprire la città metropolitana di Torino
  *  @author Razvan Apostol, Simone Tugnetti, Federica Vacca
  *  @version 1.0
  *

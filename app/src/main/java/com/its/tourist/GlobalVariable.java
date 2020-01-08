@@ -58,7 +58,7 @@ class GlobalVariable {
         this.typePerson = typePerson;
     }
 
-    public int getCalendarDay() {
+    int getCalendarDay() {
         return calendarDay;
     }
 
@@ -66,7 +66,7 @@ class GlobalVariable {
         this.calendarDay = calendarDay;
     }
 
-    public String getTimeStart() {
+    String getTimeStart() {
         return timeStart;
     }
 
@@ -74,7 +74,7 @@ class GlobalVariable {
         this.timeStart = timeStart;
     }
 
-    public String getTimeEnd() {
+    String getTimeEnd() {
         return timeEnd;
     }
 

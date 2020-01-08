@@ -158,6 +158,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         makeAlertDialog("Chiudi","Sei sicuro di voler uscire?",true);
     }
 
+
+    /**
+     * Metodo per visualizzare la mappa
+     * Viene visualizzata la mappa all'interno di un fragment
+     */
     private void visualizzaMappa () {
         SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map2);
         assert fm != null;
@@ -165,6 +170,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mapView = fm.getView();
     }
 
+
+    /**
+     * Metodo per la gestione dei stili della mappa
+     * Viene letto un json con i stili della mappa, lo stile della mappa cambierà in base all'ora del telefono
+     * Se l'ora è inferiore alle 6 del mattino o 18 del pomeriggio allora la mappa sarà in uno stile più notturno
+     * Altrimenti avrà uno stile giornaliero
+     * @return MapStyleOptions Lo stile della mappa
+     */
     private MapStyleOptions mapStyle() {
         MapStyleOptions style;
         Calendar cal = Calendar.getInstance();
@@ -179,6 +192,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         return style;
     }
 
+
+    /**
+     * Metodo per la lettura delle coordinate torinesi
+     * Vengono lette le coordinate da un file txt chiamato turinCoordinates.txt che si trova all'interno della cartella assets
+     * @return String contiene le coordinate
+     */
     public String metodoLetturaCoordinate () {
         try {
             InputStream is = getAssets().open("turinCoordinates.txt");
@@ -194,6 +213,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+
+    /**
+     * Metodo per la circoscrizione di Torino
+     * Vengono splittate le coordinate prese dal metodo sovrastante
+     * Successivamente viene disegnato il confine torinese tramite l'uso di PolyLine
+     */
     private void circoscrizioneTorino () {
         String[] coordinate = metodoLetturaCoordinate().split(";");
         polyline = new ArrayList<>();
@@ -207,6 +232,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMap.addPolyline(rectOptions);
     }
 
+
+    /**
+     * Metodo che serve per posizionare il pulsante della geolocalizzazione in basso a destro
+     */
     private void setPositionBtnGeo() {
         if (mapView != null && mapView.findViewById(Integer.parseInt("1")) != null) {
             View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
@@ -217,6 +246,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+
+    /**
+     * Metodo per verificare se il gps è attivo
+     * Se è confermato avvia la procedura per la geolocalizzazione dell'utente
+     * */
     private void checkGPS() {
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setInterval(10000);
@@ -240,6 +274,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
     }
 
+
+    /**
+     * Metodo per trovare la posizione del device
+     */
     private void getDeviceLocation() {
         mFusedLocationProviderClient.getLastLocation()
                 .addOnCompleteListener(task -> {
@@ -253,6 +291,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 });
     }
 
+
+    /**
+     * Metodo per verificare se il device è nell'area di Torino oppure no
+     * Se il device non si trova nell'area di Torino viene visualizzato un alert
+     * Ma si potrà comunque utilizzare l'app
+     * @param task per verificare se il task va a buon fine oppure no
+     */
     private void providerDeviceLocation(Task<Location> task) {
         mLastLocation = task.getResult();
         if (mLastLocation != null) {
@@ -295,6 +340,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+
+    /**
+     * Metodo per trovare tutti i luoghi che si trovano attorno al device
+     * @param placeType Il tipo al quale siamo interessati eseguire la richiesta al server (Tipi come musei/cinema/ristoranti ecc)
+     * @param request Una richiesta effettuata per potever visualizzare i luoghi che si trovano attorno al device
+     * */
     private void places(FindCurrentPlaceRequest request, Place.Type placeType) {
         Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
         placeResponse.addOnCompleteListener(task -> {
@@ -316,6 +367,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
+
+    /**
+     * Metodo per prendere i dati del singolo posto e stampare i marker
+     * Vengono verificate tutte le informazioni dei primi 3 fragment e in base a questi dati
+     * si creano nuovi marker e vengono stampati all'interno della mappa
+     * @param request Una richiesta che io faccio per poter avere tutti i dati del singolo places
+     * @param placeType Il tipo al quale siamo interessati eseguire la richiesta al server (Tipi come musei/cinema/ristoranti ecc)
+     */
     private void fetchPlace(FetchPlaceRequest request, Place.Type placeType) {
         placesClient.fetchPlace(request).addOnSuccessListener((responseFetch) -> {
             Place place = responseFetch.getPlace();
@@ -401,6 +460,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
     }
 
+
+    /**
+     * Metodo che filtra i marker in base al tipo
+     * Abbiamo 3 pulsanti per la stampa dei marker in base al tipo: Musei, Cinema, Ristoranti
+     */
     private void filtriMarker () {
         Button btnMusei = findViewById(R.id.btnMusei);
         Button btnCinema = findViewById(R.id.btnCinema);
@@ -438,6 +502,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
+
+    /**
+     * Metodo per settare l'altezza della toolbar
+     */
     private void treeObserve () {
         ViewTreeObserver vto = mAppBarLayout.getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -450,6 +518,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
     }
 
+
+    /**
+     * Metodo per settare la toolbar dell'app
+     */
     private void toolbar () {
         mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             int scrollRange = -1;
@@ -466,6 +538,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
     }
 
+
+    /**
+     * Metodo per la gestione del Meteo
+     * Tramite l'OpenWeatherMap prendiamo i dati meteo di Torino e vengono stampati nella toolbar
+     */
     private void getCurrentWeather() {
         Retrofit retrofit = new Retrofit.Builder().baseUrl("http://api.openweathermap.org/")
                 .addConverterFactory(GsonConverterFactory.create()).build();
@@ -495,10 +572,21 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
+
+    /**
+     * Metodo per la conversione da Kelvin a Celsius
+     * @return double il risultato della conversione
+     */
     private double kelvinToCelsius (double grades){
         return grades - 273.15;
     }
 
+
+    /**
+     * Metodo per la gestione del prezzo/persone (i primi 2 fragment)
+     * Vengono confrontati i dati inseriti dall'utente con i dati che noi abbiamo scelto
+     * @return int 0,1,2,3 o 4 che rappresentano 0="gratis", 1="economico", 2="medio", 3="medio-alto", 4="alto"
+     */
     private int gestioneDatiPrezzo () {
         int priceS = global.getBudgetStart();
         int priceE = global.getBudgetEnd();
@@ -535,6 +623,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         return 0;
     }
 
+
+    /**
+     * Metodo per la gestione del calendario (3 fragment)
+     * Viene prelevato il giorno della settimana in base alla data scelta dall'utente
+     * @return String il giorno della settimana
+     */
     public String gestioneDatiCalendario() {
         int timeD = global.getCalendarDay();
 
@@ -557,6 +651,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         return "";
     }
 
+
+    /**
+     * Metodo per la gestione degli alert dialog
+     * @param title il titolo dell'alert
+     * @param text il testo dell'alert
+     * @param exit se l'allert è di uscita dall'applicazione o generico
+     */
     private void makeAlertDialog(String title, String text, boolean exit) {
         if (exit) {
             new AlertDialog.Builder(this).setTitle(title).setMessage(text)

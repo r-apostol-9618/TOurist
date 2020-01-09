@@ -357,6 +357,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
             };
             mFusedLocationProviderClient.requestLocationUpdates(getLocationRequest(), locationCallback, null);
+            places(POINT_OF_INTEREST);
         }
     }
 

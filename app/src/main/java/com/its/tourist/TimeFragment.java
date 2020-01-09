@@ -92,8 +92,8 @@ public class TimeFragment extends Fragment {
         };
         ImageView calendar = Objects.requireNonNull(getView()).findViewById(R.id.imgViewCalendar);
         calendar.setOnClickListener(view -> {
-            DatePickerDialog datePickerDialog = new DatePickerDialog(Objects.requireNonNull(getActivity()), date,
-                    myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+            DatePickerDialog datePickerDialog = new DatePickerDialog(Objects.requireNonNull(getActivity()),
+                    date, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
                     myCalendar.get(Calendar.DAY_OF_MONTH));
             datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
             datePickerDialog.show();
@@ -114,9 +114,10 @@ public class TimeFragment extends Fragment {
             txtTime.setText(String.format("%02d:%02d", hour, minute));
         }
         txtTime.setOnClickListener(view -> {
-            TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), (timePicker, selectedHour, selectedMinute) -> {
-                    txtTime.setText(String.format("%02d:%02d", selectedHour, selectedMinute));
-            }, hour, minute, true);
+            TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(),
+                    (timePicker, selectedHour, selectedMinute) ->
+                    txtTime.setText(String.format("%02d:%02d", selectedHour, selectedMinute)),
+                    hour, minute, true);
             timePickerDialog.show();
         });
     }
@@ -156,7 +157,8 @@ public class TimeFragment extends Fragment {
         Button avanti = Objects.requireNonNull(getView()).findViewById(R.id.btnAvanti3);
         avanti.setOnClickListener(v -> {
             if (txtStartTime.getText().toString().equals(txtEndTime.getText().toString())) {
-                Toast.makeText(getActivity(), "Inserisci un range temporale valido!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Inserisci un range temporale valido!", Toast.LENGTH_LONG)
+                        .show();
             } else {
                 permessi();
             }
@@ -188,7 +190,8 @@ public class TimeFragment extends Fragment {
                             new AlertDialog
                                     .Builder(Objects.requireNonNull(getActivity()))
                                     .setTitle("Accesso ai permessi")
-                                    .setMessage("L'accesso alla localizzazione è permanentemente negato.\nRecarsi nelle impostazioni per attivare il servizio")
+                                    .setMessage("L'accesso alla localizzazione è permanentemente negato." +
+                                            "\nRecarsi nelle impostazioni per attivare il servizio")
                                     .setNegativeButton("Cancel", null)
                                     .setPositiveButton("OK", (dialog, which) -> getActivity().finish())
                                     .show();

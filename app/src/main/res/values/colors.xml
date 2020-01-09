@@ -24,5 +24,6 @@
     <color name="track_color">#AAAAAA</color>
     <color name="transparent">#0000FFFF</color>
     <color name="white">#FFF</color>
+    <color name="base_primary">#1c88e2</color>
 
 </resources>

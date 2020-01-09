@@ -3,7 +3,6 @@ package com.its.tourist;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -40,12 +40,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.DayOfWeek;
 import com.google.android.libraries.places.api.model.Period;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.PlaceLikelihood;
 import com.google.android.libraries.places.api.net.FetchPhotoRequest;
 import com.google.android.libraries.places.api.net.FetchPlaceRequest;
+import com.google.android.libraries.places.api.net.FetchPlaceResponse;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
@@ -59,7 +61,9 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -74,6 +78,10 @@ import static com.google.android.libraries.places.api.model.Place.Type.RESTAURAN
 import static com.google.android.libraries.places.api.model.Place.Field.ID;
 
 
+/**
+ * MapActivity
+ * Classe usata per gestire la mappa ed i suoi contenuti
+ */
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private ToolbarArcBackground mToolbarArcBackground;
@@ -86,10 +94,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private View mapView;
     private GlobalVariable global;
     private List<LatLng> polyline;
-    private List<Place.Field> placeFetchFields;
-    private FindCurrentPlaceRequest findPlaceRequest;
 
     private final float DEFAULT_ZOOM = 18;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,10 +117,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         placesClient = Places.createClient(this);
 
-        placeFetchFields = Arrays.asList(ID, Place.Field.NAME, Place.Field.ADDRESS,
-                Place.Field.LAT_LNG, Place.Field.RATING, Place.Field.PHOTO_METADATAS,
-                Place.Field.PRICE_LEVEL, Place.Field.OPENING_HOURS, Place.Field.TYPES);
-
         visualizzaMappa();
         treeObserve();
         toolbar();
@@ -122,6 +125,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -129,19 +133,21 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.setMinZoomPreference(11);
-        mMap.setInfoWindowAdapter(new CustomMarkerInfoWindowView(MapActivity.this));
+        CustomMarkerInfoWindowView adapter = new CustomMarkerInfoWindowView(this);
+        mMap.setInfoWindowAdapter(adapter);
+        mMap.setOnInfoWindowClickListener(adapter);
         mMap.setPadding(0, mToolbarArcBackground.getHeight(), 0, findViewById(R.id.buttonContainer).getHeight());
-        findPlaceRequest = FindCurrentPlaceRequest.newInstance(Collections.singletonList(ID));
 
         circoscrizioneTorino();
 
         setPositionBtnGeo();
         checkGPS();
-        places(findPlaceRequest, POINT_OF_INTEREST);
+        places(POINT_OF_INTEREST);
 
         filtriMarker();
 
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -152,6 +158,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
         }
     }
+
 
     @Override
     public void onBackPressed() {
@@ -173,14 +180,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     /**
      * Metodo per la gestione dei stili della mappa
-     * Viene letto un json con i stili della mappa, lo stile della mappa cambierà in base all'ora del telefono
-     * Se l'ora è inferiore alle 6 del mattino o 18 del pomeriggio allora la mappa sarà in uno stile più notturno
-     * Altrimenti avrà uno stile giornaliero
+     * Viene letto un json con gli stili della mappa, questa cambierà in base all'ora del telefono.
+     * Se l'ora è inferiore alle 6 del mattino o 18 del pomeriggio, allora la mappa sarà in uno stile notturno,
+     * altrimenti avrà uno stile giornaliero
      * @return MapStyleOptions Lo stile della mappa
      */
     private MapStyleOptions mapStyle() {
         MapStyleOptions style;
-        Calendar cal = Calendar.getInstance();
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Rome"), Locale.ITALIAN);
         int hour = cal.get(Calendar.HOUR_OF_DAY);
         if(hour < 6 || hour > 18){
             style = MapStyleOptions.loadRawResourceStyle(
@@ -195,8 +202,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     /**
      * Metodo per la lettura delle coordinate torinesi
-     * Vengono lette le coordinate da un file txt chiamato turinCoordinates.txt che si trova all'interno della cartella assets
-     * @return String contiene le coordinate
+     * Vengono lette le coordinate da un file txt chiamato turinCoordinates.txt
+     * che si trova all'interno della cartella assets
+     * @return String le coordinate lette
      */
     public String metodoLetturaCoordinate () {
         try {
@@ -216,8 +224,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     /**
      * Metodo per la circoscrizione di Torino
-     * Vengono splittate le coordinate prese dal metodo sovrastante
-     * Successivamente viene disegnato il confine torinese tramite l'uso di PolyLine
+     * Utilizzando le coordinate ricevute, viene creato il confine torinese utilizzando Polyline
      */
     private void circoscrizioneTorino () {
         String[] coordinate = metodoLetturaCoordinate().split(";");
@@ -227,14 +234,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             polyline.add(new LatLng(Double.parseDouble(LatLng[1]), Double.parseDouble(LatLng[0])));
         }
         PolylineOptions rectOptions = new PolylineOptions().addAll(polyline);
-        rectOptions.color(Color.parseColor("#1c88e2"));
+        rectOptions.color(ContextCompat.getColor(this, R.color.base_primary));
         rectOptions.width(8);
         mMap.addPolyline(rectOptions);
     }
 
 
     /**
-     * Metodo che serve per posizionare il pulsante della geolocalizzazione in basso a destro
+     * Metodo di posizionamento pulsante geolocalizzazione
+     * Viene utilizzato per spostare il pulsante di geolocalizzazione in basso a destra
      */
     private void setPositionBtnGeo() {
         if (mapView != null && mapView.findViewById(Integer.parseInt("1")) != null) {
@@ -248,16 +256,25 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 
     /**
-     * Metodo per verificare se il gps è attivo
-     * Se è confermato avvia la procedura per la geolocalizzazione dell'utente
-     * */
-    private void checkGPS() {
+     * Metodo per la richiesta di localizzazione
+     * Viene creata una richiesta di localizzazione da utilizzare per i relativi servizi
+     * @return LocationRequest La richiesta di localizzazione
+     */
+    private LocationRequest getLocationRequest() {
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setInterval(10000);
         locationRequest.setFastestInterval(5000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        return locationRequest;
+    }
 
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+
+    /**
+     * Metodo per la verifica del GPS
+     * Se viene rilevata l'attivazione, si avvia la procedura per la geolocalizzazione dell'utente
+     */
+    private void checkGPS() {
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(getLocationRequest());
         SettingsClient settingsClient = LocationServices.getSettingsClient(this);
         Task<LocationSettingsResponse> task = settingsClient.checkLocationSettings(builder.build());
         task.addOnSuccessListener(this, locationSettingsResponse -> getDeviceLocation());
@@ -277,6 +294,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     /**
      * Metodo per trovare la posizione del device
+     * Utilizzando un servizio chiamato fused location provider, si può ottenere la posizione effettiva dell'utente
      */
     private void getDeviceLocation() {
         mFusedLocationProviderClient.getLastLocation()
@@ -293,29 +311,37 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 
     /**
-     * Metodo per verificare se il device è nell'area di Torino oppure no
-     * Se il device non si trova nell'area di Torino viene visualizzato un alert
-     * Ma si potrà comunque utilizzare l'app
-     * @param task per verificare se il task va a buon fine oppure no
+     * Metodo per la verifica della posizione dell'utente all'interno del territorio Torinese
+     * Verrà verificato se l'utente risulterà all'interno dell'area geografica di Torino.
+     * In caso contrario, verrà visualizzato un messaggio di informazione.
+     * @param position La posizione dell'utente
+     */
+    private void checkUserIntoTurin(LatLng position) {
+        if(!PolyUtil.containsLocation(position, polyline, true)){
+            makeAlertDialog(
+                    "Attenzione",
+                    "Attualmente non ti trovi nella città di Torino." +
+                            "\nVerranno comunque visulizzati i luoghi di interesse intorno a te \uD83D\uDE09",
+                    false
+            );
+        }
+    }
+
+
+    /**
+     * Metodo principale per ottenere la localizzazione dell'utente
+     * Tramite il ricevimento di una localizzazione ricevuta da un Task,
+     * è possibile stabilire la posizione dell'utente e, se quest'ultima non è stata trovata,
+     * verrà eseguita un'ulteriore ricerca effettuando una nuova richiesta di localizzazione.
+     * @param task task ricevuto per poter ottenere la localizzazione dell'utente
      */
     private void providerDeviceLocation(Task<Location> task) {
         mLastLocation = task.getResult();
         if (mLastLocation != null) {
             LatLng mLastLocationLatLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLastLocationLatLng, DEFAULT_ZOOM));
-            if(!PolyUtil.containsLocation(mLastLocationLatLng, polyline, true)){
-                makeAlertDialog(
-                        "Attenzione",
-                        "Attualmente non ti trovi nella città di Torino.\nVerranno comunque visulizzati i luoghi di interesse intorno a te \uD83D\uDE09",
-                        false
-                );
-            }
+            checkUserIntoTurin(mLastLocationLatLng);
         } else {
-            final LocationRequest locationRequest = LocationRequest.create();
-            locationRequest.setInterval(10000);
-            locationRequest.setFastestInterval(5000);
-            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
             locationCallback = new LocationCallback() {
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
@@ -326,36 +352,45 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     mLastLocation = locationResult.getLastLocation();
                     LatLng mLastLocationLatLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLastLocationLatLng, DEFAULT_ZOOM));
-                    if(!PolyUtil.containsLocation(mLastLocationLatLng, polyline, true)){
-                        makeAlertDialog(
-                                "Attenzione",
-                                "Attualmente non ti trovi nella città di Torino.\nVerranno comunque visulizzati i luoghi di interesse intorno a te! \uD83D\uDE09",
-                                false
-                        );
-                    }
+                    checkUserIntoTurin(mLastLocationLatLng);
                     mFusedLocationProviderClient.removeLocationUpdates(locationCallback);
                 }
             };
-            mFusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
+            mFusedLocationProviderClient.requestLocationUpdates(getLocationRequest(), locationCallback, null);
         }
     }
 
 
     /**
-     * Metodo per trovare tutti i luoghi che si trovano attorno al device
-     * @param placeType Il tipo al quale siamo interessati eseguire la richiesta al server (Tipi come musei/cinema/ristoranti ecc)
-     * @param request Una richiesta effettuata per potever visualizzare i luoghi che si trovano attorno al device
-     * */
-    private void places(FindCurrentPlaceRequest request, Place.Type placeType) {
-        Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
+     * Metodo per trovare i punti di interesse
+     * Viene utilizzato per controllare se sono presenti dei luoghi di interesse attorno all'utente,
+     * raccogliendone poi le informazioni necessarie per ogni singolo posto dandone come riferimento l'ID
+     * @param placeType Il tipo di luogo da visualizzare
+     */
+    private void places(Place.Type placeType) {
+        List<Place.Field> placeFetchFields = Arrays.asList(ID, Place.Field.NAME, Place.Field.ADDRESS,
+                Place.Field.LAT_LNG, Place.Field.RATING, Place.Field.PHOTO_METADATAS,
+                Place.Field.PRICE_LEVEL, Place.Field.OPENING_HOURS, Place.Field.TYPES, Place.Field.PHONE_NUMBER);
+        FindCurrentPlaceRequest findPlaceRequest = FindCurrentPlaceRequest.newInstance(Collections.singletonList(ID));
+        Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(findPlaceRequest);
         placeResponse.addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 FindCurrentPlaceResponse response = task.getResult();
                 assert response != null;
                 for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
+
                     FetchPlaceRequest requestFetch = FetchPlaceRequest
                             .newInstance(Objects.requireNonNull(placeLikelihood.getPlace().getId()), placeFetchFields);
-                    fetchPlace(requestFetch, placeType);
+                    placesClient.fetchPlace(requestFetch).addOnSuccessListener((responseFetch) ->
+
+                            makePlace(responseFetch, placeType)
+
+                    ).addOnFailureListener((exception) -> {
+                        if (exception instanceof ApiException) {
+                            Log.e("Fetch not found", "Place not found: " + exception.getMessage());
+                        }
+                    });
+
                 }
             } else {
                 Exception exception = task.getException();
@@ -364,106 +399,99 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
             }
         });
-
     }
 
 
     /**
-     * Metodo per prendere i dati del singolo posto e stampare i marker
-     * Vengono verificate tutte le informazioni dei primi 3 fragment e in base a questi dati
-     * si creano nuovi marker e vengono stampati all'interno della mappa
-     * @param request Una richiesta che io faccio per poter avere tutti i dati del singolo places
-     * @param placeType Il tipo al quale siamo interessati eseguire la richiesta al server (Tipi come musei/cinema/ristoranti ecc)
+     * Metodo per la creazione e visualizzazione dei luoghi verificati
+     * Vengono stampati sulla mappa i luoghi tramite marker se i dati richiesti dall'utente coincidono con
+     * quelli del luogo di riferimento, oppure se non sono disponibili.
+     * @param responseFetch La risposta da FetchPlaceRequest per ottenere il luogo con le info necessarie
+     * @param placeType Il tipo di luogo da visualizzare
      */
-    private void fetchPlace(FetchPlaceRequest request, Place.Type placeType) {
-        placesClient.fetchPlace(request).addOnSuccessListener((responseFetch) -> {
-            Place place = responseFetch.getPlace();
+    private void makePlace(FetchPlaceResponse responseFetch, Place.Type placeType) {
+        Place place = responseFetch.getPlace();
+        List<Place.Type> types = place.getTypes();
+        assert types != null;
+        if(types.contains(placeType)){
             MarkerOptions markerOptions = new MarkerOptions();
-            List<Place.Type> types = place.getTypes();
-            assert types!= null;
+            MarkerTags tag = new MarkerTags();
+            markerOptions.title(place.getName());
+            markerOptions.position(Objects.requireNonNull(place.getLatLng()));
+            String orario = "Gli orari possono variare";
+            boolean aperto = false;
 
-            //Dato che tourist_attraction non c'è questo if serve per mettere le cose che secondo me sono per "turisti"
-            if(types.contains(placeType)){
-                markerOptions.title(place.getName());
-                markerOptions.position(Objects.requireNonNull(place.getLatLng()));
+            if(place.getOpeningHours() != null) {
+                List<Period> periods = Objects.requireNonNull(place.getOpeningHours()).getPeriods();
+                String [] userTimeSplit;
+                int hourStart, minuteStart, hourEnd, minuteEnd, hourPlaceStart,
+                        minutePlaceStart, hourPlaceEnd, minutePlaceEnd;
+                for(Period p : periods) {
+                    if (Objects.requireNonNull(p.getOpen()).getDay() == gestioneDatiCalendario()) {
+                        userTimeSplit = global.getTimeStart().split(":");
+                        hourStart = Integer.parseInt(userTimeSplit[0]);
+                        minuteStart = Integer.parseInt(userTimeSplit[1]);
 
-                if(place.getOpeningHours() != null) {
-                    List<Period> periods = Objects.requireNonNull(place.getOpeningHours()).getPeriods();
+                        userTimeSplit = global.getTimeEnd().split(":");
+                        hourEnd = Integer.parseInt(userTimeSplit[0]);
+                        minuteEnd = Integer.parseInt(userTimeSplit[1]);
 
-                    for(Period p : periods) {
+                        hourPlaceStart = p.getOpen().getTime().getHours();
+                        minutePlaceStart = p.getOpen().getTime().getMinutes();
+                        hourPlaceEnd = Objects.requireNonNull(p.getClose()).getTime().getHours();
+                        minutePlaceEnd = p.getClose().getTime().getMinutes();
 
-                        // verifico che il posto sia aperto nel giorno inserito dall'utente
-                        if (((p.getOpen().getDay()).toString()).equals(gestioneDatiCalendario())) {
-
-                            // separo la stringa dell'orario inserito dall'utente
-                            String[] userTimeStart = (global.getTimeStart()).split(":");
-                            String hourStart = userTimeStart[0];
-                            String minuteStart = userTimeStart[1];
-
-                            String[] userTimeEnd = (global.getTimeEnd()).split(":");
-                            String hourEnd = userTimeEnd[0];
-                            String minuteEnd = userTimeEnd[1];
-
-                            // converto le ore da String a int per fare il confronto
-                            // ORE
-                            int hourStartInt = Integer.parseInt(hourStart);
-                            int hourEndInt = Integer.parseInt(hourEnd);
-
-                            // controllo se il locale è aperto nell'itervallo di ORE inserito dall'utente
-                            if(((p.getOpen().getTime().getHours()) >= hourStartInt) && (hourEndInt < (p.getClose().getTime().getHours())))
-                            {
-                                Log.i("locale", "aperto" );
-                                markerOptions.snippet("aperto");
-
-                                // se il locale è CHIUSO non mostro il marker
-                            } else {
-                                Log.i("locale", "chiuso");
-                                markerOptions.visible(false);
+                        if((hourStart < hourPlaceEnd) &&
+                                (hourStart >= hourPlaceStart && minuteStart >= minutePlaceStart)) {
+                            orario = "";
+                            aperto = true;
+                            if((hourEnd >= hourPlaceEnd && minuteEnd > minutePlaceEnd)) {
+                                orario = "Potrebbe chiudere prima dell'ora richiesta";
                             }
                         }
                     }
+                }
+            }
 
-                    // Se OpeningHours == null
+            if (place.getPriceLevel() == null) {
+                markerOptions.snippet("Indirizzo: " + place.getAddress() +
+                        "\nI prezzi possono variare" + "\n" + orario);
+            } else if (place.getPriceLevel() <= gestioneDatiPrezzo()) {
+                if (place.getRating() != null) {
+                    markerOptions.snippet("Indirizzo: " + place.getAddress() +
+                            "\nRating: " + place.getRating() + "\n" + orario);
                 } else {
-                    if (place.getPriceLevel() == null) {
-                        markerOptions.snippet("Indirizzo: " + place.getAddress() + "\nI prezzi possono variare" + "\nGli orari possono variare");
-                    } else if (place.getPriceLevel() <= gestioneDatiPrezzo()) {
-                        if (place.getRating() != null) {
-                            markerOptions.snippet("Indirizzo: " + place.getAddress() + "\nRating: " + place.getRating() + "\nGli orari possono variare");
-                        } else {
-                            markerOptions.snippet("Indirizzo: " + place.getAddress() + "\nGli orari possono variare");
-                        }
-                    }
-                }
-
-                if (place.getPriceLevel() == null || place.getPriceLevel() <= gestioneDatiPrezzo()) {
-                    if (place.getPhotoMetadatas() != null) {
-                        PhotoMetadata photoMetadata = place.getPhotoMetadatas().get(0);
-                        FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata).build();
-                        placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) ->
-                                mMap.addMarker(markerOptions).setTag(fetchPhotoResponse.getBitmap())
-                        ).addOnFailureListener((exception) -> {
-                            if (exception instanceof ApiException) {
-                                Log.e("PlaceNotFoundPhoto", "Place not found: " + exception.getMessage());
-                            }
-                        });
-                    } else {
-                        mMap.addMarker(markerOptions).setTag(null);
-                    }
+                    markerOptions.snippet("Indirizzo: " + place.getAddress() + "\n" + orario);
                 }
             }
 
-        }).addOnFailureListener((exception) -> {
-            if (exception instanceof ApiException) {
-                Log.e("Fetch not found", "Place not found: " + exception.getMessage());
+            tag.setPhone(place.getPhoneNumber());
+
+            if (place.getPhotoMetadatas() != null) {
+                PhotoMetadata photoMetadata = place.getPhotoMetadatas().get(0);
+                FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata).build();
+                placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) ->
+                        tag.setImage(fetchPhotoResponse.getBitmap())
+                ).addOnFailureListener((exception) -> {
+                    if (exception instanceof ApiException) {
+                        Log.e("PlaceNotFoundPhoto", "Place not found: " + exception.getMessage());
+                    }
+                });
             }
-        });
+
+            if (place.getPriceLevel() == null || place.getPriceLevel() <= gestioneDatiPrezzo() &&
+                    place.getOpeningHours() == null || aperto) {
+                mMap.addMarker(markerOptions).setTag(tag);
+            }
+
+        }
     }
 
 
     /**
-     * Metodo che filtra i marker in base al tipo
-     * Abbiamo 3 pulsanti per la stampa dei marker in base al tipo: Musei, Cinema, Ristoranti
+     * Metodo che filtra i luoghi in base al tipo
+     * Vengono eliminati i luoghi precedenti per poi visualizzarne altri selezionati in base a tre tipi:
+     * Musei, Cinema e Ristoranti
      */
     private void filtriMarker () {
         Button btnMusei = findViewById(R.id.btnMusei);
@@ -473,31 +501,25 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         btnMusei.setOnClickListener(view -> {
             mMap.clear();
             circoscrizioneTorino();
-            Toast.makeText(MapActivity.this,
-                    "Caricamento dei Musei attorno a te",
-                    Toast.LENGTH_SHORT).show();
-            findPlaceRequest = FindCurrentPlaceRequest.newInstance(Collections.singletonList(ID));
-            places(findPlaceRequest, MUSEUM);
+            Toast.makeText(this, "Caricamento dei Musei attorno a te", Toast.LENGTH_LONG)
+                    .show();
+            places(MUSEUM);
         });
 
         btnCinema.setOnClickListener(view -> {
             mMap.clear();
             circoscrizioneTorino();
-            Toast.makeText(MapActivity.this,
-                    "Caricamento dei Cinema attorno a te",
-                    Toast.LENGTH_SHORT).show();
-            findPlaceRequest = FindCurrentPlaceRequest.newInstance(Collections.singletonList(ID));
-            places(findPlaceRequest, MOVIE_THEATER);
+            Toast.makeText(this, "Caricamento dei Cinema attorno a te", Toast.LENGTH_LONG)
+                    .show();
+            places(MOVIE_THEATER);
         });
 
         btnRisto.setOnClickListener(view -> {
             mMap.clear();
             circoscrizioneTorino();
-            Toast.makeText(MapActivity.this,
-                    "Caricamento dei Ristoranti attorno a te",
-                    Toast.LENGTH_SHORT).show();
-            findPlaceRequest = FindCurrentPlaceRequest.newInstance(Collections.singletonList(ID));
-            places(findPlaceRequest, RESTAURANT);
+            Toast.makeText(this, "Caricamento dei Ristoranti attorno a te", Toast.LENGTH_LONG)
+                    .show();
+            places(RESTAURANT);
         });
 
     }
@@ -520,7 +542,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 
     /**
-     * Metodo per settare la toolbar dell'app
+     * Metodo per settare la toolbar
      */
     private void toolbar () {
         mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
@@ -541,7 +563,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     /**
      * Metodo per la gestione del Meteo
-     * Tramite l'OpenWeatherMap prendiamo i dati meteo di Torino e vengono stampati nella toolbar
+     * Tramite OpenWeatherMap, vengono presi i dati meteo di Torino per essere poi stampati nella toolbar
      */
     private void getCurrentWeather() {
         Retrofit retrofit = new Retrofit.Builder().baseUrl("http://api.openweathermap.org/")
@@ -574,18 +596,18 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 
     /**
-     * Metodo per la conversione da Kelvin a Celsius
-     * @return double il risultato della conversione
+     * Metodo per la conversione da gradi Kelvin a Celsius
+     * @return double Il risultato della conversione
      */
-    private double kelvinToCelsius (double grades){
+    private double kelvinToCelsius(double grades) {
         return grades - 273.15;
     }
 
 
     /**
-     * Metodo per la gestione del prezzo/persone (i primi 2 fragment)
-     * Vengono confrontati i dati inseriti dall'utente con i dati che noi abbiamo scelto
-     * @return int 0,1,2,3 o 4 che rappresentano 0="gratis", 1="economico", 2="medio", 3="medio-alto", 4="alto"
+     * Metodo per la gestione del prezzo/persone
+     * Vengono confrontati i dati inseriti dall'utente con i dati più pertinenti
+     * @return int 0="gratis", 1="economico", 2="medio", 3="medio-alto" e 4="alto"
      */
     private int gestioneDatiPrezzo () {
         int priceS = global.getBudgetStart();
@@ -625,38 +647,38 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 
     /**
-     * Metodo per la gestione del calendario (3 fragment)
+     * Metodo per la gestione del calendario
      * Viene prelevato il giorno della settimana in base alla data scelta dall'utente
-     * @return String il giorno della settimana
+     * @return DayOfWeek Il giorno della settimana
      */
-    public String gestioneDatiCalendario() {
+    private DayOfWeek gestioneDatiCalendario() {
         int timeD = global.getCalendarDay();
 
         if(timeD == 1) {
-            return "SUNDAY";
+            return DayOfWeek.SUNDAY;
         } else if(timeD == 2) {
-            return "MONDAY";
+            return DayOfWeek.MONDAY;
         } else if(timeD == 3) {
-            return "TUESDAY";
+            return DayOfWeek.TUESDAY;
         } else if (timeD == 4) {
-            return "WEDNESDAY";
+            return DayOfWeek.WEDNESDAY;
         } else if(timeD == 5) {
-            return  "THURSDAY";
+            return  DayOfWeek.THURSDAY;
         } else if(timeD == 6) {
-            return "FRIDAY";
+            return DayOfWeek.FRIDAY;
         } else if(timeD == 7) {
-            return "SATURDAY";
+            return DayOfWeek.SATURDAY;
         }
 
-        return "";
+        return null;
     }
 
 
     /**
-     * Metodo per la gestione degli alert dialog
+     * Metodo per la gestione degli Alert Dialog
      * @param title il titolo dell'alert
      * @param text il testo dell'alert
-     * @param exit se l'allert è di uscita dall'applicazione o generico
+     * @param exit se l'alert è dedicato per l'uscita dall'applicazione o generico
      */
     private void makeAlertDialog(String title, String text, boolean exit) {
         if (exit) {

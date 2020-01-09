@@ -466,7 +466,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
             }
 
-            tag.setPhone(place.getPhoneNumber());
+            if(place.getPhoneNumber() != null) {
+                tag.setPhone(place.getPhoneNumber());
+            }
 
             if (place.getPhotoMetadatas() != null) {
                 PhotoMetadata photoMetadata = place.getPhotoMetadatas().get(0);

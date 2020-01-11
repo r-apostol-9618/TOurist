@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,6 +20,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -94,6 +96,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private View mapView;
     private GlobalVariable global;
     private List<LatLng> polyline;
+    private boolean isFiltered;
 
     private final float DEFAULT_ZOOM = 18;
 
@@ -106,8 +109,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_map);
 
         global = GlobalVariable.getInstance();
-        global.setBackPeople(true);
-        global.setHandlerPeople(true);
+        global.setBackPeopleMap(false);
+
+        isFiltered = false;
 
         mToolbarArcBackground = findViewById(R.id.toolbarArcBackground);
         mAppBarLayout = findViewById(R.id.appbar);
@@ -142,7 +146,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         setPositionBtnGeo();
         checkGPS();
-        places(POINT_OF_INTEREST);
 
         filtriMarker();
 
@@ -162,7 +165,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onBackPressed() {
-        makeAlertDialog("Chiudi","Sei sicuro di voler uscire?",true);
+        if(isFiltered) {
+            Toast.makeText(this, "Reset dei luoghi di interesse", Toast.LENGTH_LONG)
+                    .show();
+            changePlaces(POINT_OF_INTEREST, false);
+        } else if(global.isBackPeopleMap()) {
+            super.onBackPressed();
+        } else {
+            makeAlertDialog("Scegli un'opzione", "", true);
+        }
     }
 
 
@@ -341,6 +352,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             LatLng mLastLocationLatLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLastLocationLatLng, DEFAULT_ZOOM));
             checkUserIntoTurin(mLastLocationLatLng);
+            places(POINT_OF_INTEREST);
         } else {
             locationCallback = new LocationCallback() {
                 @Override
@@ -442,11 +454,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         hourPlaceEnd = Objects.requireNonNull(p.getClose()).getTime().getHours();
                         minutePlaceEnd = p.getClose().getTime().getMinutes();
 
-                        if((hourStart < hourPlaceEnd) &&
-                                (hourStart >= hourPlaceStart && minuteStart >= minutePlaceStart)) {
+                        if(((hourStart < hourPlaceEnd) ||
+                                (hourStart == hourPlaceEnd && minuteStart < minutePlaceEnd)) &&
+                                    ((hourStart == hourPlaceStart && minuteStart >= minutePlaceStart)  ||
+                                        (hourStart > hourPlaceStart))) {
                             orario = "";
                             aperto = true;
-                            if((hourEnd >= hourPlaceEnd && minuteEnd > minutePlaceEnd)) {
+                            if(hourEnd >= hourPlaceEnd && minuteEnd > minutePlaceEnd) {
                                 orario = "Potrebbe chiudere prima dell'ora richiesta";
                             }
                         }
@@ -502,29 +516,39 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Button btnRisto = findViewById(R.id.btnRistoranti);
 
         btnMusei.setOnClickListener(view -> {
-            mMap.clear();
-            circoscrizioneTorino();
-            Toast.makeText(this, "Caricamento dei Musei attorno a te", Toast.LENGTH_LONG)
+            Toast.makeText(this, "Caricamento dei Musei intorno a te", Toast.LENGTH_LONG)
                     .show();
-            places(MUSEUM);
+            changePlaces(MUSEUM, true);
         });
 
         btnCinema.setOnClickListener(view -> {
-            mMap.clear();
-            circoscrizioneTorino();
-            Toast.makeText(this, "Caricamento dei Cinema attorno a te", Toast.LENGTH_LONG)
+            Toast.makeText(this, "Caricamento dei Cinema intorno a te", Toast.LENGTH_LONG)
                     .show();
-            places(MOVIE_THEATER);
+            changePlaces(MOVIE_THEATER, true);
         });
 
         btnRisto.setOnClickListener(view -> {
-            mMap.clear();
-            circoscrizioneTorino();
-            Toast.makeText(this, "Caricamento dei Ristoranti attorno a te", Toast.LENGTH_LONG)
+            Toast.makeText(this, "Caricamento dei Ristoranti intorno a te", Toast.LENGTH_LONG)
                     .show();
-            places(RESTAURANT);
+            changePlaces(RESTAURANT, true);
         });
 
+    }
+
+
+    /**
+     * Metodo per cambiare i tipi dei luoghi visulizzati
+     * Vengono cancellati i dati visulizzati sulla mappa, tranne la circoscrizione, per poi visulizzare
+     * quelli richiesti. Nel caso vengano visulizzati luoghi "filtrati", premendo back, potranno essere ripristinati
+     * i luoghi di "interesse".
+     * @param type il tipo di luogo
+     * @param filtered Flag se sono stati visulizzati i luoghi "filtrati"
+     */
+    private void changePlaces(Place.Type type, boolean filtered) {
+        mMap.clear();
+        circoscrizioneTorino();
+        places(type);
+        isFiltered = filtered;
     }
 
 
@@ -681,19 +705,30 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
      * Metodo per la gestione degli Alert Dialog
      * @param title il titolo dell'alert
      * @param text il testo dell'alert
-     * @param exit se l'alert è dedicato per l'uscita dall'applicazione o generico
+     * @param exit se l'alert è dedicato per il bottone back o generico
      */
     private void makeAlertDialog(String title, String text, boolean exit) {
         if (exit) {
-            new AlertDialog.Builder(this).setTitle(title).setMessage(text)
-                    .setPositiveButton("ESCI", (dialogInterface, i) -> {
-                        Intent intent = new Intent(MapActivity.this, MainActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        intent.putExtra("Exit", true);
-                        startActivity(intent);
-                        finish();
-                    }).setNegativeButton("ANNULLA", null)
-                    .show();
+            String[] choise = {"Reinserire i dati", "Esci"};
+            new AlertDialog.Builder(this).setTitle(title)
+                    .setSingleChoiceItems(choise, -1, null)
+                    .setPositiveButton("OK", (dialogInterface, i) -> {
+                        ListView lw = ((AlertDialog)dialogInterface).getListView();
+                        if(lw.getCheckedItemCount() > 0){
+                            switch(lw.getCheckedItemPosition()) {
+                                case 0:
+                                    findViewById(R.id.frame_map).setVisibility(View.VISIBLE);
+                                    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                                    fragmentTransaction.replace(R.id.frame_map, new PeopleFragment());
+                                    fragmentTransaction.addToBackStack(null);
+                                    fragmentTransaction.commit();
+                                    break;
+                                case 1:
+                                    finish();
+                                    break;
+                            }
+                        }
+                    }).show();
         } else {
             new AlertDialog.Builder(this).setTitle(title).setMessage(text)
                     .setPositiveButton("OK", null).show();

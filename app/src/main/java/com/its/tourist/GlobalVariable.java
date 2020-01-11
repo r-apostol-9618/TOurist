@@ -21,10 +21,12 @@ class GlobalVariable {
     private int calendarDay;
     private String timeStart;
     private String timeEnd;
+    private boolean backPeopleMap;
 
     private GlobalVariable() {
         backPeople = true;
         handlerPeople = true;
+        backPeopleMap = false;
         budgetStart = 0;
         budgetEnd = 0;
         typePerson = "singolo";
@@ -94,7 +96,15 @@ class GlobalVariable {
         return handlerPeople;
     }
 
-    void setHandlerPeople(boolean handlerPeople) {
-        this.handlerPeople = handlerPeople;
+    void setHandlerPeopleFalse() {
+        this.handlerPeople = false;
+    }
+
+    boolean isBackPeopleMap() {
+        return backPeopleMap;
+    }
+
+    void setBackPeopleMap(boolean backPeopleMap) {
+        this.backPeopleMap = backPeopleMap;
     }
 }

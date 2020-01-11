@@ -42,7 +42,8 @@ public class CustomMarkerInfoWindowView implements GoogleMap.InfoWindowAdapter, 
      */
     @Override
     public View getInfoWindow(Marker marker) {
-        @SuppressLint("InflateParams") View markerItemView = context.getLayoutInflater().inflate(R.layout.layout_markers, null);
+        @SuppressLint("InflateParams")
+        View markerItemView = context.getLayoutInflater().inflate(R.layout.layout_markers, null);
         TextView titoloCard = markerItemView.findViewById(R.id.titoloCard);
         TextView infoCard = markerItemView.findViewById(R.id.infoCard);
         ImageView imageCard = markerItemView.findViewById(R.id.imageCard);

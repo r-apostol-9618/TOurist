@@ -45,6 +45,7 @@ public class TimeFragment extends Fragment {
     private Calendar myCalendar;
     private TextView txtCalendar, txtStartTime, txtEndTime;
     private int hour, minute;
+    private GlobalVariable global;
 
 
     public TimeFragment() { }
@@ -59,6 +60,8 @@ public class TimeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        global = GlobalVariable.getInstance();
 
         txtCalendar = Objects.requireNonNull(getView()).findViewById(R.id.txtData);
         txtStartTime = getView().findViewById(R.id.timeBegin);
@@ -217,15 +220,15 @@ public class TimeFragment extends Fragment {
     private void toMapActivity() {
         assert this.getArguments() != null;
         Bundle bundle = this.getArguments();
-        GlobalVariable globalVariable = GlobalVariable.getInstance();
-        globalVariable.setBudgetStart(bundle.getInt("startBudget"));
-        globalVariable.setBudgetEnd(bundle.getInt("endBudget"));
-        globalVariable.setTypePerson(bundle.getString("numberOfPeople"));
-        globalVariable.setCalendarDay(myCalendar.get(Calendar.DAY_OF_WEEK));
-        globalVariable.setTimeStart(txtStartTime.getText().toString());
-        globalVariable.setTimeEnd(txtEndTime.getText().toString());
+        global.setBudgetStart(bundle.getInt("startBudget"));
+        global.setBudgetEnd(bundle.getInt("endBudget"));
+        global.setTypePerson(bundle.getString("numberOfPeople"));
+        global.setCalendarDay(myCalendar.get(Calendar.DAY_OF_WEEK));
+        global.setTimeStart(txtStartTime.getText().toString());
+        global.setTimeEnd(txtEndTime.getText().toString());
         Intent intent = new Intent(getActivity(), MapActivity.class);
         startActivity(intent);
+        Objects.requireNonNull(getActivity()).finish();
     }
 
 }

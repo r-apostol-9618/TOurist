@@ -32,12 +32,6 @@ public class MainActivity extends AppCompatActivity {
 
         global = GlobalVariable.getInstance();
         toPeople();
-
-        // Gestione dell'uscita da parte di MapActivity
-        if(getIntent().getBooleanExtra("Exit", false)){
-            finish();
-        }
-
     }
 
 
@@ -65,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
     private void toPeople(){
         run = () -> {
             findViewById(R.id.frame_main).setVisibility(View.VISIBLE);
-            findViewById(R.id.mainIntro).setVisibility(View.GONE);
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.frame_main, new PeopleFragment());
             fragmentTransaction.addToBackStack(null);

@@ -216,7 +216,7 @@ public class ToolbarArcBackground extends View {
         path.moveTo(0, getMeasuredHeight());
 
         //arco
-        path.quadTo(getMeasuredWidth() / 2, getMeasuredHeight() - waveHeight * scale, getMeasuredWidth(), getMeasuredHeight());
+        path.quadTo(getMeasuredWidth() >> 2, getMeasuredHeight() - waveHeight * scale, getMeasuredWidth(), getMeasuredHeight());
 
         path.lineTo(0, getMeasuredHeight());
         path.close();

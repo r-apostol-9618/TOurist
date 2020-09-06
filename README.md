@@ -1,50 +1,64 @@
-Progetto TOurist
+# Progetto TOurist :airplane:
 
-L'Idea TOurist è un progetto Android nato con lo scopo di dare una mano ai turisti che vengono a visitare la città di Torino.
+TOurist is an Android project created with the aim of lending a hand to tourists who come to visit the city of Turin.
 
-Volevamo dare ai nostri utenti un resoconto veloce dei posti di interesse, in modo rapido, senza registrazioni o pagamenti in app.
+We wanted to give our users a quick report of places of interest, quickly, without registering or paying in the app.
 
-All'avvio, l'app richiede 3 informazioni all'utente:
- - Selezionare il numero di persone
- - Selezionare il budget in possesso
- - Selezionare il tempo a disposizione
+At startup, the app requests 3 information from the user:
+ - The number of people you are with
+ - The budget you want to spend
+ - The time at your disposal
  
-Dopo che vengono inseriti i dati, verrà mostrata una mappa con i punti di interesse relativi e in alto, all'interno della toolbar, la temperatura esterna in quel momento. 
+After the data is entered, a map will be shown with the relative points of interest and at the top, inside the toolbar, the outside temperature at that time.
 
-Ogni scelta dell'utente nelle prime 3 schermate modificheranno il risultato finale.
+Each user's choice in the first 3 screens will modify the final result.
 
-Nella prima schermata, relativa al numero di persone, l'utente può selezionare 3 scelte: "Singolo", "In coppia" o "In gruppo".
+### The number of people you are with
+In the first screen, relating to the number of people, the user can select 3 choices: "Single", "In couple" or "In group".
 
-Nella seconda schermata, quella relativa al budget in possesso, l'utente può selezionare due scelte: "Gratuito" o inserire un range di quanto denaro vuole spendere tramite un "Range Picker".
+<img src="demoFirstScreen.gif" width="300" />
 
-Le prime due schermate sono strettamente collegate tra loro:
+### The budget you want to spend
+In the second screen, the one relating to the budget in possession, the user can select two choices: "Free" or enter a range of how much money he wants to spend through a "Range Picker".
 
-Ogni scelta condizionerà la schermata successiva, ad esempio se si seleziona "Singolo", allora la gestione della schermata relativa al budget verrà trattata in modo differente, inserire 100 euro come budget a disposizione per un "Singolo", darà un risultato diverso rispetto a selezionare 100 euro per un "Gruppo".
+The first two screens are closely linked to each other:
 
-Nella terza schermata, quella relativa al tempo a disposizione, l'utente può selezionare il giorno tramite un bottone che funge da calendario, ed infine se ha tutto il giorno a disposizione o solo un range temporale, sempre tramite selezione.
+Each choice will affect the next screen, for example if you select "Single", then the management of the budget screen will be treated differently, enter 100 euros as the budget available for a "Single", it will give a different result than selecting 100 euros for a "Group".
 
-Infine, si avvia la quarta ed ultima schermata, con toolbar, mappa e tre pulsanti nella parte inferiore. 
+<img src="demoSecondScreen.gif" width="300" />
 
-Qui verrà chiesto all'utente di attivare il gps, per la geolocalizzazione, e se l'utente si troverà al di fuori di Torino, verrà mostrato un popup di informazione, potendo comunque usare l'app anche se non nella sua funzione principale.
+### The time at your disposal
+In the third screen, the one relating to the time available, the user can select the day using a button that acts as a calendar, and finally if he has the whole day available or only a time range, again by selecting.
 
-Nella toolbar viene visualizzato a sinistra il nome dell'app ed a destra la temperatura esterna in quel preciso momento.
+<img src="demoThirdScreen.gif" width="300" />
 
-Sulla mappa vengono mostrati i punti di interesse tramite dei marker in base alle scelte fatte fino ad ora. 
+### Map Result
 
-Al click sull'marker che ci interessa, verranno visualizzate le informazioni principali del posto selezionato tramite un custom layout, se alcuni dati non sono stati resi noti, verrà modificato il layout di conseguenza.
+Finally, the fourth and final screen starts, with toolbar, map and three buttons at the bottom.
 
-La mappa, come anche la toolbar, cambieranno in base all'ora. 
+Here the user will be asked to activate the GPS, for geolocation, and if the user is outside of Turin, an information popup will be shown, being able to use the app even if not in its main function.
 
-Se l'app viene aperta di notte, lo stile della mappa e della toolbar cambieranno, sono stati utilizzati due stili differenti per il giorno e la notte.
+The app name is displayed on the left in the toolbar and the outside temperature at that precise moment on the right.
 
-Nella parte inferiore, vengono visualizzati tre pulsanti: musei, cinema e ristoranti, utilizzati per filtrare il tipo di posto visualizzato nella mappa.
+The points of interest are shown on the map by means of markers based on the choices made so far.
+
+By clicking on the marker that interests us, the main information of the selected seat will be displayed through a custom layout, if some data have not been disclosed, the layout will be modified accordingly.
+
+The map, as well as the toolbar, will change according to the time.
+
+<img src="demoMapScreen.gif" width="300" />
+
+If the app is opened at night, the style of the map and the toolbar will change, two different styles have been used for day and night. :city_sunset:
+
+<img src="demoMapNightScreen.gif" width="300" />
+
+At the bottom, we have three buttons that are displayed: museums, cinemas and restaurants, used to filter the type of place displayed on the map.
 
 ---
 
-Tecnologie principali
+### :books: Libraries we used 
+Maps SDK - for map management
 
-Maps SDK - per la gestione della mappa
+Places SDK - to access Google's database of information about places around the user
 
-Places SDK - per accedere al database di Google di informazioni sui posti attorno all'utente
-
-OpenWeather - per la gestione dei dati meteorologici
+OpenWeather - for managing meteorological data

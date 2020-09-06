@@ -1,4 +1,4 @@
-# Progetto TOurist :airplane:
+# TOurist :airplane:
 
 TOurist is an Android project created with the aim of lending a hand to tourists who come to visit the city of Turin.
 
